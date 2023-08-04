@@ -11,9 +11,9 @@ public:
 int MyClass::ZERO=0.001;
 int MyClass::myFunction(int a, int b) {
   float fff = a + b / 10  + MyClass::ZERO     ;  char chr   = ( char ) ( 0.9 * a / b + fff * 100 )   ;
-  MY_VAR_DECL_STMT(1)
+  MY_VAR_DECL_STMT(888)
   int x,y,z;
-  MY_VAR_PLUS_STMT(1)
-  MY_VAR_DECL_STMT(2)
+  MY_VAR_PLUS_STMT(888)
+  MY_VAR_DECL_STMT(999)
   return a + b;
 }
