@@ -9,6 +9,7 @@ public:
 };
 int MyClass::ZERO=0.001;
 int MyClass::myFunction(int a, int b) {
+  auto fn=[a,b](){int zc= a*b/34.0 ;  return zc; }   ;
   float fff = a + b / 10  + MyClass::ZERO     ;  char chr   = ( char ) ( 0.9 * a / b + fff * 100 )   ;
   MY_VAR_DECL_STMT
   int x,y,z;

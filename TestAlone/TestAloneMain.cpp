@@ -147,6 +147,7 @@ int main() {
   CI.createSourceManager(CI.getFileManager());
 
   CI.getLangOpts().CPlusPlus = true;
+  CI.getLangOpts().CPlusPlus14=true;
 
   CI.getTargetOpts().Triple= "x86_64-pc-linux-gnu";
 
