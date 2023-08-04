@@ -96,6 +96,20 @@ int main() {
         macroText += tokenText.str();
       }
 
+      // 处理宏参数
+      if (MI->isFunctionLike()) {
+//        const clang::MacroInfo::ArgumentList& args = MI->params();
+        auto args = MI->params();
+        macroText += "(";
+        for (unsigned i = 0; i < args.size(); ++i) {
+          if (i > 0) {
+            macroText += ", ";
+          }
+          macroText += args[i]->getName().str();
+        }
+        macroText += ")";
+      }
+
       // 打印宏展开后的文本
       std::cout << "Macro Expansion: " << macroText << std::endl;
     }
