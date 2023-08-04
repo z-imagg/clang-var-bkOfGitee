@@ -70,9 +70,12 @@ int main() {
 
 //region 获取宏名、宏展开后文本
   for (clang::Preprocessor::macro_iterator I = _PP.macro_begin(), E = _PP.macro_end(); I != E; ++I) {
+//    const clang::MacroInfo *MI = I->second;
+
     const clang::IdentifierInfo *II = I->first;
     const StringRef &IdentifierName = II->getName();
     const clang::MacroInfo *MI = _PP.getMacroInfo(II);
+    if (MI) {
     //不显示内置宏
     if(MI->isBuiltinMacro()){
       continue;
@@ -81,27 +84,25 @@ int main() {
     if(!SM.isWrittenInMainFile(MI->getDefinitionLoc())){
       continue;
     }
-    if (MI) {
       // 获取宏展开后的标记序列
-//      clang::MacroInfo::tokens_iterator TI = MI->tokens_begin();
-//      clang::MacroInfo::tokens_iterator TE = MI->tokens_end();
-      const Token* TI = MI->tokens_begin();
-      const Token* TE = MI->tokens_end();
+      const clang::Token *tokens = MI->tokens().data();
+      unsigned numTokens = MI->tokens().size();
 
       // 将标记序列转换为文本
       std::string macroText;
-      for (; TI != TE; ++TI) {
-        const clang::Token &token = *TI;
-        const StringRef &tokenText = clang::Lexer::getSourceText(clang::CharSourceRange::getTokenRange(token.getLocation()), SM, LO);
-        macroText += (" "+ tokenText.str() );
+      for (unsigned i = 0; i < numTokens; ++i) {
+        const clang::Token &token = tokens[i];
+        StringRef tokenText=clang::Lexer::getSourceText(clang::CharSourceRange::getTokenRange(token.getLocation()), SM, CI.getLangOpts());
+        macroText += tokenText.str();
       }
 
       // 打印宏展开后的文本
-      std::cout << "宏名字:【" << IdentifierName.str() << "】，宏展开:【" << macroText <<"】"<< std::endl;
+      std::cout << "Macro Expansion: " << macroText << std::endl;
     }
   }
 
 //endregion
+
 
   return 0;
 }
