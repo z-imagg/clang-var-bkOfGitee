@@ -2,7 +2,9 @@
 # ======================================================
 
 
-set(CTk_SOURCES
+set(Brc_SOURCES
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Brc/BrcAstAct.cpp"
+
 "${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/Util.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/LocId.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Brc/BrcVst.cpp"
@@ -14,7 +16,7 @@ set(CTk_SOURCES
     add_library(
             BrcPlugin
       SHARED
-      ${CTk_SOURCES}
+      ${Brc_SOURCES}
       )
 
 target_link_libraries(BrcPlugin

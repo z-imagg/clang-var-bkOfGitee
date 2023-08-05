@@ -29,14 +29,51 @@ using namespace clang;
 
 
 
-void BrcVst::letLRBraceWrapRangeBfBf(SourceLocation B, SourceLocation E, const char* whoInserted ){
-  mRewriter_ptr->InsertTextBefore(B,"{");
+void BrcVst::letLRBraceWrapRangeAftBf(SourceLocation B, SourceLocation E, const char* whoInserted ){
+
+  //region 如果被包裹语句 处在宏中 则不处理 直接返回。
+  if(
+    Util::LocIsInMacro(B,SM)
+    ||
+    Util::LocIsInMacro(E,SM)
+  ){
+    return;
+  }
+  //endregion
+
+  //region 跳过非MainFile. 场景: '#include "xxx.def"', 跳过xxx.def， 即 不修改xxx.def
+  if( !Util::LocFileIDEqMainFileID(SM, B) || !Util::LocFileIDEqMainFileID(SM, E) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return  ;
+  }
+  //endregion
+
+
+  //region 获取主文件ID,文件路径
+  FileID mainFileId;
+  std::string filePath;
+  Util::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  //endregion
+
+  //region 若此位置已经插入过左花括号, 则不再插入，防止重复
+  LocId LBraceLocId=LocId::buildFor(filePath, B, SM);
+  if(Util::LocIdSetContains(LBraceLocIdSet,LBraceLocId)){
+    return ;
+  }
+  //endregion
+
+  //region 插入左右花括号
+  mRewriter_ptr->InsertTextAfterToken(B,"{");
 
   std::string comment;
   Util::wrapByComment(whoInserted,comment);
   std::string RBraceStr("}"+comment);
 
+  //记录已插入左花括号的节点ID们以防重： 即使重复遍历了 但不会重复插入
+  LBraceLocIdSet.insert(LBraceLocId);
+  
   mRewriter_ptr->InsertTextBefore(E,RBraceStr);
+  //endregion
 }
 
 /**
@@ -46,17 +83,66 @@ void BrcVst::letLRBraceWrapRangeBfBf(SourceLocation B, SourceLocation E, const c
  * @return
  */
 void BrcVst::letLRBraceWrapStmtBfAfTk(Stmt *stmt, const char* whoInserted){
-  mRewriter_ptr->InsertTextBefore(stmt->getBeginLoc(),"{");
+  SourceLocation beginLoc = stmt->getBeginLoc();
+  SourceLocation endLoc = stmt->getEndLoc();
+  
+  //region 如果被包裹语句 处在宏中 则不处理 直接返回。
+
+  if(
+    Util::LocIsInMacro(beginLoc,SM)
+    ||
+    Util::LocIsInMacro(endLoc,SM)
+  ){
+    return;
+  }
+  //endregion
+
+  //region 跳过非MainFile. 场景: '#include "xxx.def"', 跳过xxx.def， 即 不修改xxx.def
+  if( !Util::LocFileIDEqMainFileID(SM, beginLoc) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return  ;
+  }
+  //endregion
+
+
+  //region 获取主文件ID,文件路径
+  FileID mainFileId;
+  std::string filePath;
+  Util::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  //endregion
+
+  //region 若此位置已经插入过左花括号, 则不再插入，防止重复
+  LocId LBraceLocId=LocId::buildFor(filePath, beginLoc, SM);
+  if(Util::LocIdSetContains(LBraceLocIdSet,LBraceLocId)){
+    return ;
+  }
+  //endregion
+
+  //region 插入左右花括号
 
   bool endIsSemicolon=false;
   SourceLocation endSemicolonLoc = Util::getStmtEndSemicolonLocation(stmt,SM,endIsSemicolon);
-  if(endIsSemicolon){
+  if(endIsSemicolon &&
+
+//bug场景举例:for体为无分号单语句，比如switch，找 该体 末尾分号 将得到for外后其他语句的无关分号 此明显错误,
+// 解决办法:找到的分号位置须在体内
+//   即 找到的分号位置 必须 小于等于 体结束位置
+  endSemicolonLoc<=endLoc
+  ){
+    //只有找到分号位置，才可以插入左右花括号。
+    //   不能造成插入了左花括号，却没找到分号，然后没法插入右花括号，也没法撤销左花括号，而陷入语法错误。
+    mRewriter_ptr->InsertTextBefore(stmt->getBeginLoc(),"{");
+
     std::string comment;
     Util::wrapByComment(whoInserted,comment);
     std::string RBraceStr("}"+comment);
 
     mRewriter_ptr->InsertTextAfterToken(endSemicolonLoc,RBraceStr);
+
+    //记录已插入左花括号的节点ID们以防重： 即使重复遍历了 但不会重复插入
+    LBraceLocIdSet.insert(LBraceLocId);
   }
+  //endregion
 
 }
 
@@ -69,16 +155,23 @@ bool BrcVst::TraverseIfStmt(IfStmt *ifStmt){
   }
   //endregion
 
+  //region 跳过非MainFile
+  if( !Util::LocFileIDEqMainFileID(SM, ifStmt->getBeginLoc()) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return false;
+  }
+  //endregion
+  
   //region 自定义处理: if的then语句、else语句 若非块语句 则用花括号包裹
 
   Stmt *thenStmt = ifStmt->getThen();
   if(thenStmt && !Util::isAloneContainerStmt(thenStmt) )  {
-    letLRBraceWrapStmtBfAfTk(thenStmt, "TraverseIfStmt:thenStmt");
+    letLRBraceWrapStmtBfAfTk(thenStmt, "BrcThen");
   }
 
   Stmt *elseStmt = ifStmt->getElse();
   if(elseStmt && !Util::isAloneContainerStmt(elseStmt) ) {
-    letLRBraceWrapStmtBfAfTk(elseStmt, "TraverseIfStmt:elseStmt");
+    letLRBraceWrapStmtBfAfTk(elseStmt, "BrcElse");
   }
 //endregion 自定义处理 完毕
 
@@ -93,7 +186,11 @@ bool BrcVst::TraverseIfStmt(IfStmt *ifStmt){
   }
   //endregion
 
-  return false;
+
+  //继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回true  表示继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回false 表示从此结束遍历，遍历剩余不再遍历
+  return true;
 }
 bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
   //region 若NULL，直接返回
@@ -102,10 +199,17 @@ bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
   }
   //endregion
 
+  //region 跳过非MainFile
+  if( !Util::LocFileIDEqMainFileID(SM, whileStmt->getBeginLoc()) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return false;
+  }
+  //endregion
+
   //region 自定义处理: while的循环体语句 若非块语句 则用花括号包裹
   Stmt *bodyStmt = whileStmt->getBody();
   if(bodyStmt && !Util::isAloneContainerStmt(bodyStmt) )  {
-    letLRBraceWrapStmtBfAfTk(bodyStmt, "TraverseWhileStmt");
+    letLRBraceWrapStmtBfAfTk(bodyStmt, "BrcWhl");
   }
 
   //endregion 自定义处理 完毕
@@ -121,7 +225,10 @@ bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
   }
   //endregion
 
-  return false;
+  //继续遍历剩余源码
+//  TraverseXxxStmt末尾返回true  表示继续遍历剩余源码
+//  TraverseXxxStmt末尾返回false 表示从此结束遍历，遍历剩余不再遍历
+  return true;
 }
 
 bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
@@ -131,10 +238,19 @@ bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
   }
   //endregion
 
+  //region 跳过非MainFile
+  if( !Util::LocFileIDEqMainFileID(SM, forStmt->getBeginLoc()) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return false;
+  }
+  //endregion
+
+//  Util::printStmt(*Ctx,CI,"forStmt","",forStmt, true); //开发用打印
+
   //region 自定义处理: for的循环体语句 若非块语句 则用花括号包裹
   Stmt *bodyStmt = forStmt->getBody();
   if(bodyStmt && !Util::isAloneContainerStmt(bodyStmt) )  {
-    letLRBraceWrapStmtBfAfTk(bodyStmt, "TraverseForStmt");
+    letLRBraceWrapStmtBfAfTk(bodyStmt, "BrcFor");
   }
   //endregion
 
@@ -148,11 +264,23 @@ bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
 //    }
   }
   //endregion
+
+  //继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回true  表示继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回false 表示从此结束遍历，遍历剩余不再遍历
   return false;
 }
 
 
 bool BrcVst::TraverseSwitchStmt(SwitchStmt *switchStmt){
+  
+  //region 跳过非MainFile
+  if( !Util::LocFileIDEqMainFileID(SM, switchStmt->getBeginLoc()) ){
+//    Util::printStmt(CI,"查看","暂时不对间接文件插入时钟语句",stmt, true); //开发用打印
+    return false;
+  }
+  //endregion
+
   SwitchCase *caseList = switchStmt->getSwitchCaseList();
   LangOptions &LO = CI.getLangOpts();
 
@@ -181,7 +309,7 @@ bool BrcVst::TraverseSwitchStmt(SwitchStmt *switchStmt){
 
     //开始位置为冒号的下一个Token所在位置
     //    注意此方法中的代码 是否在任何情况下都能实现 移动到下一个位置 有待确定
-    beginLoc = Util::nextTokenLocation(scK->getColonLoc(),SM,LO);
+    beginLoc = scK->getColonLoc();
 
 
 
@@ -231,9 +359,84 @@ bool BrcVst::TraverseSwitchStmt(SwitchStmt *switchStmt){
 
     //如果case体不是块，才用花括号包裹.
     if(!subStmtIsCompound){
-      letLRBraceWrapRangeBfBf(beginLoc, endLoc,
-                              "TraverseSwitchStmt"
-      );
+      bool caseKInMacro=false;
+
+      //region 该case中是否含有宏，若有宏，不加花括号。 虽然有误杀，但保险。
+      std::string msg;
+      CaseStmt *caseK=NULL;
+      if ( isa<CaseStmt>(*scK)) {
+        caseK = dyn_cast<CaseStmt>(scK);
+        Stmt::StmtClass caseKSCls = caseK->getStmtClass();//  clang::Stmt::CaseStmtClass
+
+        bool isMacroEllipsisLoc = Util::LocIsInMacro(caseK->getEllipsisLoc(), SM);
+        caseKInMacro = caseKInMacro || isMacroEllipsisLoc;
+        bool isMacroCaseKBeginLoc = Util::LocIsInMacro(caseK->getBeginLoc(),SM);
+        caseKInMacro = caseKInMacro || isMacroCaseKBeginLoc;
+        msg=fmt::format("{},isMacroEllipsisLoc={},isMacroCaseKBeginLoc={},",msg,isMacroEllipsisLoc,isMacroCaseKBeginLoc);
+      }else if ( isa<DefaultStmt>(*scK)) {
+        DefaultStmt *defaultK = dyn_cast<DefaultStmt>(scK);
+        bool isMacro_defaultKColonLoc = Util::LocIsInMacro(defaultK->getColonLoc(),SM);
+        caseKInMacro = caseKInMacro || isMacro_defaultKColonLoc;
+        msg=fmt::format("{},isMacro_defaultKColonLoc={},",msg,isMacro_defaultKColonLoc);
+      }
+
+
+      Stmt *scKSubStmt = scK->getSubStmt();
+      bool isMacroScKSubStmtBeginLoc = Util::LocIsInMacro(scKSubStmt->getBeginLoc(),SM);
+      caseKInMacro = caseKInMacro || isMacroScKSubStmtBeginLoc;
+      bool isMacroScKSubStmtEndLoc = Util::LocIsInMacro(scKSubStmt->getEndLoc(),SM);
+      caseKInMacro = caseKInMacro || isMacroScKSubStmtEndLoc;
+      msg=fmt::format("{},isMacroScKSubStmtBeginLoc={},isMacroScKSubStmtEndLoc={},",msg,isMacroScKSubStmtBeginLoc,isMacroScKSubStmtEndLoc);
+
+      SourceLocation scKB = scK->getBeginLoc();
+      bool isMacro_scKB = Util::LocIsInMacro(scKB,SM);
+      caseKInMacro = caseKInMacro || isMacro_scKB;
+      msg=fmt::format("{},isMacro_scKB={},",msg,isMacro_scKB);
+
+      SourceLocation scKE = scK->getEndLoc();
+      bool isMacro_scKE = Util::LocIsInMacro(scKE,SM);
+      caseKInMacro = caseKInMacro || isMacro_scKE;
+      msg=fmt::format("{},isMacro_scKE={},",msg,isMacro_scKE);
+
+      bool isMacro_beginLoc = Util::LocIsInMacro(beginLoc,SM);
+      caseKInMacro = caseKInMacro || isMacro_beginLoc;
+      bool isMacro_endLoc = Util::LocIsInMacro(endLoc,SM);
+      caseKInMacro = caseKInMacro || isMacro_endLoc;
+      msg=fmt::format("{},isMacro_beginLoc={},isMacro_endLoc={},",msg,isMacro_beginLoc,isMacro_endLoc);
+
+      SourceLocation beginLocNext=Util::nextTokenLocation(beginLoc,SM,LO);
+      bool isMacro_beginLocNext = Util::LocIsInMacro(beginLocNext,SM);
+      caseKInMacro = caseKInMacro || isMacro_beginLocNext;
+      msg=fmt::format("{},isMacro_beginLocNext={},",msg,isMacro_beginLocNext);
+
+      SourceLocation beginLocPrev=Util::nextTokenLocation(beginLoc,SM,LO,-1);
+      bool isMacro_beginLocPrev = Util::LocIsInMacro(beginLocPrev,SM);
+      caseKInMacro = caseKInMacro || isMacro_beginLocPrev;
+      msg=fmt::format("{},isMacro_beginLocPrev={},",msg,isMacro_beginLocPrev);
+
+      SourceLocation endLocPrev=Util::nextTokenLocation(endLoc,SM,LO,-1);
+      bool isMacro_endLocPrev = Util::LocIsInMacro(endLocPrev,SM);
+      caseKInMacro = caseKInMacro || isMacro_endLocPrev;
+      msg=fmt::format("{},isMacro_endLocPrev={},",msg,isMacro_endLocPrev);
+
+      SourceLocation ColonLoc=scK->getColonLoc();
+      bool isMacro_ColonLoc = Util::LocIsInMacro(ColonLoc,SM);
+      caseKInMacro = caseKInMacro || isMacro_ColonLoc;
+      msg=fmt::format("{},isMacro_ColonLoc={},",msg,isMacro_ColonLoc);
+      //endregion. 。
+
+      if(
+      //该case中若有宏，不加花括号。 虽然有误杀，但保险。
+        !caseKInMacro
+      ) {
+      int line=-1,col=-1;
+      Util::extractLineAndColumn(SM,scK->getBeginLoc(),line,col);
+      msg=fmt::format("{},line={}...col={},",msg,line,col);
+//      Util::printStmt(*Ctx,CI,"scK",msg,scK,true);//开发用
+        letLRBraceWrapRangeAftBf(beginLoc, endLoc, "BrcSw");
+      }
+      
+
     }
   }
 
@@ -262,7 +465,13 @@ SwitchCase::getEndLoc 表达的 case结尾位置 基本都不对， case1的结�
     TraverseStmt(scK);
   }
   //endregion
-  return false;
+
+
+  //继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回true  表示继续遍历剩余源码
+  //  TraverseXxxStmt末尾返回false 表示从此结束遍历，遍历剩余不再遍历
+  return true;
 }
+
 
 

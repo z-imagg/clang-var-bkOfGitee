@@ -34,7 +34,7 @@ public:
     }
 
 
-    void letLRBraceWrapRangeBfBf(SourceLocation B, SourceLocation E, const char* whoInserted="");
+    void letLRBraceWrapRangeAftBf(SourceLocation B, SourceLocation E, const char* whoInserted="");
     void letLRBraceWrapStmtBfAfTk(Stmt *stmt, const char* whoInserted="");
 
     virtual bool TraverseIfStmt(IfStmt *ifStmt);
@@ -52,6 +52,9 @@ public:
     ASTContext *Ctx;
     CompilerInstance& CI;
     SourceManager& SM;
+
+    //一个位置若是插入了花括号，则表明此位置不需要再次插入花括号了。
+    std::unordered_set<LocId,LocId> LBraceLocIdSet;
 
 };
 
