@@ -1,5 +1,5 @@
 
-bool calc(char op,short x, int y, float z, int& r){
+/**__BrcOkFlagText*/bool calc(char op,short x, int y, float z, int& r){
   int sum=0;
   int diff;
   short mul;
@@ -7,11 +7,11 @@ bool calc(char op,short x, int y, float z, int& r){
 
   if (op='*' )
     if (y>128)
-      x=0  ;
+      {x=0  ;}/*TraverseIfStmt:thenStmt*/
     else if (x>64)
-      y++   ;
+      {y++   ;}/*TraverseIfStmt:thenStmt*/
     else
-      z--   ;//只到这里 ，即只到第14条语句， 这是 第一批if，  即 第一批if后的剩余源码都没有Visit
+      {z--   ;}/*TraverseIfStmt:elseStmt*///只到这里 ，即只到第14条语句， 这是 第一批if，  即 第一批if后的剩余源码都没有Visit，显然第一批if后剩余源码也没有被插入花括号
 
 
   if(op='/' && y==0)
