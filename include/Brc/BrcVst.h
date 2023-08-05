@@ -45,6 +45,9 @@ public:
 
     virtual bool TraverseSwitchStmt(SwitchStmt *switchStmt);
 
+    bool VisitStmt(clang::Stmt *stmt) ;
+
+
 public:
     const std::shared_ptr<Rewriter> mRewriter_ptr;
 

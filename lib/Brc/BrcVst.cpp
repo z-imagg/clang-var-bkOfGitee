@@ -334,4 +334,11 @@ SwitchCase::getEndLoc 表达的 case结尾位置 基本都不对， case1的结�
   return true;
 }
 
+bool BrcVst::VisitStmt(clang::Stmt *stmt) {
+  static int 语句计数器=0;
+  Util::printStmt(*Ctx,CI,"访问语句","第"+std::to_string(++语句计数器) +"个语句",stmt,true);
+  //语句计数器: 共102条语句
+  return true;
+}
+
 
