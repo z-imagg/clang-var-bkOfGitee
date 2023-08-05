@@ -28,10 +28,16 @@ using namespace clang;
 
 
 
-bool BrcVst::insertLRBrace(LocId LBraceLocId, SourceLocation LBraceLoc ,LocId RBraceLocId, SourceLocation RBraceLoc , const char* whoInserted){
-  return true;
-}
 
+void BrcVst::letLRBraceWrapRangeBfBf(SourceLocation B, SourceLocation E, const char* whoInserted ){
+  mRewriter_ptr->InsertTextBefore(B,"{");
+
+  std::string comment;
+  Util::wrapByComment(whoInserted,comment);
+  std::string RBraceStr("}"+comment);
+
+  mRewriter_ptr->InsertTextBefore(E,RBraceStr);
+}
 
 /**
  * 用左右花括号包裹给定语句
@@ -39,60 +45,44 @@ bool BrcVst::insertLRBrace(LocId LBraceLocId, SourceLocation LBraceLoc ,LocId RB
  * @param whoInserted
  * @return
  */
-bool BrcVst::letLRBraceWrapStmt(Stmt *stmt, const char* whoInserted){
+void BrcVst::letLRBraceWrapStmtBfAfTk(Stmt *stmt, const char* whoInserted){
   mRewriter_ptr->InsertTextBefore(stmt->getBeginLoc(),"{");
-  const SourceLocation &stmtEndLoc = stmt->getEndLoc();
 
-  //输入1. 假设 stmt为: 'x = y + z ;'
-  //输入2. 假设 stmt为: 'x = y + MyClass::ZERO;'
+  bool endIsSemicolon=false;
+  SourceLocation endSemicolonLoc = Util::getStmtEndSemicolonLocation(stmt,SM,endIsSemicolon);
+  if(endIsSemicolon){
+    std::string comment;
+    Util::wrapByComment(whoInserted,comment);
+    std::string RBraceStr("}"+comment);
 
-  //写法A: 肯定是错
-//  mRewriter_ptr->InsertTextAfter(stmtEndLoc,"}");
-  //错,A 结果1:'{x = y + }z ;'
-  //错,A 结果2:'{x = y + MyClass::}ZERO;'
-
-  //写法B: 肯定是错，但比写法A好一点
-//  mRewriter_ptr->InsertTextAfterToken(stmtEndLoc,"}");
-  //错,B 结果1:'{x = y + z} ;'
-  //错,B 结果2:'{x = y + MyClass::ZERO};'
-
-  //写法C: 分号左边单词非空格时对、分号左边是空格时错，但比写法A、B都
-  SourceLocation NextTokenEndLoc = Lexer::getLocForEndOfToken(stmtEndLoc, 0, SM, CI.getLangOpts());
-  mRewriter_ptr->InsertTextAfterToken(NextTokenEndLoc,"}");
-  //错,C 结果1: '{x = y + z} ;'
-  //     分号左边单词非空格时对
-  //对,C 结果2:'{x = y + MyClass::ZERO;}'
-  //     分号紧挨着左边单词
+    mRewriter_ptr->InsertTextAfterToken(endSemicolonLoc,RBraceStr);
+  }
 
 }
 
 
 
 bool BrcVst::TraverseIfStmt(IfStmt *ifStmt){
-  /////////////////////////对当前节点compoundStmt做 自定义处理
-
+  //region 若NULL，直接返回
   if(!ifStmt){
     return false;
   }
+  //endregion
+
+  //region 自定义处理: if的then语句、else语句 若非块语句 则用花括号包裹
 
   Stmt *thenStmt = ifStmt->getThen();
-  if(thenStmt)  {
-    bool thenIsCompoundStmt=isa<CompoundStmt>(*thenStmt);
-    if ( !thenIsCompoundStmt ) {
-      letLRBraceWrapStmt(thenStmt,"");
-    }
+  if(thenStmt && !Util::isAloneContainerStmt(thenStmt) )  {
+    letLRBraceWrapStmtBfAfTk(thenStmt, "TraverseIfStmt:thenStmt");
   }
 
   Stmt *elseStmt = ifStmt->getElse();
-  if(elseStmt) {
-    bool elseIsCompoundStmt=isa<CompoundStmt>(*elseStmt);
-    if (!elseIsCompoundStmt ) {
-      letLRBraceWrapStmt(elseStmt,"");
-    }
+  if(elseStmt && !Util::isAloneContainerStmt(elseStmt) ) {
+    letLRBraceWrapStmtBfAfTk(elseStmt, "TraverseIfStmt:elseStmt");
   }
-///////////////////// 自定义处理 完毕
+//endregion 自定义处理 完毕
 
-////////////////////  将递归链条正确的接好:  对 当前节点ifStmt的下一层节点child:{then,else}  调用顶层方法TraverseStmt(child)
+  //region  将递归链条正确的接好:  对 当前节点ifStmt的下一层节点child:{then,else}  调用顶层方法TraverseStmt(child)
 
   if(thenStmt){
       TraverseStmt  (thenStmt);
@@ -101,81 +91,178 @@ bool BrcVst::TraverseIfStmt(IfStmt *ifStmt){
   if(elseStmt){
     TraverseStmt(elseStmt);
   }
+  //endregion
 
-  return true;
+  return false;
 }
 bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
-/////////////////////////对当前节点whileStmt做 自定义处理
-  if(Util::parentIsCompound(Ctx,whileStmt)){
-    letLRBraceWrapStmt(whileStmt, "TraverseWhileStmt");
+  //region 若NULL，直接返回
+  if(!whileStmt){
+    return false;
   }
-///////////////////// 自定义处理 完毕
+  //endregion
 
-////////////////////  将递归链条正确的接好:  对 当前节点whileStmt的下一层节点child:{body} 调用顶层方法TraverseStmt(child)
+  //region 自定义处理: while的循环体语句 若非块语句 则用花括号包裹
   Stmt *bodyStmt = whileStmt->getBody();
-  if(bodyStmt){
-
-    Stmt::StmtClass bodyStmtClass = bodyStmt->getStmtClass();
-    if(bodyStmtClass==Stmt::StmtClass::CompoundStmtClass){
-      //这一段可以替代shouldInsert
-      /**只有当while的循环体是 块语句 时, 该 循环体，才需要 经过 TraverseStmt(循环体) ---...--->TraverseCompoundStmt(循环体) 转交，在 TraverseCompoundStmt(循环体) 中 对 该循环体中的每条子语句前 插入 时钟调用语句.
-       * 形如:
-       * while(...)
-       * {
-       * ...;//这里是 while的循环体, 是一个块语句，需要 对 循环体中的每条子语句前 插入 时钟调用语句.
-       * }
-       */
-      TraverseStmt(bodyStmt);
-    }
-    /**否则 while的循环体 肯定是一个单行语句，无需插入 时钟调用语句.
-     * 形如 :
-     * while(...)
-     *   ...;// 这里是 while的循环体, 是一个单行语句，无需插入 时钟调用语句.
-     */
+  if(bodyStmt && !Util::isAloneContainerStmt(bodyStmt) )  {
+    letLRBraceWrapStmtBfAfTk(bodyStmt, "TraverseWhileStmt");
   }
-  return true;
-}
 
-bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
-/////////////////////////对当前节点forStmt做 自定义处理
-  if(Util::parentIsCompound(Ctx,forStmt)){
-    letLRBraceWrapStmt(forStmt, "TraverseForStmt");
-  }
-///////////////////// 自定义处理 完毕
+  //endregion 自定义处理 完毕
 
-////////////////////  将递归链条正确的接好:  对 当前节点forStmt的下一层节点child:{body} 调用顶层方法TraverseStmt(child)
-  Stmt *bodyStmt = forStmt->getBody();
+  //region  将递归链条正确的接好:  对 当前节点whileStmt的下一层节点child:{body} 调用顶层方法TraverseStmt(child)
   if(bodyStmt){
     Stmt::StmtClass bodyStmtClass = bodyStmt->getStmtClass();
 //    if(bodyStmtClass==Stmt::StmtClass::CompoundStmtClass){
-      //这一段可以替代shouldInsert
+//是否向下层遍历 与 本节点whileStmt的直接子结点 是否为 块语句 无关，因为 whileStmt的深层子结点 可能是块语句
+//	即使whileStmt的直接子节点不是块语句 但不影响 whileStmt的深层子结点 可能是块语句
       TraverseStmt(bodyStmt);
 //    }
   }
-  return true;
+  //endregion
+
+  return false;
+}
+
+bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
+  //region 若NULL，直接返回
+  if(!forStmt){
+    return false;
+  }
+  //endregion
+
+  //region 自定义处理: for的循环体语句 若非块语句 则用花括号包裹
+  Stmt *bodyStmt = forStmt->getBody();
+  if(bodyStmt && !Util::isAloneContainerStmt(bodyStmt) )  {
+    letLRBraceWrapStmtBfAfTk(bodyStmt, "TraverseForStmt");
+  }
+  //endregion
+
+  //region  将递归链条正确的接好:  对 当前节点forStmt的下一层节点child:{body} 调用顶层方法TraverseStmt(child)
+  if(bodyStmt){
+    Stmt::StmtClass bodyStmtClass = bodyStmt->getStmtClass();
+//    if(bodyStmtClass==Stmt::StmtClass::CompoundStmtClass){
+//是否向下层遍历 与 本节点forStmt的直接子结点 是否为 块语句 无关，因为 forStmt的深层子结点 可能是块语句
+//	即使forStmt的直接子节点不是块语句 但不影响 forStmt的深层子结点 可能是块语句
+      TraverseStmt(bodyStmt);
+//    }
+  }
+  //endregion
+  return false;
 }
 
 
+bool BrcVst::TraverseSwitchStmt(SwitchStmt *switchStmt){
+  SwitchCase *caseList = switchStmt->getSwitchCaseList();
+  LangOptions &LO = CI.getLangOpts();
 
-bool BrcVst::TraverseCaseStmt(CaseStmt *caseStmt) {
+  std::vector<SwitchCase*> caseVec;
+  //这里假定了: SwitchCase::getNextSwitchCase 获取的顺序 目前 看是  书写case的次序的逆序,
+  //    但不能排除 出现  乱须 毫无规律，所以 排序 才靠谱
+  for (SwitchCase* switchCase = caseList; switchCase; switchCase = switchCase->getNextSwitchCase()) {
+    caseVec.push_back(switchCase);
+  }
 
-/////////////////////////对当前节点caseStmt 不做 自定义处理
-///////////////////// 自定义处理 完毕
+  //对各个case语句 按开始位置 升序 排序
+  std::sort(caseVec.begin(), caseVec.end(), [](clang::SwitchCase* lhs, clang::SwitchCase* rhs) {
+      return lhs->getBeginLoc() < rhs->getBeginLoc();
+  });
 
-////////////////////  粘接直接子节点到递归链条:  对 当前节点caseStmt的下一层节点中的单情况体  调用顶层方法TraverseStmt(单情况体)
-                                /////case的其他子节点，比如 'case 值:' 中的 '值' 不做处理。
-  Stmt *body = caseStmt->getSubStmt();//不太确定 case.getSubStmt 是 获取case的单情况体
-  if(body){
-    Stmt::StmtClass bodyStmtClass = body->getStmtClass();
-    if(bodyStmtClass==Stmt::StmtClass::CompoundStmtClass){
-      //这一段可以替代shouldInsert
-      TraverseStmt(body);
+  SourceLocation beginLoc;
+  SourceLocation endLoc;
+  size_t caseCnt = caseVec.size();
+  for(int k=0; k < caseCnt; k++){
+    SwitchCase* scK=caseVec[k];
+
+    Stmt *subStmt = scK->getSubStmt();
+//    Util::printStmt(*Ctx,CI,"sub","",subStmt,true);
+//    Util::printStmt(*Ctx,CI,"scK","",scK,true);
+    bool subStmtIsCompound = isa<CompoundStmt>(*subStmt);
+
+    //开始位置为冒号的下一个Token所在位置
+    //    注意此方法中的代码 是否在任何情况下都能实现 移动到下一个位置 有待确定
+    beginLoc = Util::nextTokenLocation(scK->getColonLoc(),SM,LO);
+
+
+
+
+    if(k<caseCnt-1){
+      endLoc=caseVec[k+1]->getBeginLoc();
+    }else{
+      endLoc=switchStmt->getEndLoc();
+    }
+    if ( isa<CaseStmt>(*scK)) {
+      CaseStmt *caseK = dyn_cast<CaseStmt>(scK);
+
+
+      //region 输出case 后表达式 , 开发用
+//      Expr *LHS = caseK->getLHS();
+//      LangOptions &LO = CI.getLangOpts();
+//      Token tk;
+//      Lexer::getRawToken(LHS->getExprLoc(),tk,SM,LO,true);
+//      bool invalid;
+//      const std::string &tkStr = Lexer::getSpelling(tk, SM, LO, &invalid);
+//
+//      llvm::outs() << "case " << tkStr << ":";
+      //endregion
+
+    }else if ( isa<DefaultStmt>(*scK)) {
+      DefaultStmt *defaultK = dyn_cast<DefaultStmt>(scK);
+
+      //region 输出default , 开发用
+//      llvm::outs() << "default "  << ":";
+      //endregion
+    }
+
+//    if(subStmtIsCompound){
+//      //case6 应该是块，被 case7 前的注释干扰 导致误判
+//      //  TODO： 如果要完善，nextTokenLocation(nextTokenLocation(... 需要N个nextTokenLocation嵌套，其中遇到注释的时候 忽略 继续嵌套, 直到第一个非注释？才做 < endLoc的判断?
+//      //  简单点可以把这段 块1后还有语句 的逻辑 整个去掉，会导致 一些需要{}的case 没被加上了{}, 估计影响不大?.
+//      bool 块1后还有语句=Util::nextTokenLocation(Util::nextTokenLocation(subStmt->getEndLoc(),SM,LO),SM,LO) < endLoc;
+//      if(块1后还有语句){
+//        subStmtIsCompound=false;
+//      }
+//    }
+
+    //region 开发用输出
+//    llvm::outs() << ",是否块:"<< std::to_string(subStmtIsCompound) <<",case开始: " << beginLoc.printToString(SM)
+//    << ", case结束: " << endLoc.printToString(SM) << "\n";
+    //endregion
+
+    //如果case体不是块，才用花括号包裹.
+    if(!subStmtIsCompound){
+      letLRBraceWrapRangeBfBf(beginLoc, endLoc,
+                              "TraverseSwitchStmt"
+      );
     }
   }
-  return true;
+
+
+  /**输出
+case 0:,是否块:1,case开始: /pubx/clang-brc/test_in/test_main.cpp:23:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:30:7
+case 1:,是否块:0,case开始: /pubx/clang-brc/test_in/test_main.cpp:30:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:34:7
+case 2:,是否块:0,case开始: /pubx/clang-brc/test_in/test_main.cpp:34:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:38:7
+case 3:,是否块:0,case开始: /pubx/clang-brc/test_in/test_main.cpp:38:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:40:7
+case 4:,是否块:1,case开始: /pubx/clang-brc/test_in/test_main.cpp:40:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:47:7
+case 6:,是否块:1,case开始: /pubx/clang-brc/test_in/test_main.cpp:47:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:52:7
+case 7:,是否块:1,case开始: /pubx/clang-brc/test_in/test_main.cpp:52:14, case结束: /pubx/clang-brc/test_in/test_main.cpp:56:7
+default :,是否块:0,case开始: /pubx/clang-brc/test_in/test_main.cpp:56:15, case结束: /pubx/clang-brc/test_in/test_main.cpp:59:5
+
+
+case语句列表 按 开始位置 升序 排序
+当前case结束位置 用下一个case开始位置表示， 最后一个case结束位置 用整个switch的结束位置表示
+当前case开始位置 用case或default后的冒号的位置
+SwitchCase::getEndLoc 表达的 case结尾位置 基本都不对， case1的结尾只能用case2的开始来表达了。
+   */
+
+
+  //region  将递归链条正确的接好:  对 当前节点ifStmt的下一层节点child:{then,else}  调用顶层方法TraverseStmt(child)
+  for(int k=0; k < caseCnt; k++) {
+    SwitchCase *scK = caseVec[k];
+    TraverseStmt(scK);
+  }
+  //endregion
+  return false;
 }
-
-
-
 
 

@@ -34,9 +34,8 @@ public:
     }
 
 
-    bool insertLRBrace(LocId LBraceLocId, SourceLocation LBraceLoc ,LocId RBraceLocId, SourceLocation RBraceLoc , const char* whoInserted);
-
-    bool letLRBraceWrapStmt(Stmt *stmt, const char* whoInserted="");
+    void letLRBraceWrapRangeBfBf(SourceLocation B, SourceLocation E, const char* whoInserted="");
+    void letLRBraceWrapStmtBfAfTk(Stmt *stmt, const char* whoInserted="");
 
     virtual bool TraverseIfStmt(IfStmt *ifStmt);
 
@@ -44,7 +43,7 @@ public:
 
     virtual bool TraverseForStmt(ForStmt *forStmt);
 
-    virtual bool TraverseCaseStmt(CaseStmt *caseStmt);
+    virtual bool TraverseSwitchStmt(SwitchStmt *switchStmt);
 
 public:
     const std::shared_ptr<Rewriter> mRewriter_ptr;
