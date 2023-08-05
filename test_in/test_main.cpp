@@ -11,7 +11,7 @@ bool calc(char op,short x, int y, float z, int& r){
     else if (x>64)
       y++   ;
     else
-      z--   ;
+      z--   ;//只到这里 ，即只到第14条语句， 这是 第一批if，  即 第一批if后的剩余源码都没有Visit
 
 
   if(op='/' && y==0)

@@ -131,7 +131,7 @@ bool BrcVst::TraverseIfStmt(IfStmt *ifStmt){
   //遍历完 第一批if 即 当前if ，后面可能还有第二批if 需要继续遍历，因此这里要返回true 表示继续遍历
   //  如果这里返回false，会导致第二批if 不会被遍历, 即 不会有 本方法TraverseIfStmt(第二批if), 这显然不是想要的.
   //  理论上 应该是 这里返回false 表示 从当前位置开始 后续剩余的源码不再遍历 ，而 第二批if 显然在后续剩余源码中，因此 第二批if 显然不会被遍历
-  return true;
+  return false;
 }
 bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
   //region 若NULL，直接返回
@@ -168,7 +168,7 @@ bool BrcVst::TraverseWhileStmt(WhileStmt *whileStmt){
 
   //继续遍历剩余源码
   //  继续遍历从当前位置到结束的剩余源码?
-  return true;
+  return false;
 }
 
 bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
@@ -205,7 +205,7 @@ bool BrcVst::TraverseForStmt(ForStmt *forStmt) {
 
   //继续遍历剩余源码
   //  继续遍历从当前位置到结束的剩余源码?
-  return true;
+  return false;
 }
 
 
@@ -331,7 +331,7 @@ SwitchCase::getEndLoc 表达的 case结尾位置 基本都不对， case1的结�
 
   //继续遍历剩余源码
   //  继续遍历从当前位置到结束的剩余源码?
-  return true;
+  return false;
 }
 
 bool BrcVst::VisitStmt(clang::Stmt *stmt) {
