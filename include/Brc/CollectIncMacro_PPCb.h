@@ -33,6 +33,9 @@ public:
 
     static bool hasInclusionDirective(SourceManager& SM, SourceRange range);
     static bool hasMacroDefined(SourceManager& SM, SourceRange range);
+
+    //此方法CollectIncMacro_PPCb::MacroExpands只是在宏展开时被调用，在这里很难获取到展开后的宏文本.
+//    void MacroExpands(const Token &MacroNameTok, const MacroDefinition &MD, SourceRange Range, const MacroArgs *Args) override;
 };
 
 
