@@ -8,6 +8,10 @@ MESSAGE("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(TestAlone_SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../TestAlone/TestAloneMain.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Brc/RangeHasMacroAstVst.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Brc/CollectIncMacro_PPCb.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/Util.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/LocId.cpp"
 
 )
 
@@ -22,6 +26,7 @@ set(TestAlone_SOURCES
     TestAlone
       PRIVATE
     "${LIBFMT_INCLUDE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../base_home/include/"
     )
 
     # Link in the required libraries
