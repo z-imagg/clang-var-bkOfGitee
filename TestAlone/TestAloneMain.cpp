@@ -108,6 +108,8 @@ int main() {
   //启用 PreprocessingRecord
   //  DetailedRecord默认为false，若不设置DetailedRecord为true，则 Preprocessor::getPreprocessingRecord 为NULL
   CI.getPreprocessor().getPreprocessorOpts().DetailedRecord = true;
+//  CI.getPreprocessor().DisableMacroExpansion=true;
+//  CI.getPreprocessor().InMacroArgPreExpansion=true;
   CI.getPreprocessor().Initialize(*targetInfo);
   //endregion
 
@@ -144,6 +146,8 @@ int main() {
   //region 添加输入源码文件
   FrontendInputFile srcFile = clang::FrontendInputFile("/pubx/clang-brc/test_in/test_main.cpp", clang::InputKind(clang::Language::CXX));
   CI.getFrontendOpts().Inputs.push_back(srcFile);
+  CI.getFrontendOpts().ProgramAction=frontend::ActionKind::RewriteMacros;
+  CI.getFrontendOpts().ProgramAction=frontend::ActionKind::PrintPreprocessedInput;
   //endregion
 
   //region 运行自定义Action
@@ -160,6 +164,9 @@ int main() {
   Preprocessor & _PP=CI.getPreprocessor();
 
   PreprocessingRecord *PPRecord = _PP.getPreprocessingRecord();
+  std::vector<PreprocessedEntity*> vec(PPRecord->begin(),PPRecord->end());
+
+
   const FileID &mainFileID = SM.getMainFileID();
 
   const SourceLocation &BF = SM.getLocForStartOfFile(mainFileID);
@@ -174,7 +181,9 @@ int main() {
   auto itPreprocessedEntities = PPRecord->getPreprocessedEntitiesInRange(BE);
   std::vector<PreprocessedEntity*> PreprocessedEntityVec(itPreprocessedEntities.begin(), itPreprocessedEntities.end());
 
-  for(PreprocessedEntity* entity: PreprocessedEntityVec){
+//  for(PreprocessedEntity* entity: PreprocessedEntityVec){//这PreprocessedEntityVec里面没有宏展开后文本
+  for(PreprocessedEntity* entity: vec){
+    std::cout << entity->getKind() <<"\n";
     if (entity->getKind() == clang::PreprocessedEntity::MacroExpansionKind) {
       clang::MacroExpansion* macroExpansion = static_cast<clang::MacroExpansion*>(entity);
       const std::string &__name = macroExpansion->getName()->getName().str();
