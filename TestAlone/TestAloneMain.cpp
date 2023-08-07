@@ -143,5 +143,31 @@ int main() {
   }
   //endregion
 
+  PreprocessingRecord *PPRecord = PP.getPreprocessingRecord();
+  const FileID &mainFileID = SM.getMainFileID();
+
+  const SourceLocation &BF = SM.getLocForStartOfFile(mainFileID);
+  const SourceLocation &EF = SM.getLocForEndOfFile(mainFileID);
+
+  //位置:  人类不可读的轻量级SourceLocation转为人类可读的PresumedLoc
+  const PresumedLoc &BFPr = SM.getPresumedLoc(BF);
+  const PresumedLoc &EFPr = SM.getPresumedLoc(EF);
+
+  SourceRange BE(BF,EF);
+
+  //一个未知类型的迭代器，获知其中元素类型步骤:
+  //  1. 拿到迭代器 类型写成auto
+  auto 其中元素类型未知的迭代器 = PPRecord->getPreprocessedEntitiesInRange(BE);
+  //  2. 将 *迭代器.begin() 写成一类型为auto的变量,
+  //      此时clion会在该变量右侧以灰暗的字提示该变量类型，通常是某种类型的指针
+  //      虽然clion提示了类型，但不代表此行代码 中的 *迭代器.begin() 运行不会崩溃，实际上在这里这行代码运行即崩溃
+  auto 元素0=*其中元素类型未知的迭代器.begin();
+  //      这里元素0的类型是 PreprocessedEntity*
+  PreprocessedEntity* ele0=*其中元素类型未知的迭代器.begin();
+  //  3. 获得了元素类型后，即可将 该迭代器 转为一向量，
+  //      迭代器转为vector，通常不会报错.
+  std::vector<PreprocessedEntity*> vec(其中元素类型未知的迭代器.begin(), 其中元素类型未知的迭代器.end());
+
+
   return 0;
 }
