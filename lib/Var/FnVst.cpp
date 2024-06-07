@@ -54,6 +54,27 @@ bool FnVst::insert_init__After_FnBdLBrc( bool useCXX,LocId fnBdLBrcLocId,std::st
     return insertResult_init ;
 }
 
+
+//在lambda表达式的introducer的左方括号紧后插入对变量_vdLs的capture
+bool FnVst::insert__capture__After_IntroducerLBrc(LocId lambdaExprIntroducerBeginLocId, std::string funcName, SourceLocation lambdaExprIntroducer  ){
+    //region 构造插入语句
+    std::string cStr_init=fmt::format(
+        "{} /* lamba表达式的capture, func:{}, Line:{},Column:{} */",
+        Constant::capture,
+        funcName,
+        lambdaExprIntroducerBeginLocId.line, lambdaExprIntroducerBeginLocId.column
+    );
+    llvm::StringRef strRef_init(cStr_init);
+    bool insertResult_init=mRewriter_ptr->InsertTextAfterToken(lambdaExprIntroducer , strRef_init);
+    //endregion
+
+    //记录已插入语句的节点ID们以防重： 即使重复遍历了 但不会重复插入
+    //用lambdaExprIntroducerBeginLocIdSet的尺寸作为LocationId的计数器
+    lambdaExprIntroducerBeginLocIdSet.insert(lambdaExprIntroducerBeginLocId);
+
+    return insertResult_init ;
+}
+
 bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
 //  Util::printDecl(*Ctx,CI,"TraverseFunctionDecl","FunDecl源码",funcDecl,true);
     //跳过非MainFile
@@ -248,7 +269,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
       return false;
     }
   }
-
+  const LambdaExpr::capture_range &xx = lambdaExpr->captures();
   //获得 函数体、左右花括号
 //  Stmt* body  = funcDecl->getBody();
   CompoundStmt* compoundStmt = lambdaExpr->getCompoundStmtBody();
@@ -283,6 +304,11 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   LocId funcBodyLBraceLocId=LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
   LocId funcBodyRBraceLocId=LocId::buildFor(filePath, funcBodyRBraceLoc, SM);
 
+  const SourceRange introducerRange = lambdaExpr->getIntroducerRange();
+  const SourceLocation introducerBeginLoc = introducerRange.getBegin();
+  //按照lambda的introducer的左方括号，构建位置id，防止重复插入
+  LocId introducerBeginLocId=LocId::buildFor(filePath, introducerBeginLoc, SM);
+
   //获取返回类型
   CXXRecordDecl *cxxRecordDecl = lambdaExpr->getLambdaClass();
   // funcReturnType:
@@ -297,9 +323,11 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
     funcReturnType=cxxMethodDecl->getReturnType();
   }
 
+  if(Util::LocIdSetNotContains(lambdaExprIntroducerBeginLocIdSet, introducerBeginLocId)) {//若没有
+    this->insert__capture__After_IntroducerLBrc(introducerBeginLocId, funName, introducerBeginLoc);
+  }
+
   //lambda一定有body
-
-
   return this->_Traverse_Func(
         funcReturnType,
         false,
