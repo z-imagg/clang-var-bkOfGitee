@@ -244,7 +244,7 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
           funcQualifiedName
       );
 }
-bool VisitLambdaExpr(LambdaExpr *Lambda) {
+bool FnVst::VisitLambdaExpr(LambdaExpr *Lambda) {
 
 }
 bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
