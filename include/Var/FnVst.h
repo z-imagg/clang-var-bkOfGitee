@@ -36,6 +36,7 @@ public:
     }
 
     bool insert_init__After_FnBdLBrc( bool useCXX,LocId fnBdLBrcLocId,std::string funcName, SourceLocation funcBodyLBraceLoc , SourceLocation funcBodyRBraceLoc );
+    bool insert__capture__After_IntroducerLBrc(LocId lambdaExprIntroducerBeginLocId, std::string funcName, SourceLocation lambdaExprIntroducer  );
     virtual bool TraverseFunctionDecl(FunctionDecl* funcDecl);
 /* c++构造函数声明和实现 在不在同一个源文件 中 对于 TraverseCXXMethodDecl 的差异
 1. c++构造函数声明和实现分开放时,TraverseCXXMethodDecl并不会遍历这样的构造函数实现,因此FnVst需要明确写出TraverseCXXConstructorDecl
@@ -77,6 +78,8 @@ public:
 
     //函数体左花括号紧后
     std::unordered_set<LocId,LocId> fnBdLBrcLocIdSet;
+    //lambda表达式紧前
+    std::unordered_set<LocId,LocId> lambdaExprIntroducerBeginLocIdSet;
 };
 
 
