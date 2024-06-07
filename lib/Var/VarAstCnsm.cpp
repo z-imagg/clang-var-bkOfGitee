@@ -120,10 +120,10 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
        if(clang::FunctionDecl *funDecl = dyn_cast<clang::FunctionDecl>(D)){
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
-         bool focusFunc=this->fnVst.TraverseDecl(funDecl);//A1
+         bool focusFunc=this->fnVst.TraverseFunctionDecl(funDecl);//A1
          if(focusFunc){
-           this->retVst.TraverseDecl(funDecl);//B1
-           this->varDeclVst.TraverseDecl(funDecl);//C1
+           this->retVst.TraverseFunctionDecl(funDecl);//B1
+           this->varDeclVst.TraverseFunctionDecl(funDecl);//C1
          }
        }
      }else{
