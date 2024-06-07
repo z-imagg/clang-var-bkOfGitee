@@ -244,6 +244,9 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
           funcQualifiedName
       );
 }
+bool VisitLambdaExpr(LambdaExpr *Lambda) {
+
+}
 bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   if(sizeof(lambdaExpr)<0){//以这样一句话暂时跳过lambda
     return false;
