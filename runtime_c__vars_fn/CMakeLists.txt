@@ -66,6 +66,11 @@ target_include_directories(clangPlgVar_runtime_c
     "/app/clibs--list/src"
     "/app/antirez--sds/"
     )
+
+# 设置静态库编译选项
+target_compile_options(clangPlgVar_runtime_c
+        "-fPIC"
+)
 #静态库 结束
 
 
