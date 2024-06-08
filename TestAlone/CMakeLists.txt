@@ -6,13 +6,13 @@ MESSAGE("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 MESSAGE("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 #CMAKE_CURRENT_SOURCE_DIR: /pubx/clang-var/tools
 
+#导入变量 base_util__SOURCES
+include("${CMAKE_CURRENT_SOURCE_DIR}/../base_home/base_util.cmake")
 set(TestAlone_SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../TestAlone/TestAloneMain.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/RangeHasMacroAstVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/CollectIncMacro_PPCb.cpp"
-"${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/Util.cpp"
-"${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/StrUtil.cpp"
-"${CMAKE_CURRENT_SOURCE_DIR}/../base_home/impl/base/LocId.cpp"
+"${base_util__SOURCES}"
 
 )
 
