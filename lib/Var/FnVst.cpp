@@ -330,7 +330,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
     funcReturnType=cxxMethodDecl->getReturnType();
   }
 
-  if(Util::LocIdSetNotContains(lambdaExprIntroducerBeginLocIdSet, introducerBeginLocId)) {//若没有
+  if(UtilLocId::LocIdSetNotContains(lambdaExprIntroducerBeginLocIdSet, introducerBeginLocId)) {//若没有
     this->insert__capture__After_IntroducerLBrc(introducerBeginLocId, funName, introducerBeginLoc);
   }
 
