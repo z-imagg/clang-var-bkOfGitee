@@ -16,7 +16,5 @@ public:
   constexpr static   const char* fnNameS__createVar[]={"createVar__RtC00", "createVar__RtCxx"};
   constexpr static   const char* fnNameS__destroyVar[]={"destroyVarLs_inFn__RtC00", "destroyVarLs_inFn__RtCxx"};
 
-  constexpr static   const char* capture="&_vdLs" ;
-
 };
 #endif //Var_CONSTANT_H
