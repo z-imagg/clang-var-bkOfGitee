@@ -2,6 +2,7 @@
 #include "MyClz.h"
 #include <algorithm>
 #include <list>
+#include "runtime_cpp__vars_fn.h"
 
 void funcEatLambdaFunc01(my_nsp::MyClass *(*func01)(my_nsp::UserEntity *)){_VarDeclLs * _vdLs=_init_varLs_inFn__RtCxx("/fridaAnlzAp/clang-var/test_in/test_main.cpp", "funcEatLambdaFunc01", 5, 75); /* 初始化函数变量列表, */
   my_nsp::ScoreRelation sR1;createVar__RtCxx(_vdLs, "my_nsp::ScoreRelation", 1)  /* 创建变量通知,  /fridaAnlzAp/clang-var/test_in/test_main.cpp:6,28 */ ;
