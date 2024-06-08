@@ -68,8 +68,8 @@ target_include_directories(clangPlgVar_runtime_c
     )
 
 # 设置静态库编译选项
-target_compile_options(clangPlgVar_runtime_c
-        "-fPIC"
+target_compile_options(clangPlgVar_runtime_c PRIVATE
+-fPIC
 )
 #静态库 结束
 

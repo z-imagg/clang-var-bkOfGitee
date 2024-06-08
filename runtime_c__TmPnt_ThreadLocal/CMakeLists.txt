@@ -35,8 +35,8 @@ target_include_directories(clangPlgVar_runtime_c_TmPnt_ThrLcl  PUBLIC
 )
 
 # 设置静态库编译选项
-target_compile_options(clangPlgVar_runtime_c_TmPnt_ThrLcl
-"-fPIC"
+target_compile_options(clangPlgVar_runtime_c_TmPnt_ThrLcl PRIVATE
+-fPIC
 )
 # libclangPlgVar_runtime_c_TmPnt_ThrLcl.a 结束
 

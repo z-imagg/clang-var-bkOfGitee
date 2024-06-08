@@ -46,7 +46,7 @@ target_include_directories(clangPlgVar_runtime_cxx PUBLIC
 )
 
 # 设置静态库编译选项
-target_compile_options(clangPlgVar_runtime_cxx
-"-fPIC"
+target_compile_options(clangPlgVar_runtime_cxx PRIVATE
+-fPIC
 )
 #静态库 结束
