@@ -12,6 +12,7 @@ int main(int argc, char** argv){
     struct Point pnt3;
   }
 
+  T_Pnt_typedef point4;//typedef过的类型 声明的变量 缺少跟踪语句
 
   std::list<my_nsp::MyClass*> ls;
 

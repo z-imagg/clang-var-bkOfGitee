@@ -11,6 +11,11 @@ struct Point{
     double y;
 };
 
+typedef struct _Pnt_{
+  float x;
+  double y;
+} T_Pnt_typedef;
+
 namespace my_nsp {
 
     class UserEntity{};
