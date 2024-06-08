@@ -44,4 +44,9 @@ target_include_directories(clangPlgVar_runtime_cxx PUBLIC
 #本c++运行时 依赖模块 runtime_c__TmPnt_ThreadLocal， 所以依赖 本c++运行时 的应用 一定要添加依赖 runtime_c__TmPnt_ThreadLocal
     "${runtime_c__TmPnt_ThreadLocal__include}"
 )
+
+# 设置静态库编译选项
+target_compile_options(clangPlgVar_runtime_cxx PRIVATE
+-fPIC
+)
 #静态库 结束

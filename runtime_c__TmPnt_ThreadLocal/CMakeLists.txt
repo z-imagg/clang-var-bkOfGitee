@@ -33,6 +33,11 @@ add_library(clangPlgVar_runtime_c_TmPnt_ThrLcl STATIC
 target_include_directories(clangPlgVar_runtime_c_TmPnt_ThrLcl  PUBLIC
 "${runtime_c__TmPnt_ThreadLocal__include}"
 )
+
+# 设置静态库编译选项
+target_compile_options(clangPlgVar_runtime_c_TmPnt_ThrLcl PRIVATE
+-fPIC
+)
 # libclangPlgVar_runtime_c_TmPnt_ThrLcl.a 结束
 
 # _c__test_main.elf 开始
