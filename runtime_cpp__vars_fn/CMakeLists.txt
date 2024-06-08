@@ -4,6 +4,9 @@ MESSAGE("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 
 MESSAGE("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
+#要求c++不省略rtti
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
+
 set(runtime_cpp__SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/runtime_cpp__vars_fn.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/TestMain_Cpp.cpp"
