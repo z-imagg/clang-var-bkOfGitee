@@ -13,7 +13,8 @@
 
 #include "base/MyAssert.h"
 #include "Var/Constant.h"
-
+#include "base/UtilParentKind.h"
+#include "base/UtilMainFile.h"
 
 
 using namespace llvm;
@@ -49,7 +50,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     //获取主文件ID,文件路径
     FileID mainFileId;
     std::string filePath;
-    Util::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
 
     const SourceLocation declStmtBgnLoc = declStmt->getEndLoc();
 
@@ -58,7 +59,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     //   请注意 'T var2;' 的父亲是CompoundStmt
     DynTypedNode parent;
     ASTNodeKind parentNK;
-    bool only1P = Util::only1ParentNodeKind(CI, *Ctx, declStmt, parent, parentNK);
+    bool only1P = UtilParentKind::only1ParentNodeKind(CI, *Ctx, declStmt, parent, parentNK);
     assert(only1P);
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
     if(parentNKIsForStmt){
@@ -198,17 +199,17 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 }
 
 /**  clang::Type::Auto == typeClass , 但是typeName不同 , typeName为 'class (lambda at ...)' 或 typeName='class ...'
-tag1,title1,parent0NodeKind:CompoundStmt,nodeID:2305,文件路径、坐标:</fridaAnlzAp/clang-var/test_in/test_main.cpp:31:9, line:36:10>,getStmtClassName:DeclStmt,getStmtClass:12,mainFileId:1,fileId:1,源码:【auto fn_point = [](const Point& point) {
+tag1,title1,parent0NodeKind:CompoundStmt,nodeID:2305,文件路径、坐标:</fridaAnlzAp/clp-zz/test_in/test_main.cpp:31:9, line:36:10>,getStmtClassName:DeclStmt,getStmtClass:12,mainFileId:1,fileId:1,源码:【auto fn_point = [](const Point& point) {
             if(point.x>point.y)
                 return point.x+point.y;
             else
                 return 0.1;
         }】
-typeName='class (lambda at /fridaAnlzAp/clang-var/test_in/test_main.cpp:31:25)',typeClass=14,typeClassName=Auto,isBuiltinType=false
-qualTypeAsStr=class (lambda at /fridaAnlzAp/clang-var/test_in/test_main.cpp:31:25)
+typeName='class (lambda at /fridaAnlzAp/clp-zz/test_in/test_main.cpp:31:25)',typeClass=14,typeClassName=Auto,isBuiltinType=false
+qualTypeAsStr=class (lambda at /fridaAnlzAp/clp-zz/test_in/test_main.cpp:31:25)
 [返回]likeStruct==true
 
-tag1,title1,parent0NodeKind:CompoundStmt,nodeID:2483,文件路径、坐标:</fridaAnlzAp/clang-var/test_in/test_main.cpp:42:9, col:42>,getStmtClassName:DeclStmt,getStmtClass:12,mainFileId:1,fileId:1,源码:【auto user_auto_var = UserEntity()】
+tag1,title1,parent0NodeKind:CompoundStmt,nodeID:2483,文件路径、坐标:</fridaAnlzAp/clp-zz/test_in/test_main.cpp:42:9, col:42>,getStmtClassName:DeclStmt,getStmtClass:12,mainFileId:1,fileId:1,源码:【auto user_auto_var = UserEntity()】
 typeName='class UserEntity',typeClass=14,typeClassName=Auto,isBuiltinType=false
 qualTypeAsStr=class UserEntity
 
