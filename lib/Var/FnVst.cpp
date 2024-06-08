@@ -270,8 +270,9 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   }
 
   //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
+  //  lambda表达式写在一行是很常见的, 因此要求该lambda表达式体内无语句时才跳过
   bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
-  if(funcBodyLRBraceInSameLine){
+  if(funcBodyLRBraceInSameLine && stmtCntInFuncBody == 0){
     return false;
   }
 

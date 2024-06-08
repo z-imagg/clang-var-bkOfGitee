@@ -1,17 +1,26 @@
 #include "MyClz.h"
-
+#include <algorithm>
+#include <list>
+#include "runtime_cpp__vars_fn.h"
 
 
 int main(int argc, char** argv){
-    my_nsp::MyClass varMyClass;
-    static Point pnt1;
-    struct Point pnt2;
-    {
-        struct Point * ptr1=&pnt1;
-        struct Point * ptr2=&pnt2;
-        struct Point pnt3;
-    }
+  my_nsp::MyClass varMyClass;
+  static Point pnt1;
+  struct Point pnt2;
+  {
+    struct Point * ptr1=&pnt1;
+    struct Point * ptr2=&pnt2;
+    struct Point pnt3;
+  }
 
-    return 0;
+
+  std::list<my_nsp::MyClass*> ls;
+
+  std::for_each(ls.begin(), ls.end(), [](my_nsp::MyClass* k){ my_nsp::MyClass* idx=k; return k; });
+
+  return 0;
 }
+
+
 
