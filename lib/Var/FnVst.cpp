@@ -231,13 +231,15 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
       );
 }
 bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
-  if(sizeof(lambdaExpr)<0){//以这样一句话暂时跳过lambda
+  if(sizeof(lambdaExpr)<0){
+    std::cout<<fmt::format("TraverseLambdaExpr跳过代号1");
     return false;
   }
 
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,lambdaExpr->getBeginLoc());
   if(!_LocFileIDEqMainFileID){
+    std::cout<<fmt::format("TraverseLambdaExpr跳过代号2");
     return false;
   }
   //跳过 default
@@ -252,6 +254,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
         capture.getCaptureKind() == clang::LCK_ByCopy ||
         capture.getCaptureKind() == clang::LCK_ByRef
     ) {
+      std::cout<<fmt::format("TraverseLambdaExpr跳过代号3");
       return false;
     }
   }
@@ -266,6 +269,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
   if(stmtCntInFuncBody<=0){
+    std::cout<<fmt::format("TraverseLambdaExpr跳过代号4");
     return false;
   }
 
@@ -273,6 +277,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   //  lambda表达式写在一行是很常见的, 因此要求该lambda表达式体内无语句时才跳过
   bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
   if(funcBodyLRBraceInSameLine && stmtCntInFuncBody == 0){
+    std::cout<<fmt::format("TraverseLambdaExpr跳过代号5");
     return false;
   }
 
