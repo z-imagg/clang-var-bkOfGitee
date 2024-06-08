@@ -244,10 +244,6 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   //跳过 无函数体
   //跳过 constexpr
 
-  /*
-/app/llvm_release_home/clang+llvm-15.0.0-x86_64-linux-gnu-rhel-8.4/bin/clang++ -I /fridaAnlzAp/clang-var/runtime_cpp__vars_fn/include/ -include runtime_cpp__vars_fn.h -Xclang -load -Xclang /fridaAnlzAp/clang-var/build/lib/libVarPlugin.so -Xclang -add-plugin -Xclang VarPlugin -std=c++14 -DHAVE_CONFIG_H -I. -I../../tsk -I../.. -I./../.. -I/usr/local/include -Wall -Wextra -Wno-unused-parameter -g1 -O0 -MT apfs_fs.lo -MD -MP -MF .deps/apfs_fs.Tpo -c apfs_fs.cpp -fPIC -DPIC -o .libs/apfs_fs.o
-TraverseLambdaExpr跳过代号3
-   */
   //如果一个lambda函数, 捕捉了全部外部变量，则不对其进行任何操作。
   // 因为此时lambda内外都有xFuncFrame变量，感觉有点奇怪。
   for (const auto& capture : lambdaExpr->captures()) {
