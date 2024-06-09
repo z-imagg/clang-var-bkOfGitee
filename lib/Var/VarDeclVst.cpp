@@ -91,8 +91,10 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     ASTNodeKind parentNK;
     bool only1P = UtilParentKind::only1ParentNodeKind(CI, *Ctx, declStmt, parent, parentNK);
     assert(only1P);
+    //跳过for 、foreach 中的循环变量
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
-    if(parentNKIsForStmt){
+    bool parentNKIsForEachStmt = ASTNodeKind::getFromNodeKind<CXXForRangeStmt>().isSame(parentNK);
+    if(parentNKIsForStmt || parentNKIsForEachStmt){
         return false;
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
