@@ -7,3 +7,8 @@ clang -Xclang -ast-dump -fsyntax-only   /fridaAnlzAp/clang-var/test_in/test_main
 #  文本输出，方便保存
 clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics /fridaAnlzAp/clang-var/test_in/test_main.cpp   | tee /fridaAnlzAp/clang-var/test_in/test_main.cpp.syntax_tree.txt
 ```
+
+
+```shell
+/app/llvm_release_home/clang+llvm-15.0.0-x86_64-linux-gnu-rhel-8.4/bin/clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics   /fridaAnlzAp/clang-var/test_in/typedef__demo.cpp | tee  typedef__demo.cpp.ast-dump.syntax-only.txt
+```

@@ -1,0 +1,42 @@
+TranslationUnitDecl 0x584ebf6af868 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x584ebf6b00d0 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x584ebf6afe30 '__int128'
+|-TypedefDecl 0x584ebf6b0140 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x584ebf6afe50 'unsigned __int128'
+|-TypedefDecl 0x584ebf6b04b8 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
+| `-RecordType 0x584ebf6b0230 '__NSConstantString_tag'
+|   `-CXXRecord 0x584ebf6b0198 '__NSConstantString_tag'
+|-TypedefDecl 0x584ebf6b0550 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x584ebf6b0510 'char *'
+|   `-BuiltinType 0x584ebf6af910 'char'
+|-TypedefDecl 0x584ebf6f5768 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
+| `-ConstantArrayType 0x584ebf6f5710 '__va_list_tag[1]' 1 
+|   `-RecordType 0x584ebf6b0640 '__va_list_tag'
+|     `-CXXRecord 0x584ebf6b05a8 '__va_list_tag'
+|-CXXRecordDecl 0x584ebf6f57c0 </fridaAnlzAp/clang-var/test_in/typedef__demo.cpp:1:9, line:5:1> line:1:16 struct _User_ definition
+| |-DefinitionData pass_in_registers aggregate standard_layout trivially_copyable pod trivial literal
+| | |-DefaultConstructor exists trivial
+| | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
+| | |-MoveConstructor exists simple trivial
+| | |-CopyAssignment simple trivial has_const_param needs_implicit implicit_has_const_param
+| | |-MoveAssignment exists simple trivial needs_implicit
+| | `-Destructor simple irrelevant trivial needs_implicit
+| |-CXXRecordDecl 0x584ebf6f58d8 <col:9, col:16> col:16 implicit struct _User_
+| |-FieldDecl 0x584ebf6f5980 <line:2:3, col:7> col:7 id 'int'
+| |-FieldDecl 0x584ebf6f59e8 <line:3:3, col:9> col:9 name 'char *'
+| |-FieldDecl 0x584ebf6f5a48 <line:4:3, col:8> col:8 sex 'bool'
+| |-CXXConstructorDecl 0x584ebf6f5d60 <line:1:16> col:16 implicit used _User_ 'void () noexcept' inline default trivial
+| | `-CompoundStmt 0x584ebf6f61e8 <col:16>
+| |-CXXConstructorDecl 0x584ebf6f5e68 <col:16> col:16 implicit constexpr _User_ 'void (const _User_ &)' inline default trivial noexcept-unevaluated 0x584ebf6f5e68
+| | `-ParmVarDecl 0x584ebf6f5f78 <col:16> col:16 'const _User_ &'
+| `-CXXConstructorDecl 0x584ebf6f6028 <col:16> col:16 implicit constexpr _User_ 'void (_User_ &&)' inline default trivial noexcept-unevaluated 0x584ebf6f6028
+|   `-ParmVarDecl 0x584ebf6f6138 <col:16> col:16 '_User_ &&'
+|-TypedefDecl 0x584ebf6f5b08 <col:1, line:5:3> col:3 referenced T_User 'struct _User_':'_User_'
+| `-ElaboratedType 0x584ebf6f5ab0 'struct _User_' sugar
+|   `-RecordType 0x584ebf6f5850 '_User_'
+|     `-CXXRecord 0x584ebf6f57c0 '_User_'
+`-FunctionDecl 0x584ebf6f5bc8 <line:8:1, line:10:1> line:8:6 func01 'void ()'
+  `-CompoundStmt 0x584ebf6f6370 <col:14, line:10:1>
+    `-DeclStmt 0x584ebf6f6358 <line:9:3, col:19>
+      `-VarDecl 0x584ebf6f5ce0 <col:3, col:11> col:11 zhangsan 'T_User':'_User_' callinit
+        `-CXXConstructExpr 0x584ebf6f6330 <col:11> 'T_User':'_User_' 'void () noexcept'
