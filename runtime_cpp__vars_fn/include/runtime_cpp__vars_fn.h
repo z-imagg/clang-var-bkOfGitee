@@ -19,7 +19,9 @@ struct __VarDecl{
 
     //业务字段
     std::string varTypeName;
-    int varCnt;
+    int varSize;
+    bool varIsArr;
+    int arrEleSize;
 };
 typedef struct __VarDecl _VarDecl;
 
@@ -43,7 +45,7 @@ _VarDeclLs *  _init_varLs_inFn__RtCxx(std::string srcFilePath, std::string funcN
 
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
-void createVar__RtCxx(_VarDeclLs * _vdLs, std::string varTypeName, int varCnt);
+void createVar__RtCxx(_VarDeclLs * _vdLs, std::string varTypeName, int varSize,bool varIsArr,int arrEleSize);
 
 
 //【销毁变量通知】  函数右花括号前 插入 'destroyVarLs_inFn__RtCxx(_varLs_ptr);'
