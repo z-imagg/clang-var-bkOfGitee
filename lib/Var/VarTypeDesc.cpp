@@ -72,13 +72,13 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
 //关注 auto 似结构体类型
 //关注 似结构体类型
 
-void VarTypeDesc::fillVarName(clang::IdentifierInfo * _varName_){
+void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName_){
   this->varName=  _varName_->getName();
 
   this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
 }
 
 
-void VarTypeDesc::printMsg(){
+void VarTypeDesc::printMsg_devOnly(){
 std::cout<<this->msg;
 }

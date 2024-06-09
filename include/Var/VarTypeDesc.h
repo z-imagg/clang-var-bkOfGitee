@@ -1,5 +1,5 @@
 // Created by z on 2024/6/9.
-
+// [术语] _devOnly == development only == 仅仅方便开发人员使用的函数
 #ifndef VarTypeDesc_H
 #define VarTypeDesc_H
 
@@ -27,8 +27,8 @@ public:
 
 public:
   VarTypeDesc(clang::QualType qualType);
-  void fillVarName(clang::IdentifierInfo * _varName_);
-  void printMsg();
+  void fillVarName_devOnly(clang::IdentifierInfo * _varName_);
+  void printMsg_devOnly();
 };
 
 
