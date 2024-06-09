@@ -23,7 +23,7 @@ public:
   bool isAutoType=false;
   bool isDeducedTemplateSpecializationType=false;
 
-  bool isTypedefType;
+  bool isTypedefType=false;
 
 
 public:
