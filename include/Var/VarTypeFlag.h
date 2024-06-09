@@ -45,8 +45,8 @@ class VarTypeDescPair{
 public:
 
   //原始类型存根
-  clang::QualType qualType_origin;
-  VarTypeFlag varTypeFlag_origin;
+  clang::QualType qualType;
+  VarTypeFlag varTypeFlag;
 
   //typedef类型别名链条的叶子 == typedef类型别名对应的真实类型
   clang::QualType qualType_leaf;
@@ -58,7 +58,7 @@ public:
   std::string msg;
 
 public:
-  VarTypeDescPair(clang::QualType qualType_origin);
+  VarTypeDescPair(clang::QualType qualType);
   void focus(bool& focus_);
   void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();

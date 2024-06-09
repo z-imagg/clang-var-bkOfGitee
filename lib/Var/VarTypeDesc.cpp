@@ -60,34 +60,35 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType){
 }
 
 
-VarTypeDescPair::VarTypeDescPair(clang::QualType qualType_origin)
+VarTypeDescPair::VarTypeDescPair(clang::QualType qualType)
 {
 
   //原类型==typedef第一层别名
-  this->qualType_origin=qualType_origin;
-  varTypeFlag_origin=VarTypeFlag(qualType_origin);
+  this->qualType=qualType;
+  varTypeFlag=VarTypeFlag(qualType);
 
-  const clang::Type* typePtr_origin = qualType_origin.getTypePtr();
+  const clang::Type* typePtr = qualType.getTypePtr();
 
-  clang::Type::TypeClass typeClass_origin = qualType_origin->getTypeClass();
-  const char *typeClassName_origin = typePtr_origin->getTypeClassName();
-  std::string typeName_origin = qualType_origin.getAsString();
+  clang::Type::TypeClass typeClass = qualType->getTypeClass();
+  const char *typeClassName = typePtr->getTypeClassName();
+  std::string typeName = qualType.getAsString();
   std::string msg_origin=fmt::format(
     VarTypeFlag_Print_Format,
-    typeClassName_origin, (int)typeClass_origin, typeName_origin, varTypeFlag_origin.isLambdaType, varTypeFlag_origin.isBuiltinType, varTypeFlag_origin.isArrayType, varTypeFlag_origin.isFunctionType, varTypeFlag_origin.isPointerType, varTypeFlag_origin.isDeducedType, varTypeFlag_origin.isAutoType, varTypeFlag_origin.isDeducedTemplateSpecializationType, varTypeFlag_origin.isTypedefType);
+    typeClassName, (int)typeClass, typeName, varTypeFlag.isLambdaType, varTypeFlag.isBuiltinType, varTypeFlag.isArrayType, varTypeFlag.isFunctionType, varTypeFlag.isPointerType, varTypeFlag.isDeducedType, varTypeFlag.isAutoType, varTypeFlag.isDeducedTemplateSpecializationType, varTypeFlag.isTypedefType);
 
 
-  //typedef真实类型==typedef叶子类型
-  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType_origin);
+  //递归遍历typedef链条 直到 typedef指向的真实类型
+  //   typedef真实类型==typedef叶子类型
+  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType);
 
   const clang::Type* typePtr_leaf = qualType_leaf.getTypePtr();
   std::string msg_leaf="";
 
   // 如果 是typedef类型
-  if(varTypeFlag_origin.isTypedefType){
+  if(varTypeFlag.isTypedefType){
     //断言 '起点类型 不等于 真实类型' ==  '是typedef类型'
     //  如果断言失败 可能要检查 UtilTraverseTypeDefChain::traverseTypedefChain 、 clang::QualType 复制时 不应该复制getTypePtr中的字段 ?
-    assert(typePtr_origin != typePtr_leaf);
+    assert(typePtr != typePtr_leaf);
 
     varTypeFlag_leaf=VarTypeFlag(qualType_leaf);
 
