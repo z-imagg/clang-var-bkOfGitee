@@ -56,11 +56,12 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
   }
 
   clang::Type::TypeClass typeClass = qualType->getTypeClass();
-  bool isBuiltinType = qualType->isBuiltinType();
   const char *typeClassName = typePtr->getTypeClassName();
   std::string typeName = qualType.getAsString();
 
-  std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
+  std::string  msg=fmt::format(
+  "[VarDecl描述] typeClassName={},typeClass={},typeName='{}',isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
+  typeClassName,  (int)typeClass,typeName,  isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
   std::cout<<msg;
 }
 
