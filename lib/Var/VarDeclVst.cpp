@@ -94,31 +94,32 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
   }
 
-
-  std::vector<const VarTypeDesc*> varTypeDescVec;
+  std::vector<const VarTypeDesc*> vTDPtrVec;
+  int varCnt=std::distance(declVec.begin(),declVec.end());
+  //VarTypeDesc对象们拥有者为vTDVec
+  std::vector<VarTypeDesc> vTDVec(varCnt, VarTypeDesc());
   //遍历每一个声明
-  std::for_each(declVec.begin(),declVec.end(),[this,&varTypeDescVec](const Decl* decl_k){
-    VarTypeDesc varTypeDesc_k;
+  for(int k=0; k < declVec.size(); k++){
+    const Decl* decl_k=declVec.at(k);
+    VarTypeDesc & varTypeDesc_k  = vTDVec.at(k);
     this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ );
     //第k个声明，若是似结构体则记数
     if(varTypeDesc_k.focus){
-      varTypeDescVec.push_back(&varTypeDesc_k);
+      vTDPtrVec.push_back(&varTypeDesc_k);
     }
-  });
 
-
-
+  }
 
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
     //是结构体
-    if(!varTypeDescVec.empty()){
+    if(!vTDPtrVec.empty()){
         //按照左右花括号，构建位置id，防止重复插入
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-      return insertAfter_VarDecl(useCxx, varTypeDescVec, declStmtBgnLocId, declStmtBgnLoc);
+      return insertAfter_VarDecl(useCxx, vTDPtrVec, declStmtBgnLocId, declStmtBgnLoc);
     }
 
     return false;
