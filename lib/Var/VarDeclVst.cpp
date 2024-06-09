@@ -132,12 +132,41 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     return result;
 }
 
+// 递归遍历typedef链条
+//clang::Type* actualType = traverseTypedefChain(valueDecl->getType());
+const clang::Type* traverseTypedefChain(clang::QualType qualType) {
+  const clang::Type* typePtr = qualType.getTypePtr();
+  clang::TypedefNameDecl* typedefDecl = nullptr;
+
+  // 如果是typedef，获取typedef的目标类型
+  if (const clang::TypedefType* typedefType = llvm::dyn_cast<clang::TypedefType>(typePtr)) {
+    typedefDecl = typedefType->getDecl();
+
+    // 从TypedefDecl中获取目标类型
+    clang::QualType typedef_to = typedefDecl->getUnderlyingType();
+
+    const std::string typedef_fromName = typedefDecl->getNameAsString();
+    const std::string typedef_toName = typedef_to.getAsString();
+    std::string msg=fmt::format("typedef_fromName={}, typedef_toName={}\n", typedef_fromName, typedef_toName);
+    std::cout<<msg;
+
+    // 递归处理目标类型
+    return traverseTypedefChain(typedef_to);
+  }
+
+  // 对于其他类型，您可能需要添加额外的处理逻辑，例如指针、数组等
+
+  // 假设当前类型不是typedef，则返回它自己
+  return typePtr;
+}
 
 bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, std::string &typeName, QualType &qualType){
 
 
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
+//        const clang::Type *nothing =
+          traverseTypedefChain(qualType);
         clang::Type::TypeClass typeClass = qualType->getTypeClass();
         const clang::Type *typePtr = qualType.getTypePtr();
         const char *typeClassName = typePtr->getTypeClassName();

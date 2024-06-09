@@ -1,14 +1,15 @@
-typedef struct _User_{
+typedef struct _RealType_User_{
   int id;
   char* name;
   bool sex;
-} T_User;
+} TypeAlias_deepth1_User;
 
-typedef int T_int;
-typedef T_int TT_int;
+typedef int TypeAlias_deepth1_int;
+typedef TypeAlias_deepth1_int TypeAlias_deepth2_int;
+typedef TypeAlias_deepth2_int TypeAlias_deepth3_int;
 
 void func01(){
-  T_User  zhangsan;
-  TT_int age;
+  TypeAlias_deepth1_User  zhangsan;
+  TypeAlias_deepth3_int age;
   return;
 }
