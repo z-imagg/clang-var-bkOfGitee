@@ -1,5 +1,5 @@
 #include "Var/VarDeclVst.h"
-#include "Var/VarTypeDesc.h"
+#include "Var/VarTypeFlag.h"
 
 #include "clang/Frontend/FrontendPluginRegistry.h"
 #include "base/Util.h"
@@ -185,7 +185,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         typeName = qualType.getAsString();
 
 
-      VarTypeDesc varTypeDesc(qualType);
+      VarTypeDescPair varTypeDesc(qualType);
       varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
       varTypeDesc.printMsg_devOnly();
 

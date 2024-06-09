@@ -4,18 +4,10 @@
 #include <clang/AST/DeclCXX.h>
 #include <fmt/core.h>
 #include <iostream>
-#include "Var/VarTypeDesc.h"
+#include "Var/VarTypeFlag.h"
 #include "base/UtilTraverseTypeDefChain.h"
 
-VarTypeDesc::VarTypeDesc(clang::QualType qualType){
-  //保存原始类型存根
-  this->qualType=qualType;
-
-
-  //类型必须穿透typedef链条到达其最终类型
-  //  如果不是typedef ，则 qualType_leaf表示的类型 == qualType表示的类型
-  //  如果是typedef,   则 qualType==typedef的起点类型==typedef的第一个别名, qualType_leaf==typedef的真实类型==typedef的叶子类型
-  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType);
+VarTypeFlag::VarTypeFlag(clang::QualType qualType){
 
 {//不关注 auto lambda
   /* 本代码块判断 变量是否 被赋值为 lambda表达式
@@ -64,23 +56,44 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
     isTypedefType=true;
   }
 
-  clang::Type::TypeClass typeClass = qualType->getTypeClass();
-  const char *typeClassName = typePtr->getTypeClassName();
-  std::string typeName = qualType.getAsString();
 
+}
+
+
+VarTypeDescPair::VarTypeDescPair(clang::QualType qualType_origin)
+{
+  //原类型==typedef第一层别名
+  this->qualType_origin=qualType_origin;
+  varTypeFlag_origin=VarTypeFlag(qualType_origin);
+
+  //typedef真实类型==typedef叶子类型
+  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType_origin);
+  varTypeFlag_leaf=VarTypeFlag(qualType_leaf);
+
+  const clang::Type* typePtr_origin = qualType_origin.getTypePtr();
+
+  clang::Type::TypeClass typeClass_origin = qualType_origin->getTypeClass();
+  const char *typeClassName_origin = typePtr_origin->getTypeClassName();
+  std::string typeName_origin = qualType_origin.getAsString();
+
+  std::string msg_origin=fmt::format(
+    "[origin] typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
+    typeClassName_origin, (int)typeClass_origin, typeName_origin, varTypeFlag_origin.isLambdaType, varTypeFlag_origin.isBuiltinType, varTypeFlag_origin.isArrayType, varTypeFlag_origin.isFunctionType, varTypeFlag_origin.isPointerType, varTypeFlag_origin.isDeducedType, varTypeFlag_origin.isAutoType, varTypeFlag_origin.isDeducedTemplateSpecializationType, varTypeFlag_origin.isTypedefType);
 
   const clang::Type* typePtr_leaf = qualType_leaf.getTypePtr();
+
   clang::Type::TypeClass typeClass_leaf = qualType_leaf->getTypeClass();
   const char *typeClassName_leaf = typePtr_leaf->getTypeClassName();
   std::string typeName_leaf = qualType_leaf.getAsString();
 
-  this->msg=fmt::format(
-  "typeClassName={},typeClass={},typeName='{}', typeClassName_leaf={},typeClass_leaf={},typeName_leaf='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
-  typeClassName,  (int)typeClass,typeName,  typeClassName_leaf,  (int)typeClass_leaf,typeName_leaf, isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
+  std::string msg_leaf=fmt::format(
+    "[leaf] typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
+    typeClassName_leaf, (int)typeClass_leaf, typeName_leaf, varTypeFlag_leaf.isLambdaType, varTypeFlag_leaf.isBuiltinType, varTypeFlag_leaf.isArrayType, varTypeFlag_leaf.isFunctionType, varTypeFlag_leaf.isPointerType, varTypeFlag_leaf.isDeducedType, varTypeFlag_leaf.isAutoType, varTypeFlag_leaf.isDeducedTemplateSpecializationType, varTypeFlag_leaf.isTypedefType);
+
+  this->msg=fmt::format("{} {}", msg_origin, msg_leaf);
+
 }
-
-
-void VarTypeDesc::focus(bool& focus_){
+void VarTypeDescPair::focus(bool& focus_){
 
 
 //不关注 auto lambda
@@ -91,14 +104,14 @@ void VarTypeDesc::focus(bool& focus_){
 //关注 似结构体类型
 }
 
-void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){
+void VarTypeDescPair::fillVarName_devOnly(clang::IdentifierInfo * _varName){
   this->varName=  _varName->getName();
 
   this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
 }
 
 
-void VarTypeDesc::printMsg_devOnly(){
+void VarTypeDescPair::printMsg_devOnly(){
 std::cout<<this->msg;
 }
 
