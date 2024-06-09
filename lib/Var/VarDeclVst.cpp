@@ -96,7 +96,10 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
   std::vector<const VarTypeDesc*> vTDPtrVec;
   int varCnt=std::distance(declVec.begin(),declVec.end());
-  //VarTypeDesc对象们拥有者为vTDVec
+  //vTDVec 为 varCnt个 VarTypeDesc对象 的拥有者
+  // 这里相当于 构造了 varCnt 个VarTypeDesc对象 , 放在此处栈中, 下面的 insertAfter_VarDecl 会用到这些对象,
+  //      因此要使得这些对象在被使用时还是活的、没有被释放的 即可
+  // 不想用new，因为若释放没做好会崩溃
   std::vector<VarTypeDesc> vTDVec(varCnt, VarTypeDesc());
   //遍历每一个声明
   for(int k=0; k < declVec.size(); k++){
