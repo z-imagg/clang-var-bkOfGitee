@@ -236,14 +236,6 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
 
-
-//      if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(valueDecl)) {
-        if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(getCanonicalDecl)) {
-        if(recordDecl->isLambda()){
-          recordDecl=recordDecl;
-        }
-      }
-        
         bool __like_struct=false;
         calc_likeStruct(qualType,__like_struct);
 //        const clang::Type *nothing =
