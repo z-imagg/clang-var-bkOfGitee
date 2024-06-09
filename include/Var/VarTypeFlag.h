@@ -6,7 +6,7 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/IdentifierTable.h>
 
-#define VarTypeFlag_Print_Format " typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n"
+#define VarTypeFlag_Print_Format " typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={} "
 class VarTypeFlag {
 public:
   //本对象是否经过正常初始化
@@ -23,7 +23,7 @@ public:
   bool isAutoType=false;
   bool isDeducedTemplateSpecializationType=false;
 
-  bool isTypedefType;
+  bool isTypedefType=false;
 
 
 public:

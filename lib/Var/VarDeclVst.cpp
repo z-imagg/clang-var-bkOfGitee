@@ -23,25 +23,34 @@ using namespace clang;
 
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
-bool VarDeclVst::insertAfter_VarDecl( bool useCXX,const std::string typeName,int varCnt,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
-     std::string fnName=Constant::fnNameS__createVar[useCXX];
-    //用funcEnterLocIdSet的尺寸作为LocationId的计数器
-    //region 构造插入语句
-    std::string cStr_inserted=fmt::format(
-            "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
-            fnName,typeName, varCnt, varDeclLocId.to_string()
-    );
-    llvm::StringRef strRef(cStr_inserted);
-    //endregion
+bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
+  //const std::string typeName,int varCnt
+  std::string funcName=Constant::fnNameS__createVar[useCXX];
+    std::vector<std::string> code_ls;
+    //  构造插入语句
+    std::transform(varTypeDescVec.begin(), varTypeDescVec.end(),
+         std::back_inserter(code_ls),
+         [&funcName,&varDeclLocId](const VarTypeDesc* varTypeDescK){
+      std::string code_inserted=fmt::format(
+        "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
+        funcName,
+        varTypeDescK->typeName, 1, //要求createVar__RtC 增加变量尺寸字段
+        varDeclLocId.to_string()
+      );
+      return code_inserted;
+    });
 
-    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , strRef);
+    //用 空格 join code_ls 为 单个大字符串
+  std::ostringstream oss;
+  std::copy(code_ls.begin(), code_ls.end(), std::ostream_iterator<std::string>(oss, "  "));
+  std::string code_ls_txt = oss.str();
+
+    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
 
 
     //记录已插入语句的节点ID们以防重： 即使重复遍历了 但不会重复插入
+  //用funcEnterLocIdSet的尺寸作为LocationId的计数器
     VarDeclLocIdSet.insert(varDeclLocId);
-
-    //写函数id描述行
-//  funcIdDescSrv.write(funcLocId); // 把 funcLocId.to_csv_line() 牵涉的列们 都 发送到 funcIdDescWebService 去
 
     return insertResult;
 }
@@ -68,69 +77,56 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
-    bool likeStruct;
-    std::string typeName;
-    QualType qualType;
-    int varCnt=0;
 
     Decl *singleDecl;
-    bool result=false;
 
-    bool isSingleDecl = declStmt->isSingleDecl();
-    if(isSingleDecl){
-        varCnt=1;
-        //单声明（单变量声明、单函数声明、单x声明）
-        singleDecl = declStmt->getSingleDecl();
-    }else{
-        //多声明（多变量声明、多函数声明、多x声明）
-        const DeclGroupRef &dg = declStmt->getDeclGroup();
-//        varCnt=std::distance(dg.begin(),dg.end());
-        //只看第1个声明
-        singleDecl=* (dg.begin());
+  std::vector<const Decl*> declVec;
+
+  bool isSingleDecl = declStmt->isSingleDecl();
+  if(isSingleDecl){
+    //单声明（单变量声明、单函数声明、单x声明）
+    singleDecl = declStmt->getSingleDecl();
+    declVec.push_back(singleDecl);
+  }else{
+    //多声明（多变量声明、多函数声明、多x声明）
+    const DeclGroupRef &dg = declStmt->getDeclGroup();
+    std::copy(dg.begin(), dg.end(), std::back_inserter(declVec));
+
+  }
+
+  std::vector<const VarTypeDesc*> vTDPtrVec;
+  int varCnt=std::distance(declVec.begin(),declVec.end());
+  //vTDVec 为 varCnt个 VarTypeDesc对象 的拥有者
+  // 这里相当于 构造了 varCnt 个VarTypeDesc对象 , 放在此处栈中, 下面的 insertAfter_VarDecl 会用到这些对象,
+  //      因此要使得这些对象在被使用时还是活的、没有被释放的 即可
+  // 不想用new，因为若释放没做好会崩溃
+  std::vector<VarTypeDesc> vTDVec(varCnt, VarTypeDesc());
+  //遍历每一个声明
+  for(int k=0; k < declVec.size(); k++){
+    const Decl* decl_k=declVec.at(k);
+    VarTypeDesc & varTypeDesc_k  = vTDVec.at(k);
+    this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ );
+    //第k个声明，若是似结构体则记数
+    if(varTypeDesc_k.focus){
+      vTDPtrVec.push_back(&varTypeDesc_k);
     }
 
-    // 多声明 result 依赖 第0个声明
-    // 单声明 result 依赖 该声明
-
-    // 获得 声明 中的 变量类型
-    result= this->process_singleDecl(singleDecl, likeStruct, typeName, qualType);
-    clang::Type::TypeClass  typeClass = qualType->getTypeClass();
-
-    // 获得 声明 中的 变量个数
-    //   单声明 变量个数为1， varCnt已经是1了. 因此单声明这里不做任何处理
-    if(isSingleDecl){}
-    //   多声明 循环变量们 以获得变量个数
-    else{
-        //多声明（多变量声明、多函数声明、多x声明）
-        const DeclGroupRef &dg = declStmt->getDeclGroup();
-
-        //遍历每一个声明
-        std::for_each(dg.begin(),dg.end(),[this,likeStruct,typeName,typeClass,&varCnt](const Decl* decl_k){
-            bool isStructType_k;
-            std::string typeName_k;
-            QualType qualType_k;
-            this->process_singleDecl(decl_k,isStructType_k,typeName_k,qualType_k);
-            clang::Type::TypeClass  typeClass_k = qualType_k->getTypeClass();
-            //第k个声明，若是似结构体则记数
-            if(isStructType_k){
-                varCnt++;
-            }
-        });
-    }
+  }
 
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
     //是结构体
-    if(likeStruct){
+    if(!vTDPtrVec.empty()){
         //按照左右花括号，构建位置id，防止重复插入
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-        insertAfter_VarDecl(useCxx,typeName,varCnt,declStmtBgnLocId,declStmtBgnLoc);
+       insertAfter_VarDecl(useCxx, vTDPtrVec, declStmtBgnLocId, declStmtBgnLoc);
+       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
     }
 
-    return result;
+    return true;
 }
 
 // 递归遍历typedef链条
@@ -165,18 +161,21 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& focus_, std::string &typeName, QualType &qualType){
+bool VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_){
+  //  QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
-        qualType = valueDecl->getType();
+      QualType qualType = valueDecl->getType();
 
-        typeName = qualType.getAsString();
+//      typeName_ = qualType.getAsString();
+      VarTypeDesc::build(qualType,varTypeDesc_);
 
-      VarTypeDesc varTypeDesc(qualType);
-      varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
-      varTypeDesc.printMsg_devOnly();
-      varTypeDesc.focus(focus_);
+//      VarTypeDesc varTypeDesc(qualType_);
+      varTypeDesc_.fillVarName_devOnly(valueDecl->getIdentifier());
+      varTypeDesc_.printMsg_devOnly();
+//      varTypeDesc.focus(focus_);
+//      varName_=varTypeDesc.varName;
 
-        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
+//        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
 
     return true;

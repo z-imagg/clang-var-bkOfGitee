@@ -25,14 +25,18 @@ public:
   clang::QualType qualType_leaf;
   VarTypeFlag varTypeFlag_leaf;
 
-
+  std::string typeName;
   std::string varName;
 
   std::string msg;
 
+  bool focus=false;
+
 public:
-  VarTypeDesc(clang::QualType qualType);
-  void focus(bool& focus_);
+  VarTypeDesc()=default;
+//  VarTypeDesc(clang::QualType _qualType);
+  static void build(clang::QualType _qualType, VarTypeDesc& thiz_);
+//  void focus(bool& focus_);
   void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();
 };
