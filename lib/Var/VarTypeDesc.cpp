@@ -9,47 +9,49 @@
 #include "base/UtilTraverseTypeDefChain.h"
 
 
-VarTypeDesc::VarTypeDesc(clang::QualType qualType)
-{
+void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
+
+//}
+//VarTypeDesc::VarTypeDesc(clang::QualType _qualType)
+//{
   std::string msg_origin;
 
   //原类型==typedef第一层别名
-  this->qualType=qualType;
-  varTypeFlag=VarTypeFlag(qualType,msg_origin);
+  self.qualType=_qualType;
+  self.varTypeFlag=VarTypeFlag(_qualType, msg_origin);
 
-  const clang::Type* typePtr = qualType.getTypePtr();
+  const clang::Type* typePtr = _qualType.getTypePtr();
 
   //递归遍历typedef链条 直到 typedef指向的真实类型
   //   typedef真实类型==typedef叶子类型
-  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType);
+  self.qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(_qualType);
 
-  const clang::Type* typePtr_leaf = qualType_leaf.getTypePtr();
+  const clang::Type* typePtr_leaf = self.qualType_leaf.getTypePtr();
   std::string msg_leaf="";
 
   // 如果 是typedef类型
-  if(varTypeFlag.isTypedefType){
+  if(self.varTypeFlag.isTypedefType){
     //断言 '起点类型 不等于 真实类型' ==  '是typedef类型'
     //  如果断言失败 可能要检查 UtilTraverseTypeDefChain::traverseTypedefChain 、 clang::QualType 复制时 不应该复制getTypePtr中的字段 ?
     assert(typePtr != typePtr_leaf);
 
-    varTypeFlag_leaf=VarTypeFlag(qualType_leaf,msg_leaf);
+    self.varTypeFlag_leaf=VarTypeFlag(self.qualType_leaf, msg_leaf);
 
   }
 
-  this->msg=fmt::format("[origin] {}  [leaf] {}", msg_origin, msg_leaf);
+  self.msg=fmt::format("[origin] {}  [leaf] {}", msg_origin, msg_leaf);
 
-}
-void VarTypeDesc::focus(bool& focus_){
-
-  VarTypeFlag &vTF = varTypeFlag.isTypedefType ? varTypeFlag_leaf : varTypeFlag;
-  clang::QualType &qT = varTypeFlag.isTypedefType ? qualType_leaf : qualType;
+  //////////计算focus
+  VarTypeFlag &vTF = self.varTypeFlag.isTypedefType ? self.varTypeFlag_leaf : self.varTypeFlag;
+  clang::QualType &qT = self.varTypeFlag.isTypedefType ? self.qualType_leaf : self.qualType;
   assert(vTF._inited);
+  self.typeName = qT.getAsString();
 //  clang::Type::TypeClass typeClass = qT->getTypeClass();
 //  clang::Type::Record == typeClass;
 // !vTF.isBuiltinType
 // !vTF.isPointerType
 // 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
-  focus_= ( (!qT->isBuiltinType()) &&  (!qT->isPointerType()) && (!vTF.isLambdaType)  ) || (  qT->isRecordType()  || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
+  self.focus= ((!qT->isBuiltinType()) && (!qT->isPointerType()) && (!vTF.isLambdaType)  ) || (qT->isRecordType() || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
 
 //不关注 auto lambda
 //不关注 基本类型
@@ -57,6 +59,7 @@ void VarTypeDesc::focus(bool& focus_){
 //不关注 auto 基本类型、指针类型、lambda类型
 //关注 auto 似结构体类型
 //关注 似结构体类型
+  //////////
 }
 
 void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){

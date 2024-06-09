@@ -12,6 +12,7 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/SourceManager.h"
 #include "base/LocId.h"
+#include "Var/VarTypeDesc.h"
 
 using namespace llvm;
 using namespace clang;
@@ -37,7 +38,8 @@ public:
 
 //    virtual bool VisitDeclStmt(DeclStmt* decl_k);
     virtual bool TraverseDeclStmt(DeclStmt* decl_k);
-    bool process_singleDecl(const Decl *singleDecl, QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_);
+    bool process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_);
+    // , QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_
     bool insertAfter_VarDecl( bool useCXX,const std::string typeName,int varCnt,LocId varDeclLocId, SourceLocation varDeclEndLoc );
 
 
