@@ -17,6 +17,8 @@ set(VarAlone_SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/FnVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/RetVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarDeclVst.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarTypeFlag.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarTypeDesc.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/RangeHasMacroAstVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/CollectIncMacro_PPCb.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarAstCnsm.cpp"

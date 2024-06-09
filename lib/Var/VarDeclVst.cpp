@@ -1,4 +1,5 @@
 #include "Var/VarDeclVst.h"
+#include "Var/VarTypeDesc.h"
 
 #include "clang/Frontend/FrontendPluginRegistry.h"
 #include "base/Util.h"
@@ -132,67 +133,50 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     return result;
 }
 
+// 递归遍历typedef链条
+//clang::Type* actualType = traverseTypedefChain(valueDecl->getType());
+const clang::Type* traverseTypedefChain(clang::QualType qualType) {
+  const clang::Type* typePtr = qualType.getTypePtr();
+  clang::TypedefNameDecl* typedefDecl = nullptr;
 
-bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, std::string &typeName, QualType &qualType){
+  // 如果是typedef，获取typedef的目标类型
+  if (const clang::TypedefType* typedefType = llvm::dyn_cast<clang::TypedefType>(typePtr)) {
+    typedefDecl = typedefType->getDecl();
+
+    // 从TypedefDecl中获取目标类型
+    clang::QualType typedef_to = typedefDecl->getUnderlyingType();
+    if(typedef_to->isBuiltinType()){
+
+    }
+
+    const std::string typedef_fromName = typedefDecl->getNameAsString();
+    const std::string typedef_toName = typedef_to.getAsString();
+    std::string msg=fmt::format("typedef_fromName={}, typedef_toName={}\n", typedef_fromName, typedef_toName);
+    std::cout<<msg;
+
+    // 递归处理目标类型
+    return traverseTypedefChain(typedef_to);
+  }
+
+  // 对于其他类型，您可能需要添加额外的处理逻辑，例如指针、数组等
+
+  // 假设当前类型不是typedef，则返回它自己
+  return typePtr;
+}
 
 
+bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& focus_, std::string &typeName, QualType &qualType){
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
-        clang::Type::TypeClass typeClass = qualType->getTypeClass();
-        const clang::Type *typePtr = qualType.getTypePtr();
-        const char *typeClassName = typePtr->getTypeClassName();
-        bool isBuiltinType = qualType->isBuiltinType();
 
-        bool typeClassEqRecord = clang::Type::Record == typeClass;
-        bool typeClassEqElaborated = clang::Type::Elaborated == typeClass;
-        bool typeClassEqAuto = clang::Type::Auto == typeClass;
-
-        bool isPointerType=qualType->isPointerType();
         typeName = qualType.getAsString();
 
-//        std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
-        //std::cout<<msg;
+      VarTypeDesc varTypeDesc(qualType);
+      varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
+      varTypeDesc.printMsg_devOnly();
+      varTypeDesc.focus(focus_);
 
-        if(isBuiltinType){
-            //非结构体
-            likeStruct=false;
-            //std::cout<<"[跳过]isBuiltinType==true;[返回]likeStruct==false\n";
-            return true;
-        }
-        if(isPointerType){
-            //非结构体
-            likeStruct=false;
-            //std::cout<<"[跳过]isPointerType==true;[返回]likeStruct==false\n";
-            return true;
-        }
-
-        const std::string &qualTypeAsStr = qualType.getAsString();
-        //std::cout<<"qualTypeAsStr="<<qualTypeAsStr<<"\n";
-
-        //是lambda表达式
-        bool isAuto_Lambda=false;
-        //是常规类
-        bool isAuto_Regular=false;
-        if(typeClassEqAuto){
-            //S2是S1前缀，因此S1必须在S2前面，二者顺序不能反
-            //S1
-            if(StrUtil::startsWith(typeName, "class (lambda at" )){
-                isAuto_Lambda=true;
-            }
-            //S2
-            else if(StrUtil::startsWith(typeName, "class " )  ){
-
-                isAuto_Regular= true;
-            }
-        }
-
-        //是结构体==不是Auto_Lambda且(是Record或是Elaborated或是Auto_常规类)
-        likeStruct=( !isAuto_Lambda ) && (typeClassEqRecord||typeClassEqElaborated|| isAuto_Regular);
-//        MyAssert(likeStruct,"[AssertErr]NotFit:( !isAuto_Lambda ) && (typeClassEqRecord||typeClassEqElaborated|| isAuto_Regular);");
-
-
-        //std::cout<<fmt::format("[返回]likeStruct=={}\n",likeStruct);
-
+        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
 
     return true;
