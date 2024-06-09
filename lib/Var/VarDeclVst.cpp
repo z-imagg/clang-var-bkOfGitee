@@ -227,8 +227,6 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
 
-        bool __like_struct=false;
-        calc_likeStruct(qualType,__like_struct);
 //        const clang::Type *nothing =
 //          traverseTypedefChain(qualType);
         clang::Type::TypeClass typeClass = qualType->getTypeClass();
@@ -246,6 +244,9 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 
         std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
         std::cout<<msg;
+
+      bool __like_struct=false;
+      calc_likeStruct(qualType,__like_struct);
 
         if(isBuiltinType){
             //非结构体
