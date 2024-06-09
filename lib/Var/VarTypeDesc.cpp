@@ -39,13 +39,13 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 
   }
 
-  self.msg=fmt::format("[origin] {}  [leaf] {}", msg_origin, msg_leaf);
 
   //////////计算focus
   VarTypeFlag &vTF = self.varTypeFlag.isTypedefType ? self.varTypeFlag_leaf : self.varTypeFlag;
   clang::QualType &qT = self.varTypeFlag.isTypedefType ? self.qualType_leaf : self.qualType;
   assert(vTF._inited);
   self.typeName = qT.getAsString();
+  self.msg=fmt::format("typeName={} [origin] {}  [leaf] {}", self.typeName, msg_origin, msg_leaf);
 //  clang::Type::TypeClass typeClass = qT->getTypeClass();
 //  clang::Type::Record == typeClass;
 // !vTF.isBuiltinType
