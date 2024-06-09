@@ -68,8 +68,9 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
-    bool likeStruct;
+    bool focus;
     std::string typeName;
+  std::string varName;
     QualType qualType;
     int varCnt=0;
 
@@ -93,7 +94,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     // 单声明 result 依赖 该声明
 
     // 获得 声明 中的 变量类型
-    result= this->process_singleDecl(singleDecl, likeStruct, typeName, qualType);
+    result= this->process_singleDecl(singleDecl, qualType/*出量*/, focus/*出量*/, typeName/*出量*/, varName/*出量*/);
     clang::Type::TypeClass  typeClass = qualType->getTypeClass();
 
     // 获得 声明 中的 变量个数
@@ -105,14 +106,15 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         const DeclGroupRef &dg = declStmt->getDeclGroup();
 
         //遍历每一个声明
-        std::for_each(dg.begin(),dg.end(),[this,likeStruct,typeName,typeClass,&varCnt](const Decl* decl_k){
-            bool isStructType_k;
+        std::for_each(dg.begin(),dg.end(),[this,focus,typeName,typeClass,&varCnt](const Decl* decl_k){
+            bool focus_k;
             std::string typeName_k;
+          std::string varName_k;
             QualType qualType_k;
-            this->process_singleDecl(decl_k,isStructType_k,typeName_k,qualType_k);
+            this->process_singleDecl(decl_k, qualType_k/*出量*/, focus_k/*出量*/, typeName_k/*出量*/, varName_k/*出量*/);
             clang::Type::TypeClass  typeClass_k = qualType_k->getTypeClass();
             //第k个声明，若是似结构体则记数
-            if(isStructType_k){
+            if(focus_k){
                 varCnt++;
             }
         });
@@ -121,13 +123,13 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
     //是结构体
-    if(likeStruct){
+    if(focus){
         //按照左右花括号，构建位置id，防止重复插入
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-        insertAfter_VarDecl(useCxx,typeName,varCnt,declStmtBgnLocId,declStmtBgnLoc);
+        insertAfter_VarDecl(useCxx, typeName, varCnt, declStmtBgnLocId, declStmtBgnLoc);
     }
 
     return result;
@@ -165,16 +167,17 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& focus_, std::string &typeName, QualType &qualType){
+bool VarDeclVst::process_singleDecl(const Decl *singleDecl, QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_){
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
-        qualType = valueDecl->getType();
+      qualType_ = valueDecl->getType();
 
-        typeName = qualType.getAsString();
+      typeName_ = qualType_.getAsString();
 
-      VarTypeDesc varTypeDesc(qualType);
+      VarTypeDesc varTypeDesc(qualType_);
       varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
       varTypeDesc.printMsg_devOnly();
       varTypeDesc.focus(focus_);
+      varName_=varTypeDesc.varName;
 
         std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
