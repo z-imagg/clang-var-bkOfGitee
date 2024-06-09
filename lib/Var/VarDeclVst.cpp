@@ -150,8 +150,8 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         bool isPointerType=qualType->isPointerType();
         typeName = qualType.getAsString();
 
-//        std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
-        //std::cout<<msg;
+        std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
+        std::cout<<msg;
 
         if(isBuiltinType){
             //非结构体
@@ -191,7 +191,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 //        MyAssert(likeStruct,"[AssertErr]NotFit:( !isAuto_Lambda ) && (typeClassEqRecord||typeClassEqElaborated|| isAuto_Regular);");
 
 
-        //std::cout<<fmt::format("[返回]likeStruct=={}\n",likeStruct);
+        std::cout<<fmt::format("[返回]likeStruct=={}\n",likeStruct);
 
     }
 
