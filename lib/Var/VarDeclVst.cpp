@@ -31,10 +31,14 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
     std::transform(varTypeDescVec.begin(), varTypeDescVec.end(),
          std::back_inserter(code_ls),
          [&funcName,&varDeclLocId](const VarTypeDesc* varTypeDescK){
+       const QualType qualType_Leaf = varTypeDescK->getQualType_Leaf();
+       const VarTypeFlag varTypeFlag_Leaf = varTypeDescK->getVarTypeFlag_Leaf();
+       bool isArr=qualType_Leaf->isArrayType();
+       std::string eleSizeOf=isArr?fmt::format("sizeof({}[0])",varTypeDescK->varName):"-1";
       std::string code_inserted=fmt::format(
-        "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
+        "{}(_vdLs, \"{}\", sizeof({}) ,{}, {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
         funcName,
-        varTypeDescK->typeName, 1, //要求createVar__RtC 增加变量尺寸字段
+        varTypeDescK->typeName, varTypeDescK->varName, isArr,eleSizeOf, //要求createVar__RtC 增加变量尺寸字段
         varDeclLocId.to_string()
       );
       return code_inserted;

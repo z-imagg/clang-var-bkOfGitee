@@ -39,6 +39,14 @@ public:
 //  void focus(bool& focus_);
   void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();
+
+  VarTypeFlag getVarTypeFlag_Leaf() const{
+    return varTypeFlag.isTypedefType ? varTypeFlag_leaf : varTypeFlag;
+  }
+
+  clang::QualType getQualType_Leaf() const{
+    return varTypeFlag.isTypedefType ? qualType_leaf : qualType;
+  }
 };
 
 #endif //VarTypeDesc_H
