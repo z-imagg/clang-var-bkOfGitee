@@ -31,7 +31,7 @@ public:
 
 public:
   VarTypeFlag()=default;
-  VarTypeFlag(clang::QualType qualType);
+  VarTypeFlag(clang::QualType qualType,std::string & msg_);
 
 };
 

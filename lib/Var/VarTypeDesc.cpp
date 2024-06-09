@@ -7,7 +7,7 @@
 #include "Var/VarTypeFlag.h"
 #include "base/UtilTraverseTypeDefChain.h"
 
-VarTypeFlag::VarTypeFlag(clang::QualType qualType){
+VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
 
 {//不关注 auto lambda
   /* 本代码块判断 变量是否 被赋值为 lambda表达式
@@ -57,25 +57,25 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType){
   }
 
 
+  clang::Type::TypeClass typeClass = qualType->getTypeClass();
+  const char *typeClassName = typePtr->getTypeClassName();
+  std::string typeName = qualType.getAsString();
+  msg_=fmt::format(
+    VarTypeFlag_Print_Format,
+    typeClassName, (int)typeClass, typeName, isLambdaType, isBuiltinType, isArrayType, isFunctionType, isPointerType, isDeducedType, isAutoType, isDeducedTemplateSpecializationType, isTypedefType);
+
 }
 
 
 VarTypeDescPair::VarTypeDescPair(clang::QualType qualType)
 {
+  std::string msg_origin;
 
   //原类型==typedef第一层别名
   this->qualType=qualType;
-  varTypeFlag=VarTypeFlag(qualType);
+  varTypeFlag=VarTypeFlag(qualType,msg_origin);
 
   const clang::Type* typePtr = qualType.getTypePtr();
-
-  clang::Type::TypeClass typeClass = qualType->getTypeClass();
-  const char *typeClassName = typePtr->getTypeClassName();
-  std::string typeName = qualType.getAsString();
-  std::string msg_origin=fmt::format(
-    VarTypeFlag_Print_Format,
-    typeClassName, (int)typeClass, typeName, varTypeFlag.isLambdaType, varTypeFlag.isBuiltinType, varTypeFlag.isArrayType, varTypeFlag.isFunctionType, varTypeFlag.isPointerType, varTypeFlag.isDeducedType, varTypeFlag.isAutoType, varTypeFlag.isDeducedTemplateSpecializationType, varTypeFlag.isTypedefType);
-
 
   //递归遍历typedef链条 直到 typedef指向的真实类型
   //   typedef真实类型==typedef叶子类型
@@ -90,15 +90,8 @@ VarTypeDescPair::VarTypeDescPair(clang::QualType qualType)
     //  如果断言失败 可能要检查 UtilTraverseTypeDefChain::traverseTypedefChain 、 clang::QualType 复制时 不应该复制getTypePtr中的字段 ?
     assert(typePtr != typePtr_leaf);
 
-    varTypeFlag_leaf=VarTypeFlag(qualType_leaf);
+    varTypeFlag_leaf=VarTypeFlag(qualType_leaf,msg_leaf);
 
-    clang::Type::TypeClass typeClass_leaf = qualType_leaf->getTypeClass();
-    const char *typeClassName_leaf = typePtr_leaf->getTypeClassName();
-    std::string typeName_leaf = qualType_leaf.getAsString();
-
-    msg_leaf=fmt::format(
-      VarTypeFlag_Print_Format,
-      typeClassName_leaf, (int)typeClass_leaf, typeName_leaf, varTypeFlag_leaf.isLambdaType, varTypeFlag_leaf.isBuiltinType, varTypeFlag_leaf.isArrayType, varTypeFlag_leaf.isFunctionType, varTypeFlag_leaf.isPointerType, varTypeFlag_leaf.isDeducedType, varTypeFlag_leaf.isAutoType, varTypeFlag_leaf.isDeducedTemplateSpecializationType, varTypeFlag_leaf.isTypedefType);
   }
 
   this->msg=fmt::format("[origin] {}  [leaf] {}", msg_origin, msg_leaf);
