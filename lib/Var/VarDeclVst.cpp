@@ -23,7 +23,7 @@ using namespace clang;
 
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
-bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*> varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
+bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
   //const std::string typeName,int varCnt
   std::string funcName=Constant::fnNameS__createVar[useCXX];
     std::vector<std::string> code_ls;
@@ -77,66 +77,51 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
-  VarTypeDesc varTypeDesc;
-    QualType qualType;
-    int varCnt=0;
 
     Decl *singleDecl;
-    bool result=false;
 
-    bool isSingleDecl = declStmt->isSingleDecl();
-    if(isSingleDecl){
-        varCnt=1;
-        //单声明（单变量声明、单函数声明、单x声明）
-        singleDecl = declStmt->getSingleDecl();
-    }else{
-        //多声明（多变量声明、多函数声明、多x声明）
-        const DeclGroupRef &dg = declStmt->getDeclGroup();
-//        varCnt=std::distance(dg.begin(),dg.end());
-        //只看第1个声明
-        singleDecl=* (dg.begin());
-    }
+  std::vector<const Decl*> declVec;
 
-    // 多声明 result 依赖 第0个声明
-    // 单声明 result 依赖 该声明
+  bool isSingleDecl = declStmt->isSingleDecl();
+  if(isSingleDecl){
+    //单声明（单变量声明、单函数声明、单x声明）
+    singleDecl = declStmt->getSingleDecl();
+    declVec.push_back(singleDecl);
+  }else{
+    //多声明（多变量声明、多函数声明、多x声明）
+    const DeclGroupRef &dg = declStmt->getDeclGroup();
+    std::copy(dg.begin(), dg.end(), std::back_inserter(declVec));
 
-    // 获得 声明 中的 变量类型
-    result= this->process_singleDecl(singleDecl,varTypeDesc/*出量*/ );
-    clang::Type::TypeClass  typeClass = qualType->getTypeClass();
+  }
 
-    // 获得 声明 中的 变量个数
-    //   单声明 变量个数为1， varCnt已经是1了. 因此单声明这里不做任何处理
-    if(isSingleDecl){}
-    //   多声明 循环变量们 以获得变量个数
-    else{
-        //多声明（多变量声明、多函数声明、多x声明）
-        const DeclGroupRef &dg = declStmt->getDeclGroup();
-
-        //遍历每一个声明
-        std::for_each(dg.begin(),dg.end(),[this,&varCnt](const Decl* decl_k){
-          VarTypeDesc varTypeDesc_k;
-            this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ );
-            //第k个声明，若是似结构体则记数
-            if(varTypeDesc_k.focus){
-                varCnt++;
-            }
-        });
-    }
 
   std::vector<const VarTypeDesc*> varTypeDescVec;
+  //遍历每一个声明
+  std::for_each(declVec.begin(),declVec.end(),[this,&varTypeDescVec](const Decl* decl_k){
+    VarTypeDesc varTypeDesc_k;
+    this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ );
+    //第k个声明，若是似结构体则记数
+    if(varTypeDesc_k.focus){
+      varTypeDescVec.push_back(&varTypeDesc_k);
+    }
+  });
+
+
+
+
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
     //是结构体
-    if(varTypeDesc.focus){
+    if(!varTypeDescVec.empty()){
         //按照左右花括号，构建位置id，防止重复插入
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-        insertAfter_VarDecl(useCxx, varTypeDescVec, declStmtBgnLocId, declStmtBgnLoc);
+      return insertAfter_VarDecl(useCxx, varTypeDescVec, declStmtBgnLocId, declStmtBgnLoc);
     }
 
-    return result;
+    return false;
 }
 
 // 递归遍历typedef链条
