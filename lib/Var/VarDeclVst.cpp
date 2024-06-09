@@ -146,6 +146,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         bool typeClassEqRecord = clang::Type::Record == typeClass;
         bool typeClassEqElaborated = clang::Type::Elaborated == typeClass;
         bool typeClassEqAuto = clang::Type::Auto == typeClass;
+        bool typeClassEqTypedef = clang::Type::Typedef == typeClass;
 
         bool isPointerType=qualType->isPointerType();
         typeName = qualType.getAsString();
