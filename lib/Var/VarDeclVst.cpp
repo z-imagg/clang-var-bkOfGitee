@@ -235,23 +235,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
-      CXXRecordDecl *cXXRecordDecl=qualType->getAsCXXRecordDecl();
-      if(cXXRecordDecl!= nullptr){
-        bool isLamb=cXXRecordDecl->isLambda();
-        int x=0;
-      }
 
-      const FunctionDecl *getAsFunction = valueDecl->getAsFunction();
-      Stmt *getBody = valueDecl->getBody();
-      AccessSpecifier getAccess = valueDecl->getAccess();
-      const AttrVec &getAttrs = valueDecl->getAttrs();
-      const Decl *getCanonicalDecl = valueDecl->getCanonicalDecl();
-      const DeclarationName &getDeclName = valueDecl->getDeclName();
-      const char *getDeclKindName = valueDecl->getDeclKindName();
-      const clang::FunctionType *getFunctionType0 = valueDecl->getFunctionType(true);
-      Decl::Kind getKind = valueDecl->getKind();
-      const std::string &getQualifiedNameAsString = valueDecl->getQualifiedNameAsString();
-      const NamedDecl *getUnderlyingDecl = valueDecl->getUnderlyingDecl();
 
 //      if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(valueDecl)) {
         if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(getCanonicalDecl)) {
