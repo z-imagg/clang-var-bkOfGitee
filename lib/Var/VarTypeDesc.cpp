@@ -83,7 +83,12 @@ VarTypeDescPair::VarTypeDescPair(clang::QualType qualType_origin)
   const clang::Type* typePtr_leaf = qualType_leaf.getTypePtr();
   std::string msg_leaf="";
 
-  if(typePtr_origin != typePtr_leaf){
+  // 如果 是typedef类型
+  if(varTypeFlag_origin.isTypedefType){
+    //断言 '起点类型 不等于 真实类型' ==  '是typedef类型'
+    //  如果断言失败 可能要检查 UtilTraverseTypeDefChain::traverseTypedefChain 、 clang::QualType 复制时 不应该复制getTypePtr中的字段 ?
+    assert(typePtr_origin != typePtr_leaf);
+
     varTypeFlag_leaf=VarTypeFlag(qualType_leaf);
 
     clang::Type::TypeClass typeClass_leaf = qualType_leaf->getTypeClass();
