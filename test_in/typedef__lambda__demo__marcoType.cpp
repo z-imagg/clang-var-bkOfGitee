@@ -36,10 +36,10 @@ void func_demo_typedef(){
   TypeAlias_deepth2_Macro2_T_Clz_User userVar_class;
   TypeAlias_deepth5_Macro_T_Union_Score scoreVar_union;
   short short_var;
-  TypeAlias_deepth1_User  zhangsan_user,LISI_user,wangwu_user;
+  TypeAlias_deepth1_User  zhangsan_user,LISI_user,wangwu_user,arr_user[37];
   TypeAlias_deepth3_int age;
   TypeAlias_deepth5_Macro_T_Union_Score scoreVar2_union,*ptr_scoreVar3_union;
-  TypeAlias_deepth2_Macro2_T_Clz_User userVar2_class,userVar3_class;
+  TypeAlias_deepth2_Macro2_T_Clz_User userVar2_class,userVar3_class,userVarArr_class[0];
   return;
 }
 
