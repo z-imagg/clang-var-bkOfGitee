@@ -23,25 +23,34 @@ using namespace clang;
 
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
-bool VarDeclVst::insertAfter_VarDecl( bool useCXX,const std::string typeName,int varCnt,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
-     std::string fnName=Constant::fnNameS__createVar[useCXX];
-    //用funcEnterLocIdSet的尺寸作为LocationId的计数器
-    //region 构造插入语句
-    std::string cStr_inserted=fmt::format(
-            "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
-            fnName,typeName, varCnt, varDeclLocId.to_string()
-    );
-    llvm::StringRef strRef(cStr_inserted);
-    //endregion
+bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*> varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
+  //const std::string typeName,int varCnt
+  std::string funcName=Constant::fnNameS__createVar[useCXX];
+    std::vector<std::string> code_ls;
+    //  构造插入语句
+    std::transform(varTypeDescVec.begin(), varTypeDescVec.end(),
+         std::back_inserter(code_ls),
+         [&funcName,&varDeclLocId](const VarTypeDesc* varTypeDescK){
+      std::string code_inserted=fmt::format(
+        "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
+        funcName,
+        varTypeDescK->typeName, 1, //要求createVar__RtC 增加变量尺寸字段
+        varDeclLocId.to_string()
+      );
+      return code_inserted;
+    });
 
-    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , strRef);
+    //用 空格 join code_ls 为 单个大字符串
+  std::ostringstream oss;
+  std::copy(code_ls.begin(), code_ls.end(), std::ostream_iterator<std::string>(oss, "  "));
+  std::string code_ls_txt = oss.str();
+
+    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
 
 
     //记录已插入语句的节点ID们以防重： 即使重复遍历了 但不会重复插入
+  //用funcEnterLocIdSet的尺寸作为LocationId的计数器
     VarDeclLocIdSet.insert(varDeclLocId);
-
-    //写函数id描述行
-//  funcIdDescSrv.write(funcLocId); // 把 funcLocId.to_csv_line() 牵涉的列们 都 发送到 funcIdDescWebService 去
 
     return insertResult;
 }
@@ -114,6 +123,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         });
     }
 
+  std::vector<const VarTypeDesc*> varTypeDescVec;
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
     //是结构体
@@ -123,7 +133,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-        insertAfter_VarDecl(useCxx, typeName, varCnt, declStmtBgnLocId, declStmtBgnLoc);
+        insertAfter_VarDecl(useCxx, varTypeDescVec, declStmtBgnLocId, declStmtBgnLoc);
     }
 
     return result;
