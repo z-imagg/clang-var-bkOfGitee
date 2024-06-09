@@ -185,7 +185,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         typeName = qualType.getAsString();
 
 
-      VarTypeDescPair varTypeDesc(qualType);
+      VarTypeDesc varTypeDesc(qualType);
       varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
       varTypeDesc.printMsg_devOnly();
 

@@ -67,7 +67,7 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
 }
 
 
-VarTypeDescPair::VarTypeDescPair(clang::QualType qualType)
+VarTypeDesc::VarTypeDesc(clang::QualType qualType)
 {
   std::string msg_origin;
 
@@ -97,7 +97,7 @@ VarTypeDescPair::VarTypeDescPair(clang::QualType qualType)
   this->msg=fmt::format("[origin] {}  [leaf] {}", msg_origin, msg_leaf);
 
 }
-void VarTypeDescPair::focus(bool& focus_){
+void VarTypeDesc::focus(bool& focus_){
 
 
 //不关注 auto lambda
@@ -108,14 +108,14 @@ void VarTypeDescPair::focus(bool& focus_){
 //关注 似结构体类型
 }
 
-void VarTypeDescPair::fillVarName_devOnly(clang::IdentifierInfo * _varName){
+void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){
   this->varName=  _varName->getName();
 
   this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
 }
 
 
-void VarTypeDescPair::printMsg_devOnly(){
+void VarTypeDesc::printMsg_devOnly(){
 std::cout<<this->msg;
 }
 

@@ -36,7 +36,7 @@ public:
 };
 
 
-class VarTypeDescPair{
+class VarTypeDesc{
   //类型必须穿透typedef链条到达其最终类型
   //  如果不是typedef ，则 qualType_leaf表示的类型 == qualType表示的类型
   //  如果是typedef,   则 qualType==typedef的起点类型==typedef的第一个别名, qualType_leaf==typedef的真实类型==typedef的叶子类型
@@ -58,7 +58,7 @@ public:
   std::string msg;
 
 public:
-  VarTypeDescPair(clang::QualType qualType);
+  VarTypeDesc(clang::QualType qualType);
   void focus(bool& focus_);
   void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();
