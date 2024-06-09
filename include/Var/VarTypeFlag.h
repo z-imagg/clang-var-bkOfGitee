@@ -6,6 +6,7 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/IdentifierTable.h>
 
+#define VarTypeFlag_Print_Format " typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n"
 class VarTypeFlag {
 public:
   //原始类型存根
@@ -31,6 +32,7 @@ public:
 public:
   VarTypeFlag()=default;
   VarTypeFlag(clang::QualType qualType);
+
 };
 
 
