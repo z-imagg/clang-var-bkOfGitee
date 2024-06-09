@@ -1,4 +1,5 @@
 #include "Var/VarDeclVst.h"
+#include "Var/VarTypeDesc.h"
 
 #include "clang/Frontend/FrontendPluginRegistry.h"
 #include "base/Util.h"
@@ -164,72 +165,6 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
-
-  const clang::Type* typePtr = qualType.getTypePtr();
-
-  clang::Type::TypeClass typeClass = qualType->getTypeClass();
-  bool isBuiltinType = qualType->isBuiltinType();
-  const char *typeClassName = typePtr->getTypeClassName();
-  std::string typeName = qualType.getAsString();
-
-  std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
-  std::cout<<msg;
-
-
-  {//不关注 auto lambda
-  /* 本代码块判断 变量是否 被赋值为 lambda表达式
-   比如以下变量 lambda_func_var_们 都是 lambda表达式
-   auto lambda_func_var_1=[&k]( ){ return 0.0;};
-   double (*lambda_func_var_2)() = []() { return 0.0; };
-   */
-    CXXRecordDecl *cXXRecordDecl=qualType->getAsCXXRecordDecl();
-    if(cXXRecordDecl!= nullptr){
-      bool isLambda_=cXXRecordDecl->isLambda();
-      if(isLambda_){
-        //不关注 auto lambda
-        likeStruct=false; return;
-      }
-    }
-  }
-
-  if (const clang::BuiltinType* builtinType = llvm::dyn_cast<clang::BuiltinType>(typePtr)) {
-    //不关注 基本类型
-    likeStruct=false; return;
-  }
-
-  if (const clang::PointerType* pointerType = llvm::dyn_cast<clang::PointerType>(typePtr)) {
-    //不关注 指针类型
-    likeStruct=false; return;
-  }
-
-  if (const clang::DeducedType* deducedType = llvm::dyn_cast<clang::DeducedType>(typePtr)) {
-    if (const clang::AutoType* autoType = llvm::dyn_cast<clang::AutoType>(deducedType)) {
-      //不关注 auto xxx
-      likeStruct=false; return;
-    }
-
-    if (const clang::DeducedTemplateSpecializationType* dtsType = llvm::dyn_cast<clang::DeducedTemplateSpecializationType>(deducedType)) {
-      return;
-    }
-  }
-
-  if (const clang::TypedefType* typedefType = llvm::dyn_cast<clang::TypedefType>(typePtr)) {
-    return;
-  }
-
-  if (const clang::ArrayType* arrayType = llvm::dyn_cast<clang::ArrayType>(typePtr)) {
-    return;
-  }
-
-  if (const clang::FunctionType* functionType = llvm::dyn_cast<clang::FunctionType>(typePtr)) {
-    return;
-  }
-
-
-
-}
-
 bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, std::string &typeName, QualType &qualType){
 
 
@@ -250,8 +185,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         typeName = qualType.getAsString();
 
 
-      bool __like_struct=false;
-      calc_likeStruct(qualType,__like_struct);
+      VarTypeDesc varTypeDesc(qualType);
 
         if(isBuiltinType){
             //非结构体
