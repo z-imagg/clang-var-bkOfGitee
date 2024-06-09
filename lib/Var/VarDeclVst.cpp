@@ -119,10 +119,11 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
         //只有似结构体变量才会产生通知
-      return insertAfter_VarDecl(useCxx, vTDPtrVec, declStmtBgnLocId, declStmtBgnLoc);
+       insertAfter_VarDecl(useCxx, vTDPtrVec, declStmtBgnLocId, declStmtBgnLoc);
+       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
     }
 
-    return false;
+    return true;
 }
 
 // 递归遍历typedef链条
