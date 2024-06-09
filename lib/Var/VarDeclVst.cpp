@@ -144,6 +144,9 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 
     // 从TypedefDecl中获取目标类型
     clang::QualType typedef_to = typedefDecl->getUnderlyingType();
+    if(typedef_to->isBuiltinType()){
+
+    }
 
     const std::string typedef_fromName = typedefDecl->getNameAsString();
     const std::string typedef_toName = typedef_to.getAsString();
@@ -160,13 +163,56 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
   return typePtr;
 }
 
+
+void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
+
+  const clang::Type* typePtr = qualType.getTypePtr();
+  if (const clang::BuiltinType* builtinType = llvm::dyn_cast<clang::BuiltinType>(typePtr)) {
+    //不关注 基本类型
+    likeStruct=false; return;
+  }
+
+  if (const clang::PointerType* pointerType = llvm::dyn_cast<clang::PointerType>(typePtr)) {
+    //不关注 指针类型
+    likeStruct=false; return;
+  }
+
+  if (const clang::DeducedType* deducedType = llvm::dyn_cast<clang::DeducedType>(typePtr)) {
+    if (const clang::AutoType* autoType = llvm::dyn_cast<clang::AutoType>(deducedType)) {
+      //不关注 auto lambda
+      likeStruct=false; return;
+    }
+
+    if (const clang::DeducedTemplateSpecializationType* dtsType = llvm::dyn_cast<clang::DeducedTemplateSpecializationType>(deducedType)) {
+      return;
+    }
+  }
+
+  if (const clang::TypedefType* typedefType = llvm::dyn_cast<clang::TypedefType>(typePtr)) {
+    return;
+  }
+
+  if (const clang::ArrayType* arrayType = llvm::dyn_cast<clang::ArrayType>(typePtr)) {
+    return;
+  }
+
+  if (const clang::FunctionType* functionType = llvm::dyn_cast<clang::FunctionType>(typePtr)) {
+    return;
+  }
+
+
+
+}
+
 bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, std::string &typeName, QualType &qualType){
 
 
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
+        bool __like_struct=false;
+        calc_likeStruct(qualType,__like_struct);
 //        const clang::Type *nothing =
-          traverseTypedefChain(qualType);
+//          traverseTypedefChain(qualType);
         clang::Type::TypeClass typeClass = qualType->getTypeClass();
         const clang::Type *typePtr = qualType.getTypePtr();
         const char *typeClassName = typePtr->getTypeClassName();
