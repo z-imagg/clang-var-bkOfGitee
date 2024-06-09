@@ -4,6 +4,7 @@
 #define VarTypeDesc_H
 
 #include <clang/AST/Type.h>
+#include <clang/Basic/IdentifierTable.h>
 
 class VarTypeDesc {
 public:
@@ -20,8 +21,14 @@ public:
 
   bool isTypedefType;
 
+  std::string varName;
+
+  std::string msg;
+
 public:
   VarTypeDesc(clang::QualType qualType);
+  void fillVarName(clang::IdentifierInfo * _varName_);
+  void printMsg();
 };
 
 

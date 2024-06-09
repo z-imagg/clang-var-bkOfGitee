@@ -186,6 +186,8 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 
 
       VarTypeDesc varTypeDesc(qualType);
+      varTypeDesc.fillVarName(valueDecl->getIdentifier());
+      varTypeDesc.printMsg();
 
         if(isBuiltinType){
             //非结构体

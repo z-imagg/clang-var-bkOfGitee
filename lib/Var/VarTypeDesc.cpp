@@ -59,10 +59,9 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
   const char *typeClassName = typePtr->getTypeClassName();
   std::string typeName = qualType.getAsString();
 
-  std::string  msg=fmt::format(
-  "[VarDecl描述] typeClassName={},typeClass={},typeName='{}',isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
+  this->msg=fmt::format(
+  "typeClassName={},typeClass={},typeName='{}',isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
   typeClassName,  (int)typeClass,typeName,  isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
-  std::cout<<msg;
 }
 
 //类型必须穿透typedef链条到达其最终类型
@@ -72,3 +71,14 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
 //不关注 auto 基本类型、指针类型、lambda类型
 //关注 auto 似结构体类型
 //关注 似结构体类型
+
+void VarTypeDesc::fillVarName(clang::IdentifierInfo * _varName_){
+  this->varName=  _varName_->getName();
+
+  this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
+}
+
+
+void VarTypeDesc::printMsg(){
+std::cout<<this->msg;
+}
