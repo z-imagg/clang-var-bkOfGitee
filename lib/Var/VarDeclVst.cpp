@@ -196,16 +196,7 @@ void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
 
   if (const clang::DeducedType* deducedType = llvm::dyn_cast<clang::DeducedType>(typePtr)) {
     if (const clang::AutoType* autoType = llvm::dyn_cast<clang::AutoType>(deducedType)) {
-      //不关注 auto lambda
-      autoType->isUndeducedAutoType();
-      autoType->isFunctionReferenceType();
-
-
-
-      if (const clang::FunctionType* functionType = llvm::dyn_cast<clang::FunctionType>(typePtr)) {
-        likeStruct=false; return;
-      }
-
+      //不关注 auto xxx
       likeStruct=false; return;
     }
 
