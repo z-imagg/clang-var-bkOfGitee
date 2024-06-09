@@ -30,7 +30,7 @@ public:
 
   std::string msg;
 
-  bool focus;
+  bool focus=false;
 
 public:
   VarTypeDesc()=default;
