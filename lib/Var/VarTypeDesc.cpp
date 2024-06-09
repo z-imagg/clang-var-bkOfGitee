@@ -5,8 +5,12 @@
 #include <fmt/core.h>
 #include <iostream>
 #include "Var/VarTypeDesc.h"
+#include "base/UtilTraverseTypeDefChain.h"
 
 VarTypeDesc::VarTypeDesc(clang::QualType qualType){
+
+
+  qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType);
 
 {//不关注 auto lambda
   /* 本代码块判断 变量是否 被赋值为 lambda表达式
@@ -59,9 +63,15 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
   const char *typeClassName = typePtr->getTypeClassName();
   std::string typeName = qualType.getAsString();
 
+
+  const clang::Type* typePtr_leaf = qualType_leaf.getTypePtr();
+  clang::Type::TypeClass typeClass_leaf = qualType_leaf->getTypeClass();
+  const char *typeClassName_leaf = typePtr_leaf->getTypeClassName();
+  std::string typeName_leaf = qualType_leaf.getAsString();
+
   this->msg=fmt::format(
-  "typeClassName={},typeClass={},typeName='{}',isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
-  typeClassName,  (int)typeClass,typeName,  isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
+  "typeClassName={},typeClass={},typeName='{}', typeClassName_leaf={},typeClass_leaf={},typeName_leaf='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n",
+  typeClassName,  (int)typeClass,typeName,  typeClassName_leaf,  (int)typeClass_leaf,typeName_leaf, isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
 }
 
 //类型必须穿透typedef链条到达其最终类型
@@ -82,3 +92,5 @@ void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName_){
 void VarTypeDesc::printMsg_devOnly(){
 std::cout<<this->msg;
 }
+
+

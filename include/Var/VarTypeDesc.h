@@ -8,6 +8,9 @@
 
 class VarTypeDesc {
 public:
+  //typedef类型别名链条的叶子 == typedef类型别名对应的真实类型
+  clang::QualType qualType_leaf;
+
   bool isLambdaType=false;
 
   bool isBuiltinType=false;
