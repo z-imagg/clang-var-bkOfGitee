@@ -30,7 +30,6 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
   }
   if (const clang::ArrayType* arrayType = llvm::dyn_cast<clang::ArrayType>(typePtr)) {
     isArrayType=true;
-    return;
   }
 
   if (const clang::FunctionType* functionType = llvm::dyn_cast<clang::FunctionType>(typePtr)) {
