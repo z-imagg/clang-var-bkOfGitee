@@ -24,13 +24,14 @@ using namespace clang;
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
 bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
+  std::string varDeclLocIdStr=varDeclLocId.to_string();
   //const std::string typeName,int varCnt
   std::string funcName=Constant::fnNameS__createVar[useCXX];
     std::vector<std::string> code_ls;
     //  构造插入语句
     std::transform(varTypeDescVec.begin(), varTypeDescVec.end(),
          std::back_inserter(code_ls),
-         [&funcName,&varDeclLocId](const VarTypeDesc* varTypeDescK){
+[funcName,varDeclLocIdStr](const VarTypeDesc* varTypeDescK){
        const QualType qualType_Leaf = varTypeDescK->getQualType_Leaf();
        const VarTypeFlag varTypeFlag_Leaf = varTypeDescK->getVarTypeFlag_Leaf();
        bool isArr=qualType_Leaf->isArrayType();
@@ -39,7 +40,7 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
         "{}(_vdLs, \"{}\", sizeof({}) ,{}, {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
         funcName,
         varTypeDescK->typeName, varTypeDescK->varName, isArr,eleSizeOf, //要求createVar__RtC 增加变量尺寸字段
-        varDeclLocId.to_string()
+        varDeclLocIdStr
       );
       return code_inserted;
     });
