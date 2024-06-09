@@ -167,6 +167,23 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
 
   const clang::Type* typePtr = qualType.getTypePtr();
+
+  {//不关注 auto lambda
+  /* 本代码块判断 变量是否 被赋值为 lambda表达式
+   比如以下变量 lambda_func_var_们 都是 lambda表达式
+   auto lambda_func_var_1=[&k]( ){ return 0.0;};
+   double (*lambda_func_var_2)() = []() { return 0.0; };
+   */
+    CXXRecordDecl *cXXRecordDecl=qualType->getAsCXXRecordDecl();
+    if(cXXRecordDecl!= nullptr){
+      bool isLambda_=cXXRecordDecl->isLambda();
+      if(isLambda_){
+        //不关注 auto lambda
+        likeStruct=false; return;
+      }
+    }
+  }
+
   if (const clang::BuiltinType* builtinType = llvm::dyn_cast<clang::BuiltinType>(typePtr)) {
     //不关注 基本类型
     likeStruct=false; return;
@@ -180,6 +197,15 @@ void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
   if (const clang::DeducedType* deducedType = llvm::dyn_cast<clang::DeducedType>(typePtr)) {
     if (const clang::AutoType* autoType = llvm::dyn_cast<clang::AutoType>(deducedType)) {
       //不关注 auto lambda
+      autoType->isUndeducedAutoType();
+      autoType->isFunctionReferenceType();
+
+
+
+      if (const clang::FunctionType* functionType = llvm::dyn_cast<clang::FunctionType>(typePtr)) {
+        likeStruct=false; return;
+      }
+
       likeStruct=false; return;
     }
 
@@ -209,6 +235,31 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
+      CXXRecordDecl *cXXRecordDecl=qualType->getAsCXXRecordDecl();
+      if(cXXRecordDecl!= nullptr){
+        bool isLamb=cXXRecordDecl->isLambda();
+        int x=0;
+      }
+
+      const FunctionDecl *getAsFunction = valueDecl->getAsFunction();
+      Stmt *getBody = valueDecl->getBody();
+      AccessSpecifier getAccess = valueDecl->getAccess();
+      const AttrVec &getAttrs = valueDecl->getAttrs();
+      const Decl *getCanonicalDecl = valueDecl->getCanonicalDecl();
+      const DeclarationName &getDeclName = valueDecl->getDeclName();
+      const char *getDeclKindName = valueDecl->getDeclKindName();
+      const clang::FunctionType *getFunctionType0 = valueDecl->getFunctionType(true);
+      Decl::Kind getKind = valueDecl->getKind();
+      const std::string &getQualifiedNameAsString = valueDecl->getQualifiedNameAsString();
+      const NamedDecl *getUnderlyingDecl = valueDecl->getUnderlyingDecl();
+
+//      if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(valueDecl)) {
+        if (const RecordDecl *recordDecl = dyn_cast_or_null<RecordDecl>(getCanonicalDecl)) {
+        if(recordDecl->isLambda()){
+          recordDecl=recordDecl;
+        }
+      }
+        
         bool __like_struct=false;
         calc_likeStruct(qualType,__like_struct);
 //        const clang::Type *nothing =
