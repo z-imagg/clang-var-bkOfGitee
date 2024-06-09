@@ -8,8 +8,13 @@
 #include "base/UtilTraverseTypeDefChain.h"
 
 VarTypeDesc::VarTypeDesc(clang::QualType qualType){
+  //保存原始类型存根
+  this->qualType=qualType;
 
 
+  //类型必须穿透typedef链条到达其最终类型
+  //  如果不是typedef ，则 qualType_leaf表示的类型 == qualType表示的类型
+  //  如果是typedef,   则 qualType==typedef的起点类型==typedef的第一个别名, qualType_leaf==typedef的真实类型==typedef的叶子类型
   qualType_leaf=UtilTraverseTypeDefChain::traverseTypedefChain(qualType);
 
 {//不关注 auto lambda
@@ -74,16 +79,20 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType){
   typeClassName,  (int)typeClass,typeName,  typeClassName_leaf,  (int)typeClass_leaf,typeName_leaf, isLambdaType,isBuiltinType,isArrayType,isFunctionType,isPointerType,isDeducedType,isAutoType,isDeducedTemplateSpecializationType,isTypedefType);
 }
 
-//类型必须穿透typedef链条到达其最终类型
+
+void VarTypeDesc::focus(bool& focus_){
+
+
 //不关注 auto lambda
 //不关注 基本类型
 //不关注 指针类型
 //不关注 auto 基本类型、指针类型、lambda类型
 //关注 auto 似结构体类型
 //关注 似结构体类型
+}
 
-void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName_){
-  this->varName=  _varName_->getName();
+void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){
+  this->varName=  _varName->getName();
 
   this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
 }

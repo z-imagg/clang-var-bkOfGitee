@@ -8,6 +8,9 @@
 
 class VarTypeDesc {
 public:
+  //原始类型存根
+  clang::QualType qualType;
+
   //typedef类型别名链条的叶子 == typedef类型别名对应的真实类型
   clang::QualType qualType_leaf;
 
@@ -30,7 +33,8 @@ public:
 
 public:
   VarTypeDesc(clang::QualType qualType);
-  void fillVarName_devOnly(clang::IdentifierInfo * _varName_);
+  void focus(bool& focus_);
+  void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();
 };
 
