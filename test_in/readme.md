@@ -10,5 +10,9 @@ clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics /fridaAnlzAp/clang
 
 
 ```shell
-/app/llvm_release_home/clang+llvm-15.0.0-x86_64-linux-gnu-rhel-8.4/bin/clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics   /fridaAnlzAp/clang-var/test_in/typedef__demo.cpp | tee  typedef__demo.cpp.ast-dump.syntax-only.txt
+/app/llvm_release_home/clang+llvm-15.0.0-x86_64-linux-gnu-rhel-8.4/bin/clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics   /fridaAnlzAp/clang-var/test_in/typedef__demo.cpp | tee  /fridaAnlzAp/clang-var/test_in/typedef__demo.cpp.ast-dump.syntax-only.txt
+
+/app/llvm_release_home/clang+llvm-15.0.0-x86_64-linux-gnu-rhel-8.4/bin/clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics   /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp | tee  /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp.ast-dump.syntax-only.txt
+
 ```
+

@@ -1,0 +1,54 @@
+TranslationUnitDecl 0x5fdb7bc41868 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x5fdb7bc420d0 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x5fdb7bc41e30 '__int128'
+|-TypedefDecl 0x5fdb7bc42140 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x5fdb7bc41e50 'unsigned __int128'
+|-TypedefDecl 0x5fdb7bc424b8 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
+| `-RecordType 0x5fdb7bc42230 '__NSConstantString_tag'
+|   `-CXXRecord 0x5fdb7bc42198 '__NSConstantString_tag'
+|-TypedefDecl 0x5fdb7bc42550 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x5fdb7bc42510 'char *'
+|   `-BuiltinType 0x5fdb7bc41910 'char'
+|-TypedefDecl 0x5fdb7bc87758 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
+| `-ConstantArrayType 0x5fdb7bc87700 '__va_list_tag[1]' 1 
+|   `-RecordType 0x5fdb7bc42640 '__va_list_tag'
+|     `-CXXRecord 0x5fdb7bc425a8 '__va_list_tag'
+`-FunctionDecl 0x5fdb7bc877f8 </fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:2:1, line:6:1> line:2:6 func_demo 'void ()'
+  `-CompoundStmt 0x5fdb7bca2c50 <col:17, line:6:1>
+    |-DeclStmt 0x5fdb7bc87960 <line:3:3, col:10>
+    | `-VarDecl 0x5fdb7bc878f8 <col:3, col:9> col:9 used k 'float'
+    |-DeclStmt 0x5fdb7bca2c28 <line:4:3, col:52>
+    | `-VarDecl 0x5fdb7bc879f0 <col:3, col:51> col:8 lambda_func01 '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)':'(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)' cinit
+    |   `-ExprWithCleanups 0x5fdb7bca2c10 <col:22, col:51> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)':'(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)'
+    |     `-CXXConstructExpr 0x5fdb7bca2be0 <col:22, col:51> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)':'(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)' 'void ((lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &&) noexcept' elidable
+    |       `-MaterializeTemporaryExpr 0x5fdb7bc885a8 <col:22, col:51> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)' xvalue
+    |         `-LambdaExpr 0x5fdb7bc87ff8 <col:22, col:51> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)'
+    |           |-CXXRecordDecl 0x5fdb7bc87b58 <col:22> col:22 implicit class definition
+    |           | |-DefinitionData lambda pass_in_registers trivially_copyable can_const_default_init
+    |           | | |-DefaultConstructor
+    |           | | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
+    |           | | |-MoveConstructor exists simple trivial
+    |           | | |-CopyAssignment trivial has_const_param needs_implicit implicit_has_const_param
+    |           | | |-MoveAssignment
+    |           | | `-Destructor simple irrelevant trivial
+    |           | |-CXXMethodDecl 0x5fdb7bc87ca0 <col:37, col:51> col:22 operator() 'double (char) const' inline
+    |           | | |-ParmVarDecl 0x5fdb7bc87a68 <col:27, col:32> col:32 input 'char'
+    |           | | `-CompoundStmt 0x5fdb7bc87f30 <col:38, col:51>
+    |           | |   `-ReturnStmt 0x5fdb7bc87f20 <col:40, col:47>
+    |           | |     `-FloatingLiteral 0x5fdb7bc87d88 <col:47> 'double' 0.000000e+00
+    |           | |-FieldDecl 0x5fdb7bc87f80 <col:24> col:24 implicit referenced 'float &'
+    |           | |-CXXDestructorDecl 0x5fdb7bc88028 <col:22> col:22 implicit referenced ~ 'void () noexcept' inline default trivial
+    |           | |-CXXConstructorDecl 0x5fdb7bc88260 <col:22> col:22 implicit constexpr  'void (const (lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &)' inline default trivial noexcept-unevaluated 0x5fdb7bc88260
+    |           | | `-ParmVarDecl 0x5fdb7bc88378 <col:22> col:22 'const (lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &'
+    |           | `-CXXConstructorDecl 0x5fdb7bc88418 <col:22> col:22 implicit used constexpr  'void ((lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &&) noexcept' inline default trivial
+    |           |   |-ParmVarDecl 0x5fdb7bc88528 <col:22> col:22 used '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &&'
+    |           |   |-CXXCtorInitializer Field 0x5fdb7bc87f80 '' 'float &'
+    |           |   | `-MemberExpr 0x5fdb7bca2b60 <col:22> 'float' lvalue . 0x5fdb7bc87f80
+    |           |   |   `-CXXStaticCastExpr 0x5fdb7bca2b30 <col:22> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)' xvalue static_cast<class (lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &&> <NoOp>
+    |           |   |     `-DeclRefExpr 0x5fdb7bca2b00 <col:22> '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22)' lvalue ParmVar 0x5fdb7bc88528 '' '(lambda at /fridaAnlzAp/clang-var/test_in/lambda__demo.cpp:4:22) &&'
+    |           |   `-CompoundStmt 0x5fdb7bca2bd0 <col:22>
+    |           |-DeclRefExpr 0x5fdb7bc87f48 <col:24> 'float' lvalue Var 0x5fdb7bc878f8 'k' 'float'
+    |           `-CompoundStmt 0x5fdb7bc87f30 <col:38, col:51>
+    |             `-ReturnStmt 0x5fdb7bc87f20 <col:40, col:47>
+    |               `-FloatingLiteral 0x5fdb7bc87d88 <col:47> 'double' 0.000000e+00
+    `-ReturnStmt 0x5fdb7bca2c40 <line:5:3>
