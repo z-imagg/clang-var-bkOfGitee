@@ -37,6 +37,9 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 
     self.varTypeFlag_leaf=VarTypeFlag(self.qualType_leaf, msg_leaf);
 
+    self.msg=fmt::format(" [origin] {}  [leaf] {}",  msg_origin, msg_leaf);
+  }else{
+    self.msg=fmt::format(" [origin] {}   ",  msg_origin );
   }
 
 
@@ -45,7 +48,7 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
   clang::QualType &qT = self.varTypeFlag.isTypedefType ? self.qualType_leaf : self.qualType;
   assert(vTF._inited);
   self.typeName = qT.getAsString();
-  self.msg=fmt::format("typeName={} [origin] {}  [leaf] {}", self.typeName, msg_origin, msg_leaf);
+  self.msg=fmt::format("typeName={}  {}", self.typeName, self.msg );
 //  clang::Type::TypeClass typeClass = qT->getTypeClass();
 //  clang::Type::Record == typeClass;
 // !vTF.isBuiltinType
@@ -65,7 +68,7 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){
   this->varName=  _varName->getName();
 
-  this->msg=fmt::format("[VarDecl描述] varName={}, {}", this->varName,this->msg);
+  this->msg=fmt::format("[VarDecl描述] varName={}, {} \n", this->varName,this->msg);
 }
 
 
