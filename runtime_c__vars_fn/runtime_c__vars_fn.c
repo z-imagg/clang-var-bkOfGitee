@@ -37,11 +37,13 @@ _VarDeclLs *  _init_varLs_inFn__RtC00(sds srcFilePath, sds funcName, int funcLBr
 
 
 //结构体变量声明末尾 插入 'createVar__RtC00(_varLs_ptr,"变量类型名",变量个数);'
-void createVar__RtC00(_VarDeclLs *_vdLs, sds varTypeName, int varCnt){
+void createVar__RtC00(_VarDeclLs *_vdLs, sds varTypeName, int varSize,short varIsArr,int arrEleSize){
 
     _VarDecl *vd= _NEW_(_VarDecl);//分配 对象1 : _NEW_1
     vd->varTypeName=varTypeName;
-    vd->varCnt=varCnt;
+    vd->varSize=varSize;
+    vd->varIsArr=varIsArr;
+    vd->arrEleSize=arrEleSize;
 
     list_node_t *node=list_node_new(vd);
     list_rpush(_vdLs->_vdVec, node); // vdLs->_vdVec->push_back(vd);
@@ -52,22 +54,22 @@ void createVar__RtC00(_VarDeclLs *_vdLs, sds varTypeName, int varCnt){
 void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs){
     list_t* _vdVec = _vdLs->_vdVec; // std::vector<_VarDecl>
 
-  long varDeclGroupCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
+  long varDeclCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
 
-if(varDeclGroupCnt>0){
-  int varCntSum=0;
+if(varDeclCnt>0){
+  int varSizeSum=0;
   list_node_t *nodeK;
   list_iterator_t *it = list_iterator_new(_vdVec, LIST_HEAD);
   while ((nodeK = list_iterator_next(it))) {
     _VarDecl* vdK=(_VarDecl*)(nodeK->val); //这不是c++，这是c，无类型信息，只能做危险的强制类型转换
-    printf("vd:{varTypeName=%s,varCnt=%d}\n",vdK->varTypeName,vdK->varCnt);
-    varCntSum += vdK->varCnt;
+    printf("vd:{varTypeName=%s,varSize=%d,varIsArr=%d,arrEleSize=%d}\n",vdK->varTypeName,vdK->varSize,vdK->varIsArr,vdK->arrEleSize);
+    varSizeSum += vdK->varSize;
     _DEL_(vdK);//释放 对象1 : _DEL_1
   }
   //释放迭代器(不释放链表自身)
   list_iterator_destroy(it);
 
-  printf("%s:%d:%d,varDeclGroupCnt=%d,varCntSum=%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclGroupCnt, varCntSum ) ;
+  printf("%s:%d:%d,varDeclCnt=%d,varSizeSum=%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclCnt, varSizeSum ) ;
 
 }
 
