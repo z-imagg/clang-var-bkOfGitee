@@ -40,7 +40,7 @@ public:
     virtual bool TraverseDeclStmt(DeclStmt* decl_k);
     bool process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_);
     // , QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_
-    bool insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*> varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc );
+    bool insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*> &varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc );
 
 
 
