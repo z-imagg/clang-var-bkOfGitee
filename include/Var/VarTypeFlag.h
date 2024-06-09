@@ -9,11 +9,8 @@
 #define VarTypeFlag_Print_Format " typeClassName={},typeClass={},typeName='{}', isLambdaType={},isBuiltinType={},isArrayType={},isFunctionType={},isPointerType={},isDeducedType={},isAutoType={},isDeducedTemplateSpecializationType={},isTypedefType={}\n"
 class VarTypeFlag {
 public:
-  //原始类型存根
-//  clang::QualType qualType;
-
-  //typedef类型别名链条的叶子 == typedef类型别名对应的真实类型
-//  clang::QualType qualType_leaf;
+  //本对象是否经过正常初始化
+  bool _inited=false;
 
   bool isLambdaType=false;
 

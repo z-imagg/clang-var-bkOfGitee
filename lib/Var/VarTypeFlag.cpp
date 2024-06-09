@@ -38,6 +38,7 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
   }
 
   if (const clang::PointerType* pointerType = llvm::dyn_cast<clang::PointerType>(typePtr)) {
+    // 上面这个if是等效于qualType.isPointerType()么？
     isPointerType=true;
   }
 
@@ -63,6 +64,7 @@ VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
     VarTypeFlag_Print_Format,
     typeClassName, (int)typeClass, typeName, isLambdaType, isBuiltinType, isArrayType, isFunctionType, isPointerType, isDeducedType, isAutoType, isDeducedTemplateSpecializationType, isTypedefType);
 
+  _inited=true;
 }
 
 

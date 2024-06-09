@@ -165,70 +165,18 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, std::string &typeName, QualType &qualType){
-
-
+bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& focus_, std::string &typeName, QualType &qualType){
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
         qualType = valueDecl->getType();
 
-//        const clang::Type *nothing =
-//          traverseTypedefChain(qualType);
-        clang::Type::TypeClass typeClass = qualType->getTypeClass();
-      bool isBuiltinType = qualType->isBuiltinType();
-
-        bool typeClassEqRecord = clang::Type::Record == typeClass;
-        bool typeClassEqElaborated = clang::Type::Elaborated == typeClass;
-        bool typeClassEqAuto = clang::Type::Auto == typeClass;
-        bool typeClassEqTypedef = clang::Type::Typedef == typeClass;
-
-        bool isPointerType=qualType->isPointerType();
         typeName = qualType.getAsString();
-
 
       VarTypeDesc varTypeDesc(qualType);
       varTypeDesc.fillVarName_devOnly(valueDecl->getIdentifier());
       varTypeDesc.printMsg_devOnly();
+      varTypeDesc.focus(focus_);
 
-        if(isBuiltinType){
-            //非结构体
-            likeStruct=false;
-            //std::cout<<"[跳过]isBuiltinType==true;[返回]likeStruct==false\n";
-            return true;
-        }
-        if(isPointerType){
-            //非结构体
-            likeStruct=false;
-            //std::cout<<"[跳过]isPointerType==true;[返回]likeStruct==false\n";
-            return true;
-        }
-
-        const std::string &qualTypeAsStr = qualType.getAsString();
-        //std::cout<<"qualTypeAsStr="<<qualTypeAsStr<<"\n";
-
-        //是lambda表达式
-        bool isAuto_Lambda=false;
-        //是常规类
-        bool isAuto_Regular=false;
-        if(typeClassEqAuto){
-            //S2是S1前缀，因此S1必须在S2前面，二者顺序不能反
-            //S1
-            if(StrUtil::startsWith(typeName, "class (lambda at" )){
-                isAuto_Lambda=true;
-            }
-            //S2
-            else if(StrUtil::startsWith(typeName, "class " )  ){
-
-                isAuto_Regular= true;
-            }
-        }
-
-        //是结构体==不是Auto_Lambda且(是Record或是Elaborated或是Auto_常规类)
-        likeStruct=( !isAuto_Lambda ) && (typeClassEqRecord||typeClassEqElaborated|| isAuto_Regular);
-//        MyAssert(likeStruct,"[AssertErr]NotFit:( !isAuto_Lambda ) && (typeClassEqRecord||typeClassEqElaborated|| isAuto_Regular);");
-
-
-        std::cout<<fmt::format("[返回]likeStruct=={}\n",likeStruct);
-
+        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
 
     return true;

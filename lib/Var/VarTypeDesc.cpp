@@ -41,6 +41,15 @@ VarTypeDesc::VarTypeDesc(clang::QualType qualType)
 }
 void VarTypeDesc::focus(bool& focus_){
 
+  VarTypeFlag &vTF = varTypeFlag.isTypedefType ? varTypeFlag_leaf : varTypeFlag;
+  clang::QualType &qT = varTypeFlag.isTypedefType ? qualType_leaf : qualType;
+  assert(vTF._inited);
+//  clang::Type::TypeClass typeClass = qT->getTypeClass();
+//  clang::Type::Record == typeClass;
+// !vTF.isBuiltinType
+// !vTF.isPointerType
+// 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
+  focus_= ( (!qT->isBuiltinType()) &&  (!qT->isPointerType()) && (!vTF.isLambdaType)  ) || (  qT->isRecordType()  || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
 
 //不关注 auto lambda
 //不关注 基本类型
