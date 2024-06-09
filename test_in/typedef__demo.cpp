@@ -7,4 +7,5 @@ typedef struct _User_{
 
 void func01(){
   T_User  zhangsan;
+  return;
 }
