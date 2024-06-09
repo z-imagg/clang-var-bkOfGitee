@@ -168,6 +168,15 @@ void calc_likeStruct(clang::QualType qualType,bool& likeStruct) {
 
   const clang::Type* typePtr = qualType.getTypePtr();
 
+  clang::Type::TypeClass typeClass = qualType->getTypeClass();
+  bool isBuiltinType = qualType->isBuiltinType();
+  const char *typeClassName = typePtr->getTypeClassName();
+  std::string typeName = qualType.getAsString();
+
+  std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
+  std::cout<<msg;
+
+
   {//不关注 auto lambda
   /* 本代码块判断 变量是否 被赋值为 lambda表达式
    比如以下变量 lambda_func_var_们 都是 lambda表达式
@@ -230,9 +239,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
 //        const clang::Type *nothing =
 //          traverseTypedefChain(qualType);
         clang::Type::TypeClass typeClass = qualType->getTypeClass();
-        const clang::Type *typePtr = qualType.getTypePtr();
-        const char *typeClassName = typePtr->getTypeClassName();
-        bool isBuiltinType = qualType->isBuiltinType();
+      bool isBuiltinType = qualType->isBuiltinType();
 
         bool typeClassEqRecord = clang::Type::Record == typeClass;
         bool typeClassEqElaborated = clang::Type::Elaborated == typeClass;
@@ -242,8 +249,6 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl, bool& likeStruct, st
         bool isPointerType=qualType->isPointerType();
         typeName = qualType.getAsString();
 
-        std::string  msg=fmt::format("typeName='{}',typeClass={},typeClassName={},isBuiltinType={}\n", typeName, (int)typeClass, typeClassName, isBuiltinType);
-        std::cout<<msg;
 
       bool __like_struct=false;
       calc_likeStruct(qualType,__like_struct);
