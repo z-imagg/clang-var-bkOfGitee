@@ -33,11 +33,13 @@ _VarDeclLs *  _init_varLs_inFn__RtCxx(std::string srcFilePath, std::string funcN
 
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
-void createVar__RtCxx(_VarDeclLs *_vdLs, std::string varTypeName, int varCnt){
+void createVar__RtCxx(_VarDeclLs *_vdLs, std::string varTypeName,  int varSize,bool varIsArr,int arrEleSize){
 
     _VarDecl vd;
     vd.varTypeName=varTypeName;
-    vd.varCnt=varCnt;
+    vd.varSize=varSize;
+    vd.varIsArr=varIsArr;
+    vd.arrEleSize=arrEleSize;
 
     _vdLs->_vdVec->push_back(vd);
 
@@ -48,10 +50,10 @@ void createVar__RtCxx(_VarDeclLs *_vdLs, std::string varTypeName, int varCnt){
 void destroyVarLs_inFn__RtCxx(_VarDeclLs *_vdLs){
     std::vector<_VarDecl> *_vdVec = _vdLs->_vdVec;
 
-  long varDeclGroupCnt = std::distance(_vdVec->begin(), _vdVec->end());
+  long varDeclCnt = std::distance(_vdVec->begin(), _vdVec->end());
 
-if(varDeclGroupCnt>0){
-    _VarDecl zero; zero.varCnt=0;
+if(varDeclCnt > 0){
+    _VarDecl zero; zero.varSize=0;
 
     const _VarDecl &sum_vd = std::accumulate(
     _vdVec->begin(),
@@ -59,17 +61,17 @@ if(varDeclGroupCnt>0){
     zero,
 [](const _VarDecl &a, const _VarDecl &b) {
       _VarDecl result;
-      result.varCnt = a.varCnt + b.varCnt;
+      result.varSize = a.varSize + b.varSize;
       return result;
     }
     );
 
-    int varCntSum=sum_vd.varCnt;
+    int varSizeSum=sum_vd.varSize;
 
-    std::cout << _vdLs->srcFilePath << ":" << _vdLs->funcLBrc_line << ":" << _vdLs->funcLBrc_column << ",varDeclGroupCnt=" << varDeclGroupCnt << ",varCntSum=" << varCntSum << std::endl;
+    std::cout << _vdLs->srcFilePath << ":" << _vdLs->funcLBrc_line << ":" << _vdLs->funcLBrc_column << ",varDeclCnt=" << varDeclCnt << ",varSizeSum=" << varSizeSum << std::endl;
 
     std::for_each(_vdVec->begin(), _vdVec->end(), [](const _VarDecl vd){
-      std::cout<<"vd@runtimeCxx:{varTypeName="<<vd.varTypeName<<",varCnt="<<vd.varCnt<<"}"<<std::endl;
+      std::cout<<"vd@runtimeCxx:{varTypeName="<<vd.varTypeName<<",varSize="<<vd.varSize<<",varIsArr="<<vd.varIsArr<<",arrEleSize="<<vd.arrEleSize<<"}"<<std::endl;
     });
   }
 

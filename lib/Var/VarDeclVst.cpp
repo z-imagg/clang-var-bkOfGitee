@@ -21,22 +21,42 @@
 using namespace llvm;
 using namespace clang;
 
+//仅此文件使用的局部方法
+//   varIsArr 当c++时候用bool值 当c时用int值
+static std::string __bool2txt(bool isArr, bool useCxx){
+  std::string isArrTxtAsNum=isArr?"1":"0";
+  std::string isArrTxtAsBool=fmt::format("{}",isArr);
+  std::string  isArrTxt=useCxx?isArrTxtAsBool:isArrTxtAsNum;
+  return isArrTxt;
+}
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
 bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
+  bool useCxx = ASTContextUtil::useCxx(Ctx);
+  std::string varDeclLocIdStr=varDeclLocId.to_string();
   //const std::string typeName,int varCnt
   std::string funcName=Constant::fnNameS__createVar[useCXX];
     std::vector<std::string> code_ls;
     //  构造插入语句
     std::transform(varTypeDescVec.begin(), varTypeDescVec.end(),
          std::back_inserter(code_ls),
-         [&funcName,&varDeclLocId](const VarTypeDesc* varTypeDescK){
-      std::string code_inserted=fmt::format(
-        "{}(_vdLs, \"{}\", {})  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
+[useCxx,funcName,varDeclLocIdStr](const VarTypeDesc* varTypeDescK){
+
+      const QualType qualType_Leaf = varTypeDescK->getQualType_Leaf();
+       const VarTypeFlag varTypeFlag_Leaf = varTypeDescK->getVarTypeFlag_Leaf();
+
+       bool isArr=qualType_Leaf->isArrayType();
+       std::string  isArrTxt=__bool2txt(isArr,useCxx);
+
+       std::string eleSizeOf=isArr?fmt::format("sizeof({}[0])",varTypeDescK->varName):"-1";
+
+       std::string code_inserted=fmt::format(
+        "{}(_vdLs/*_VarDeclLs*/,  \"{}\"/*varTypeName*/, sizeof({})/*varSize*/ , {}/*varIsArr*/ , {}/*arrEleSize*/ )  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
         funcName,
-        varTypeDescK->typeName, 1, //要求createVar__RtC 增加变量尺寸字段
-        varDeclLocId.to_string()
+        varTypeDescK->typeName, varTypeDescK->varName, isArrTxt,eleSizeOf,
+        varDeclLocIdStr
       );
+
       return code_inserted;
     });
 
@@ -71,8 +91,10 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     ASTNodeKind parentNK;
     bool only1P = UtilParentKind::only1ParentNodeKind(CI, *Ctx, declStmt, parent, parentNK);
     assert(only1P);
+    //跳过for 、foreach 中的循环变量
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
-    if(parentNKIsForStmt){
+    bool parentNKIsForEachStmt = ASTNodeKind::getFromNodeKind<CXXForRangeStmt>().isSame(parentNK);
+    if(parentNKIsForStmt || parentNKIsForEachStmt){
         return false;
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?

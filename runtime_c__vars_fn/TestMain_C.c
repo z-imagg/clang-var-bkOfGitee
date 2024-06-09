@@ -9,15 +9,22 @@ void func1(){_VarDeclLs * _vdLs= _init_varLs_inFn__RtC00("runtime_c__vars_fn/tes
                                                          7, 14);
     int a, b, c, *d;
     struct T_User user1, user2, *ptr_user3;
-  createVar__RtC00(_vdLs, "T_User", 2);
+  createVar__RtC00(_vdLs, "struct T_User", sizeof(struct T_User),0,-1);
+  createVar__RtC00(_vdLs, "struct T_User", sizeof(struct T_User),0,-1);
+  createVar__RtC00(_vdLs, "struct T_User", sizeof(struct T_User*),0,-1);
 
     if(TRUE){
         for(int i=1; i <= 2; i++){
             struct T_Book book1, book2, *ptr_book3,book4;
-          createVar__RtC00(_vdLs, "T_Book", 3);
+          createVar__RtC00(_vdLs, "struct T_Book", sizeof(struct T_Book),0,-1);
+          createVar__RtC00(_vdLs, "struct T_Book", sizeof(struct T_Book),0,-1);
+          createVar__RtC00(_vdLs, "struct T_Book*", sizeof(struct T_Book*),0,-1);
             {
-                struct T_Auth auth1,auth2,*ptr_auth3;
-              createVar__RtC00(_vdLs, "T_Auth", 2);
+                struct T_Auth auth1,auth2,*ptr_auth3,authArr[5];
+              createVar__RtC00(_vdLs, "struct T_Auth", sizeof(struct T_Book),0,-1);
+              createVar__RtC00(_vdLs, "struct T_Auth", sizeof(struct T_Book),0,-1);
+              createVar__RtC00(_vdLs, "struct T_Auth*", sizeof(struct T_Book*),0,-1);
+              createVar__RtC00(_vdLs, "struct T_Auth[5]", sizeof(struct T_Book),1,sizeof(authArr[0]));
             }
         }
     }

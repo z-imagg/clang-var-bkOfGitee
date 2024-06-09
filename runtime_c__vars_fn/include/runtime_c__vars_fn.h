@@ -21,7 +21,9 @@ struct __VarDecl{
 
     //业务字段
     sds varTypeName;
-    int varCnt;
+    int varSize;
+    short varIsArr;
+    int arrEleSize;
 };
 typedef struct __VarDecl _VarDecl;
 
@@ -45,7 +47,7 @@ _VarDeclLs *  _init_varLs_inFn__RtC00(sds srcFilePath, sds funcName, int funcLBr
 
 
 //结构体变量声明末尾 插入 'createVar__RtC00(_varLs_ptr,"变量类型名",变量个数);'
-void createVar__RtC00(_VarDeclLs * _vdLs, sds varTypeName, int varCnt);
+void createVar__RtC00(_VarDeclLs * _vdLs, sds varTypeName, int varSize,short varIsArr,int arrEleSize);
 
 
 //【销毁变量通知】    函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'

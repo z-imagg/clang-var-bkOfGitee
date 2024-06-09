@@ -44,8 +44,8 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 
 
   //////////计算focus
-  VarTypeFlag &vTF = self.varTypeFlag.isTypedefType ? self.varTypeFlag_leaf : self.varTypeFlag;
-  clang::QualType &qT = self.varTypeFlag.isTypedefType ? self.qualType_leaf : self.qualType;
+  VarTypeFlag vTF = self.getVarTypeFlag_Leaf();
+  clang::QualType qT = self.getQualType_Leaf();
   assert(vTF._inited);
   self.typeName = qT.getAsString();
   self.msg=fmt::format("typeName={}  {}", self.typeName, self.msg );
