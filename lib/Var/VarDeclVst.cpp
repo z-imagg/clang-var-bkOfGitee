@@ -1,5 +1,5 @@
 #include "Var/VarDeclVst.h"
-#include "Var/VarTypeFlag.h"
+#include "Var/VarTypeDesc.h"
 
 #include "clang/Frontend/FrontendPluginRegistry.h"
 #include "base/Util.h"
