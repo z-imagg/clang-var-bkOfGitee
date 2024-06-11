@@ -108,6 +108,10 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
   if(isSingleDecl){
     //单声明（单变量声明、单函数声明、单x声明）
     singleDecl = declStmt->getSingleDecl();
+    //跳过函数声明  (在函数f1体内,声明另一个函数f2签名的语句. 跳过这样的函数签名语句)
+    if(singleDecl && llvm::isa<FunctionDecl>(*singleDecl)){
+      return true;
+    }
     declVec.push_back(singleDecl);
   }else{
     //多声明（多变量声明、多函数声明、多x声明）
