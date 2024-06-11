@@ -77,6 +77,10 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
 
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
+    const Stmt::child_range &children_ = declStmt->children();
+    if(!children_.empty()){
+      const Stmt::child_iterator &son = children_.begin();
+    }
     //获取主文件ID,文件路径
     FileID mainFileId;
     std::string filePath;
@@ -99,7 +103,6 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
-
     Decl *singleDecl;
 
   std::vector<const Decl*> declVec;
@@ -108,6 +111,10 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
   if(isSingleDecl){
     //单声明（单变量声明、单函数声明、单x声明）
     singleDecl = declStmt->getSingleDecl();
+    //跳过函数声明
+    if(singleDecl && llvm::isa<FunctionDecl>(*singleDecl)){
+      return true;
+    }
     declVec.push_back(singleDecl);
   }else{
     //多声明（多变量声明、多函数声明、多x声明）
