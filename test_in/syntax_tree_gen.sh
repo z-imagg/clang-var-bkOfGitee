@@ -11,6 +11,6 @@ mkdir -p $_SyntaxTree_dir_
 #  文本输出，方便保存
 #clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics $_Home_/test_main.cpp   | tee /tmp/test_main.cpp.ast-dump.syntax-only.txt
 
-cd $_Home_ ; find . -type f -name "*.cpp" | xargs -I@ bash -c "clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics  @ > $_SyntaxTree_dir_/@.syntax_tree.txt"
+cd $_Home_ ; find . -type f -name "*.cpp" | xargs -I@ bash -x -c "clang -Xclang -ast-dump -fsyntax-only  -fno-color-diagnostics  @ > $_SyntaxTree_dir_/@.syntax_tree.txt"
 
 
