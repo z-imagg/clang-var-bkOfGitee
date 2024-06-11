@@ -1,0 +1,23 @@
+TranslationUnitDecl 0x6218c4d936c8 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x6218c4d93f30 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x6218c4d93c90 '__int128'
+|-TypedefDecl 0x6218c4d93fa0 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x6218c4d93cb0 'unsigned __int128'
+|-TypedefDecl 0x6218c4d94318 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
+| `-RecordType 0x6218c4d94090 '__NSConstantString_tag'
+|   `-CXXRecord 0x6218c4d93ff8 '__NSConstantString_tag'
+|-TypedefDecl 0x6218c4d943b0 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x6218c4d94370 'char *'
+|   `-BuiltinType 0x6218c4d93770 'char'
+|-TypedefDecl 0x6218c4dd94e8 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
+| `-ConstantArrayType 0x6218c4dd9490 '__va_list_tag[1]' 1 
+|   `-RecordType 0x6218c4d944a0 '__va_list_tag'
+|     `-CXXRecord 0x6218c4d94408 '__va_list_tag'
+`-FunctionDecl 0x6218c4dd96e0 <./test_main.cpp:2:1, line:5:1> line:2:5 main 'int (int, char **)'
+  |-ParmVarDecl 0x6218c4dd9558 <col:10, col:14> col:14 argc 'int'
+  |-ParmVarDecl 0x6218c4dd9600 <col:20, col:27> col:27 argv 'char **'
+  `-CompoundStmt 0x6218c4dd9920 <col:32, line:5:1>
+    |-DeclStmt 0x6218c4dd98d8 <line:3:3, col:23>
+    | `-FunctionDecl 0x6218c4dd9828 parent 0x6218c4d936c8 <col:3, col:22> col:15 func02 'void ()' extern
+    `-ReturnStmt 0x6218c4dd9910 <line:4:3, col:10>
+      `-IntegerLiteral 0x6218c4dd98f0 <col:10> 'int' 0
