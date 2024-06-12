@@ -154,22 +154,22 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
 
   }
-
   //对 关注的声明们 执行修改
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
-  bool useCxx=ASTContextUtil::useCxx(Ctx);
-  //是结构体
-  if(!vTDVec_ptr_focus.empty()){
-    //按照左右花括号，构建位置id，防止重复插入
-    //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
-    LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
-    //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
-    //只有似结构体变量才会产生通知
-    insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
-    //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
-  }
-  // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec
-  //////}
+    bool useCxx=ASTContextUtil::useCxx(Ctx);
+    //是结构体
+    if(!vTDVec_ptr_focus.empty()){
+        //按照左右花括号，构建位置id，防止重复插入
+        //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
+        LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
+        //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
+        //只有似结构体变量才会产生通知
+       insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
+       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
+    }
+    // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec
+    //////}
+
 
     RetTrue_to_KeepOuterLoop;
 }
