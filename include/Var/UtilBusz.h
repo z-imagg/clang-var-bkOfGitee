@@ -9,7 +9,7 @@ using namespace clang;
 
 class UtilBusz {
 public:
-  static bool isModifiable_FunctionDecl(CXXMethodDecl* cxxMethDecl,  SourceManager& SM );
+  static bool isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl,  SourceManager& SM );
 };
 
 

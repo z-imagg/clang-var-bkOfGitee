@@ -70,7 +70,11 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   if(found_funcNode){
     const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
     assert(funcDecl!= nullptr);
-    UtilBusz::isModifiable_FunctionDecl()
+    bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,SM);
+    // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
+    if(!isModifiableFuncDecl){
+      RetTrue_to_KeepOuterLoop;
+    }
   }
 
 /////////////////////////对当前节点returnStmt做 自定义处理
