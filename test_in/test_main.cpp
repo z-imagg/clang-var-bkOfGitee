@@ -1,5 +1,11 @@
+class C_User{
+public:
+  void func01();
+};
 
-char fun01(){return 'X';}
+void C_User::func01() {
+  return ;
+}
 int main(int argc, char** argv){
 
   return 0;
