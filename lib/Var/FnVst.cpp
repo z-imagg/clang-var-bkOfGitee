@@ -23,6 +23,8 @@
 #include "base/UtilMainFile.h"
 #include "base/UtilLocId.h"
 #include "base/UtilEnvVar.h"
+#include "base/UtilPrintAstNode.h"
+#include "base/UtilDebugDecl.h"
 
 using namespace llvm;
 using namespace clang;
@@ -162,6 +164,11 @@ bool FnVst::TraverseCXXDestructorDecl(CXXDestructorDecl * cxxDestructorDecl){
 }
 
 bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who){
+  bool funcNameEqual=UtilDebugDecl::ifNameEqPrintSrcTxt(cxxMethDecl,"do_heap_region",*Ctx,CI);
+  // 调试步骤(函数名条件断点):
+  // 1.  非调试地运行一次,人工观察获知第k个 '上一行输出' 是关注处
+  // 2.  在下一行 加条件断点('funcNameEqual==true') , 调试地运行, 人工到第k次断, 即到达关注处
+
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
   if(!_LocFileIDEqMainFileID){
