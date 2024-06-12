@@ -1,0 +1,35 @@
+TranslationUnitDecl 0x56d97f6fa6c8 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x56d97f6faf30 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x56d97f6fac90 '__int128'
+|-TypedefDecl 0x56d97f6fafa0 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x56d97f6facb0 'unsigned __int128'
+|-TypedefDecl 0x56d97f6fb318 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
+| `-RecordType 0x56d97f6fb090 '__NSConstantString_tag'
+|   `-CXXRecord 0x56d97f6faff8 '__NSConstantString_tag'
+|-TypedefDecl 0x56d97f6fb3b0 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x56d97f6fb370 'char *'
+|   `-BuiltinType 0x56d97f6fa770 'char'
+|-TypedefDecl 0x56d97f7405a8 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
+| `-ConstantArrayType 0x56d97f740550 '__va_list_tag[1]' 1 
+|   `-RecordType 0x56d97f6fb4a0 '__va_list_tag'
+|     `-CXXRecord 0x56d97f6fb408 '__va_list_tag'
+|-CXXRecordDecl 0x56d97f740600 <./test_main.cpp:1:1, line:4:1> line:1:7 class C_User definition
+| |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+| | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
+| | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
+| | |-MoveConstructor exists simple trivial needs_implicit
+| | |-CopyAssignment simple trivial has_const_param needs_implicit implicit_has_const_param
+| | |-MoveAssignment exists simple trivial needs_implicit
+| | `-Destructor simple irrelevant trivial needs_implicit
+| |-CXXRecordDecl 0x56d97f740718 <col:1, col:7> col:7 implicit class C_User
+| |-AccessSpecDecl 0x56d97f7407a8 <line:2:1, col:7> col:1 public
+| `-CXXMethodDecl 0x56d97f740848 <line:3:3, col:15> col:8 func01 'void ()'
+|-CXXMethodDecl 0x56d97f740940 parent 0x56d97f740600 prev 0x56d97f740848 <line:6:1, line:8:1> line:6:14 func01 'void ()'
+| `-CompoundStmt 0x56d97f740a40 <col:23, line:8:1>
+|   `-ReturnStmt 0x56d97f740a30 <line:7:3>
+`-FunctionDecl 0x56d97f740c00 <line:9:1, line:12:1> line:9:5 main 'int (int, char **)'
+  |-ParmVarDecl 0x56d97f740a70 <col:10, col:14> col:14 argc 'int'
+  |-ParmVarDecl 0x56d97f740b20 <col:20, col:27> col:27 argv 'char **'
+  `-CompoundStmt 0x56d97f740d28 <col:32, line:12:1>
+    `-ReturnStmt 0x56d97f740d18 <line:11:3, col:10>
+      `-IntegerLiteral 0x56d97f740cf8 <col:10> 'int' 0

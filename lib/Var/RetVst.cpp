@@ -9,6 +9,8 @@
 #include "Var/RangeHasMacroAstVst.h"
 #include "Var/CollectIncMacro_PPCb.h"
 #include "Var/Common.h"
+#include "Var/ClConst.h"
+#include "Var/UtilBusz.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -21,6 +23,7 @@
 #include "base/UtilMainFile.h"
 #include "base/UtilLocId.h"
 #include "base/UtilEnvVar.h"
+#include "base/UtilTraverseSingleParent.h"
 
 using namespace llvm;
 using namespace clang;
@@ -55,12 +58,18 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
     RetTrue_to_KeepOuterLoop;
   }
 
-
   //获取主文件ID,文件路径
   FileID mainFileId;
   std::string filePath;
   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
 
+  // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
+  CompoundStmt* compoundStmt;
+  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, CI,SM,Ctx);
+  if(!isModifiableFuncDecl){
+    RetTrue_to_KeepOuterLoop;
+  }
 
 /////////////////////////对当前节点returnStmt做 自定义处理
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化

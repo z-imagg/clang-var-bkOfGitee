@@ -10,6 +10,8 @@ set(Var_SOURCES
 "${base_util__SOURCES}"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/FnVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/RetVst.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/UtilBusz.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/ClConst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarDeclVst.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarTypeFlag.cpp"
 "${CMAKE_CURRENT_SOURCE_DIR}/../lib/Var/VarTypeDesc.cpp"
