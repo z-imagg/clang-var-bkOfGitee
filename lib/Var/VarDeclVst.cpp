@@ -206,7 +206,7 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-bool VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_){
+void VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_){
   //  QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
       QualType qualType = valueDecl->getType();
@@ -223,7 +223,7 @@ bool VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeD
 //        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
 
-    return true;
+    return;
 }
 
 /**  clang::Type::Auto == typeClass , 但是typeName不同 , typeName为 'class (lambda at ...)' 或 typeName='class ...'
