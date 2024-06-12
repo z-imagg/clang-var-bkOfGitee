@@ -9,7 +9,7 @@
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
 using namespace clang;
-bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
+bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* & compoundStmt_/*出参*/, SourceLocation &  funcBodyLBraceLoc_/*出参*/, SourceLocation & funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
   bool isModifiableFuncDecl= false;
   clang::DynTypedNode returnNode=clang::DynTypedNode::create(*stmt);
   clang::DynTypedNode funcNode;
@@ -29,7 +29,7 @@ bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* compoun
  * @param SM
  * @return
  */
-bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/, SourceManager& SM ){
+bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, CompoundStmt* & compoundStmt_/*出参*/, SourceLocation& funcBodyLBraceLoc_/*出参*/, SourceLocation& funcBodyRBraceLoc_/*出参*/, SourceManager& SM ){
 
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
