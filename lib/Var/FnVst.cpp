@@ -23,6 +23,8 @@
 #include "base/UtilMainFile.h"
 #include "base/UtilLocId.h"
 #include "base/UtilEnvVar.h"
+#include "base/UtilPrintAstNode.h"
+#include "base/UtilDebugDecl.h"
 
 using namespace llvm;
 using namespace clang;
@@ -162,6 +164,9 @@ bool FnVst::TraverseCXXDestructorDecl(CXXDestructorDecl * cxxDestructorDecl){
 }
 
 bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who){
+  UtilDebugDecl::debugFuncDeclByGlobalCounter(cxxMethDecl ,*Ctx,CI);
+  //调试说明在该函数内
+
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
   if(!_LocFileIDEqMainFileID){
@@ -191,13 +196,13 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
   if(stmtCntInFuncBody<=0){
-    return false;
+    return true;
   }
 
   //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
   bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
   if(funcBodyLRBraceInSameLine){
-    return false;
+    return true;
   }
 
   //获取最后一条语句
