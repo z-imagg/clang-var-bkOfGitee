@@ -6,71 +6,20 @@ set print pretty on
 set pagination off
 set breakpoint pending on
 
-break _init_varLs_inFn__RtC00
-commands
- silent
- printf "_init_varLs_inFn__RtC00 \n"
- continue
-end
 
-break destroyVarLs_inFn__RtC00
-commands
- silent
- printf "destroyVarLs_inFn__RtC00 \n"
- continue
-end
-
-break createVar__RtC00
-commands
- silent
- printf "createVar__RtC00 \n"
- continue
-end
-
-
-break TL_TmPnt__update
-commands
- silent
- printf "TL_TmPnt__update \n"
- continue
-end
-
-
-break TL_TmPnt__get
-commands
- silent
- printf "TL_TmPnt__get \n"
- continue
-end
-
-break TL_TmPnt__printPtr
-commands
- silent
- printf "TL_TmPnt__printPtr \n"
- continue
-end
-
+set $counter=0
 
 break _init_varLs_inFn__RtCxx
 commands
  silent
+ set $counter=$counter+1
+ if $counter % 100 == 0
  printf "_init_varLs_inFn__RtCxx \n"
+ end
+#  bt
  continue
 end
 
-break createVar__RtCxx
-commands
- silent
- printf "createVar__RtCxx \n"
- continue
-end
-
-break destroyVarLs_inFn__RtCxx
-commands
- silent
- printf "destroyVarLs_inFn__RtCxx \n"
- continue
-end
 
 run
 contine
