@@ -48,10 +48,12 @@ bool RetVst::insert_destroy__Before_fnRet(bool useCXX ,LocId retBgnLocId, Source
 }
 
 bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
+  //是否做本次修改
+  bool modify_me=true;
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,returnStmt->getBeginLoc());
   if(!_LocFileIDEqMainFileID){
-    return false;
+    modify_me= false;
   }
 
 
@@ -63,18 +65,10 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
 
 /////////////////////////对当前节点returnStmt做 自定义处理
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
-  bool useCxx=ASTContextUtil::useCxx(Ctx);
-
-//  int64_t returnStmtID = returnStmt->getID(*Ctx);
-  const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
-  LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, SM);
-
-  if(bool parentIsCompound=UtilParentKind::parentIsCompound(Ctx,returnStmt)){
-      if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {//防重复
-          insert_destroy__Before_fnRet(useCxx, retBgnLocId, retBgnLoc);
-      }
+  if(modify_me){
+    do__modify_me(returnStmt, filePath);
   }
-
+  return true;//上层遍历循环保持继续以免跳过后续源码文本
 ///////////////////// 自定义处理 完毕
 
 ////////////////////  粘接直接子节点到递归链条:  对 当前节点doStmt的下一层节点child:{body} 调用顶层方法TraverseStmt(child)
@@ -82,6 +76,21 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
 //希望return true能继续遍历子节点吧，因为return中应该可以写lambda，lambada内有更复杂的函数结构
   return true;
 //  Expr *xxx = returnStmt->getRetValue();
+}
+
+void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
+  bool useCxx=ASTContextUtil::useCxx(Ctx);
+
+  const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
+  LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, SM);
+
+  if(bool parentIsCompound=UtilParentKind::parentIsCompound(Ctx,returnStmt)){
+    if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {//防重复
+      insert_destroy__Before_fnRet(useCxx, retBgnLocId, retBgnLoc);
+    }
+  }
+
+  return;
 }
 
 
