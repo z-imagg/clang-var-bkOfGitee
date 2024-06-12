@@ -1,23 +1,74 @@
-TranslationUnitDecl 0x5ecb95c6f6c8 <<invalid sloc>> <invalid sloc>
-|-TypedefDecl 0x5ecb95c6ff30 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
-| `-BuiltinType 0x5ecb95c6fc90 '__int128'
-|-TypedefDecl 0x5ecb95c6ffa0 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
-| `-BuiltinType 0x5ecb95c6fcb0 'unsigned __int128'
-|-TypedefDecl 0x5ecb95c70318 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
-| `-RecordType 0x5ecb95c70090 '__NSConstantString_tag'
-|   `-CXXRecord 0x5ecb95c6fff8 '__NSConstantString_tag'
-|-TypedefDecl 0x5ecb95c703b0 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
-| `-PointerType 0x5ecb95c70370 'char *'
-|   `-BuiltinType 0x5ecb95c6f770 'char'
-|-TypedefDecl 0x5ecb95cb54e8 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
-| `-ConstantArrayType 0x5ecb95cb5490 '__va_list_tag[1]' 1 
-|   `-RecordType 0x5ecb95c704a0 '__va_list_tag'
-|     `-CXXRecord 0x5ecb95c70408 '__va_list_tag'
-`-FunctionDecl 0x5ecb95cb56e0 <./test_main.cpp:2:1, line:5:1> line:2:5 main 'int (int, char **)'
-  |-ParmVarDecl 0x5ecb95cb5558 <col:10, col:14> col:14 argc 'int'
-  |-ParmVarDecl 0x5ecb95cb5600 <col:20, col:27> col:27 argv 'char **'
-  `-CompoundStmt 0x5ecb95cb5920 <col:32, line:5:1>
-    |-DeclStmt 0x5ecb95cb58d8 <line:3:3, col:23>
-    | `-FunctionDecl 0x5ecb95cb5828 parent 0x5ecb95c6f6c8 <col:3, col:22> col:15 func02 'void ()' extern
-    `-ReturnStmt 0x5ecb95cb5910 <line:4:3, col:10>
-      `-IntegerLiteral 0x5ecb95cb58f0 <col:10> 'int' 0
+TranslationUnitDecl 0x59af8c9976c8 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x59af8c997f30 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x59af8c997c90 '__int128'
+|-TypedefDecl 0x59af8c997fa0 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x59af8c997cb0 'unsigned __int128'
+|-TypedefDecl 0x59af8c998318 <<invalid sloc>> <invalid sloc> implicit __NSConstantString '__NSConstantString_tag'
+| `-RecordType 0x59af8c998090 '__NSConstantString_tag'
+|   `-CXXRecord 0x59af8c997ff8 '__NSConstantString_tag'
+|-TypedefDecl 0x59af8c9983b0 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x59af8c998370 'char *'
+|   `-BuiltinType 0x59af8c997770 'char'
+|-TypedefDecl 0x59af8c9dd738 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list '__va_list_tag[1]'
+| `-ConstantArrayType 0x59af8c9dd6e0 '__va_list_tag[1]' 1 
+|   `-RecordType 0x59af8c9984a0 '__va_list_tag'
+|     `-CXXRecord 0x59af8c998408 '__va_list_tag'
+|-CXXRecordDecl 0x59af8c9dd790 <./test_main.cpp:3:1, line:6:1> line:3:7 class G1HeapVerifier definition
+| |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+| | |-DefaultConstructor exists trivial constexpr defaulted_is_constexpr
+| | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
+| | |-MoveConstructor exists simple trivial
+| | |-CopyAssignment simple trivial has_const_param needs_implicit implicit_has_const_param
+| | |-MoveAssignment exists simple trivial needs_implicit
+| | `-Destructor simple irrelevant trivial needs_implicit
+| |-CXXRecordDecl 0x59af8c9dd8a8 <col:1, col:7> col:7 implicit class G1HeapVerifier
+| |-AccessSpecDecl 0x59af8c9dd938 <line:4:1, col:7> col:1 public
+| |-CXXMethodDecl 0x59af8c9dda68 <line:5:3, col:42> col:8 verify_bitmap_clear 'void (bool)'
+| | `-ParmVarDecl 0x59af8c9dd970 <col:28, col:33> col:33 from_tams 'bool'
+| |-CXXConstructorDecl 0x59af8c9de040 <line:3:7> col:7 implicit constexpr G1HeapVerifier 'void ()' inline default trivial noexcept-unevaluated 0x59af8c9de040
+| |-CXXConstructorDecl 0x59af8c9de178 <col:7> col:7 implicit constexpr G1HeapVerifier 'void (const G1HeapVerifier &)' inline default trivial noexcept-unevaluated 0x59af8c9de178
+| | `-ParmVarDecl 0x59af8c9de288 <col:7> col:7 'const G1HeapVerifier &'
+| `-CXXConstructorDecl 0x59af8c9de338 <col:7> col:7 implicit constexpr G1HeapVerifier 'void (G1HeapVerifier &&)' inline default trivial noexcept-unevaluated 0x59af8c9de338
+|   `-ParmVarDecl 0x59af8c9de448 <col:7> col:7 'G1HeapVerifier &&'
+`-CXXMethodDecl 0x59af8c9ddbe8 parent 0x59af8c9dd790 prev 0x59af8c9dda68 <line:8:1, line:25:1> line:8:22 verify_bitmap_clear 'void (bool)'
+  |-ParmVarDecl 0x59af8c9ddb58 <col:42, col:47> col:47 used from_tams 'bool'
+  `-CompoundStmt 0x59af8c9fbe60 <col:58, line:25:1>
+    |-IfStmt 0x59af8c9ddd18 <line:9:3, line:11:3>
+    | |-CXXBoolLiteralExpr 0x59af8c9ddce0 <line:9:7> 'bool' true
+    | `-CompoundStmt 0x59af8c9ddd00 <col:13, line:11:3>
+    |   `-ReturnStmt 0x59af8c9ddcf0 <line:10:5>
+    |-DeclStmt 0x59af8c9fbdb0 <line:13:3, line:22:18>
+    | |-CXXRecordDecl 0x59af8c9ddd38 <line:13:3, line:22:3> line:13:9 class G1VerifyBitmapClear definition
+    | | |-DefinitionData polymorphic has_user_declared_ctor can_const_default_init
+    | | | |-DefaultConstructor defaulted_is_constexpr
+    | | | |-CopyConstructor simple non_trivial has_const_param implicit_has_const_param
+    | | | |-MoveConstructor exists simple non_trivial
+    | | | |-CopyAssignment simple non_trivial has_const_param implicit_has_const_param
+    | | | |-MoveAssignment exists simple non_trivial
+    | | | `-Destructor simple irrelevant trivial
+    | | |-CXXRecordDecl 0x59af8c9dde58 <col:3, col:9> col:9 implicit referenced class G1VerifyBitmapClear
+    | | |-AccessSpecDecl 0x59af8c9ddee8 <line:15:3, col:9> col:3 public
+    | | |-CXXConstructorDecl 0x59af8c9de4c8 <line:16:5, col:38> col:5 used G1VerifyBitmapClear 'void (int)' implicit-inline
+    | | | |-ParmVarDecl 0x59af8c9ddf28 <col:26, col:30> col:30 xxx 'int'
+    | | | `-CompoundStmt 0x59af8c9fb7d0 <col:36, col:38>
+    | | |-CXXMethodDecl 0x59af8c9fb290 <line:18:5, line:21:5> line:18:18 used do_heap_region 'bool (int *)' virtual implicit-inline
+    | | | |-ParmVarDecl 0x59af8c9de5c0 <col:33, col:38> col:38 r 'int *'
+    | | | `-CompoundStmt 0x59af8c9fb800 <col:41, line:21:5>
+    | | |   `-ReturnStmt 0x59af8c9fb7f0 <line:20:7, col:14>
+    | | |     `-CXXBoolLiteralExpr 0x59af8c9fb7e0 <col:14> 'bool' false
+    | | |-CXXMethodDecl 0x59af8c9fb398 <line:13:9> col:9 implicit operator= 'G1VerifyBitmapClear &(const G1VerifyBitmapClear &)' inline default noexcept-unevaluated 0x59af8c9fb398
+    | | | `-ParmVarDecl 0x59af8c9fb4a8 <col:9> col:9 'const G1VerifyBitmapClear &'
+    | | |-CXXMethodDecl 0x59af8c9fb548 <col:9> col:9 implicit operator= 'G1VerifyBitmapClear &(G1VerifyBitmapClear &&)' inline default noexcept-unevaluated 0x59af8c9fb548
+    | | | `-ParmVarDecl 0x59af8c9fb658 <col:9> col:9 'G1VerifyBitmapClear &&'
+    | | |-CXXDestructorDecl 0x59af8c9fb6f0 <col:9> col:9 implicit ~G1VerifyBitmapClear 'void ()' inline default trivial noexcept-unevaluated 0x59af8c9fb6f0
+    | | |-CXXConstructorDecl 0x59af8c9fb920 <col:9> col:9 implicit constexpr G1VerifyBitmapClear 'void (const G1VerifyBitmapClear &)' inline default noexcept-unevaluated 0x59af8c9fb920
+    | | | `-ParmVarDecl 0x59af8c9fba38 <col:9> col:9 'const G1VerifyBitmapClear &'
+    | | `-CXXConstructorDecl 0x59af8c9fbab8 <col:9> col:9 implicit constexpr G1VerifyBitmapClear 'void (G1VerifyBitmapClear &&)' inline default noexcept-unevaluated 0x59af8c9fbab8
+    | |   `-ParmVarDecl 0x59af8c9fbbc8 <col:9> col:9 'G1VerifyBitmapClear &&'
+    | `-VarDecl 0x59af8c9fb878 <col:3, line:22:17> col:5 cl 'class G1VerifyBitmapClear':'G1VerifyBitmapClear' callinit
+    |   `-CXXConstructExpr 0x59af8c9fbd68 <col:5, col:17> 'class G1VerifyBitmapClear':'G1VerifyBitmapClear' 'void (int)'
+    |     `-ImplicitCastExpr 0x59af8c9fbc60 <col:8> 'int' <IntegralCast>
+    |       `-ImplicitCastExpr 0x59af8c9fbc48 <col:8> 'bool' <LValueToRValue>
+    |         `-DeclRefExpr 0x59af8c9fb8e0 <col:8> 'bool' lvalue ParmVar 0x59af8c9ddb58 'from_tams' 'bool'
+    `-DeclStmt 0x59af8c9fbe48 <line:24:3, col:14>
+      `-VarDecl 0x59af8c9fbde0 <col:3, col:10> col:10 ddyy 'double'
