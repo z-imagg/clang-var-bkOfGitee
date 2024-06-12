@@ -15,12 +15,12 @@ using namespace clang;
  * @param SM
  * @return
  */
-bool UtilBusz::isModifiable_FunctionDecl(CXXMethodDecl* cxxMethDecl, SourceManager& SM ){
+bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, SourceManager& SM ){
 
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
   if(!_LocFileIDEqMainFileID){
-    RetFalse_NotModifiableFunctionDecl;
+    RetFalse_For_NotModifiableFunctionDecl;
   }
   //跳过 default
 //  if(Util::funcIsDefault(cxxMethDecl)){
@@ -29,12 +29,12 @@ bool UtilBusz::isModifiable_FunctionDecl(CXXMethodDecl* cxxMethDecl, SourceManag
   //跳过 无函数体
   bool hasBody=cxxMethDecl->hasBody();
   if(!hasBody){
-    RetFalse_NotModifiableFunctionDecl;
+    RetFalse_For_NotModifiableFunctionDecl;
   }
   //跳过 constexpr
   bool _isConstexpr = cxxMethDecl->isConstexpr();
   if(_isConstexpr){
-    RetFalse_NotModifiableFunctionDecl;
+    RetFalse_For_NotModifiableFunctionDecl;
   }
 
   //获得 函数体、左右花括号
@@ -46,16 +46,16 @@ bool UtilBusz::isModifiable_FunctionDecl(CXXMethodDecl* cxxMethDecl, SourceManag
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
   if(stmtCntInFuncBody<=0){
-    RetFalse_NotModifiableFunctionDecl;
+    RetFalse_For_NotModifiableFunctionDecl;
   }
 
   //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
   bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
   if(funcBodyLRBraceInSameLine){
-    RetFalse_NotModifiableFunctionDecl;
+    RetFalse_For_NotModifiableFunctionDecl;
   }
 
 
 //Modifiable == 能够被修改的函数 == 具有被修改资格的函数
-  RetTrue_ModifiableFunctionDecl;
+  RetTrue_For_ModifiableFunctionDecl;
 }
