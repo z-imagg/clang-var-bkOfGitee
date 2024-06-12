@@ -9,6 +9,7 @@
 #include "Var/RangeHasMacroAstVst.h"
 #include "Var/CollectIncMacro_PPCb.h"
 #include "Var/Common.h"
+#include "Var/ClConst.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -21,6 +22,7 @@
 #include "base/UtilMainFile.h"
 #include "base/UtilLocId.h"
 #include "base/UtilEnvVar.h"
+#include "base/UtilTraverseSingleParent.h"
 
 using namespace llvm;
 using namespace clang;
@@ -61,6 +63,12 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   std::string filePath;
   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
 
+  clang::DynTypedNode returnNode=clang::DynTypedNode::create(*returnStmt);
+  clang::DynTypedNode funcNode;
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
+  if(found_funcNode){
+    const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
+  }
 
 /////////////////////////对当前节点returnStmt做 自定义处理
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
