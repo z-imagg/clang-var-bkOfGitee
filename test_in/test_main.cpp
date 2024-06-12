@@ -15,7 +15,7 @@ void G1HeapVerifier::verify_bitmap_clear(bool from_tams) {
   public:
     G1VerifyBitmapClear( int xxx)  { }
 
-    virtual bool do_heap_region(int* r) {
+    virtual bool targetClosureFunction_do_heap_region(int* r) {
       //这里插入了destroy, 但是却没有插入init. 说明 FnVisit没认识闭包
       return false;
     }
