@@ -6,9 +6,6 @@ set print pretty on
 set pagination off
 set breakpoint pending on
 
-run
-#quit
-
 break _init_varLs_inFn__RtC00
 commands
  silent
@@ -75,4 +72,6 @@ commands
  continue
 end
 
-
+run
+contine
+quit
