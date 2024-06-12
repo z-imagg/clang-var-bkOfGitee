@@ -76,6 +76,29 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
     return insertResult;
 }
 
+static  void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& declVec_/*出量*/, bool & isFunctionDecl_/*出量*/){
+  Decl *singleDecl;
+
+//  std::vector<const Decl*> declVec;
+
+  bool isSingleDecl = declStmt->isSingleDecl();
+  if(isSingleDecl){
+    //单声明（单变量声明、单函数声明、单x声明）
+    singleDecl = declStmt->getSingleDecl();
+    if(singleDecl && llvm::isa<FunctionDecl>(*singleDecl)){
+      isFunctionDecl_=true;
+//      return true;
+    }
+    declVec_.push_back(singleDecl);
+  }else{
+    //多声明（多变量声明、多函数声明、多x声明）
+    const DeclGroupRef &dg = declStmt->getDeclGroup();
+    std::copy(dg.begin(), dg.end(), std::back_inserter(declVec_));
+
+  }
+}
+
+
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
     //获取主文件ID,文件路径
@@ -101,57 +124,52 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
 
-    Decl *singleDecl;
-
-  std::vector<const Decl*> declVec;
-
-  bool isSingleDecl = declStmt->isSingleDecl();
-  if(isSingleDecl){
-    //单声明（单变量声明、单函数声明、单x声明）
-    singleDecl = declStmt->getSingleDecl();
-    //跳过函数声明  (在函数f1体内,声明另一个函数f2签名的语句. 跳过这样的函数签名语句)
-    if(singleDecl && llvm::isa<FunctionDecl>(*singleDecl)){
-      RetTrue_to_KeepOuterLoop;
-    }
-    declVec.push_back(singleDecl);
-  }else{
-    //多声明（多变量声明、多函数声明、多x声明）
-    const DeclGroupRef &dg = declStmt->getDeclGroup();
-    std::copy(dg.begin(), dg.end(), std::back_inserter(declVec));
-
+  //声明语句 转为 声明们
+  std::vector<const Decl*> declVec;//声明们
+  bool isFunctionDecl;
+  declStmt2DeclVec(declStmt, declVec/*出量*/, isFunctionDecl/*出量*/);
+  //跳过函数声明  (在函数f1体内,声明另一个函数f2签名的语句. 跳过这样的函数签名语句)
+  if(isFunctionDecl){
+    RetTrue_to_KeepOuterLoop;
   }
 
-  std::vector<const VarTypeDesc*> vTDPtrVec;
+  //////{ [依赖关系] vTDVec_ptr_focus 中指针 指向 vTDVec 中元素
+  //从 声明们 中过滤出 关注的声明们
+  std::vector<const VarTypeDesc*> vTDVec_ptr_focus;//关注的声明们
+  //  vTDVec_ptr_focus 中的 指针 指向 vTDVec 中的对象, 因此 vTDVec 必须比 vTDVec_ptr_focus 活得更久
   int varCnt=std::distance(declVec.begin(),declVec.end());
   //vTDVec 为 varCnt个 VarTypeDesc对象 的拥有者
   // 这里相当于 构造了 varCnt 个VarTypeDesc对象 , 放在此处栈中, 下面的 insertAfter_VarDecl 会用到这些对象,
   //      因此要使得这些对象在被使用时还是活的、没有被释放的 即可
   // 不想用new，因为若释放没做好会崩溃
-  std::vector<VarTypeDesc> vTDVec(varCnt, VarTypeDesc());
+  std::vector<VarTypeDesc> vTDVec(varCnt, VarTypeDesc()); //分配varCnt个默认对象 给 vTDVec
   //遍历每一个声明
   for(int k=0; k < declVec.size(); k++){
     const Decl* decl_k=declVec.at(k);
     VarTypeDesc & varTypeDesc_k  = vTDVec.at(k);
-    this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ );
+    this->process_singleDecl(decl_k, varTypeDesc_k/*出量*/ ); //vTDVec中一些对象被填充'关注'内容
     //第k个声明，若是似结构体则记数
     if(varTypeDesc_k.focus){
-      vTDPtrVec.push_back(&varTypeDesc_k);
+      vTDVec_ptr_focus.push_back(&varTypeDesc_k);
     }
 
   }
 
+  //对 关注的声明们 执行修改
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
-    bool useCxx=ASTContextUtil::useCxx(Ctx);
-    //是结构体
-    if(!vTDPtrVec.empty()){
-        //按照左右花括号，构建位置id，防止重复插入
-        //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
-        LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
-        //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
-        //只有似结构体变量才会产生通知
-       insertAfter_VarDecl(useCxx, vTDPtrVec, declStmtBgnLocId, declStmtBgnLoc);
-       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
-    }
+  bool useCxx=ASTContextUtil::useCxx(Ctx);
+  //是结构体
+  if(!vTDVec_ptr_focus.empty()){
+    //按照左右花括号，构建位置id，防止重复插入
+    //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
+    LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
+    //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
+    //只有似结构体变量才会产生通知
+    insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
+    //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
+  }
+  // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec
+  //////}
 
     RetTrue_to_KeepOuterLoop;
 }
