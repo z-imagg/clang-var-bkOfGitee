@@ -49,7 +49,7 @@ public:
     bool TraverseCXXDestructorDecl(CXXDestructorDecl * cxxDestructorDecl);//CXXDestructorDecl是一种CXXMethodDecl
     bool I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who);
     bool TraverseLambdaExpr(LambdaExpr *lambdaExpr);
-    bool do_modify(
+    void do_modify_me(
 //            bool funcIsStatic,
 //            bool funcIsInline,
             QualType funcReturnType,

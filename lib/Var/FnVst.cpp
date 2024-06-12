@@ -130,7 +130,7 @@ bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
 //    std::cout<<verboseLogMsg;
 
     if(modify_me){
-      this->do_modify(//其中的insertAfter_X__funcEnter内Vst.fnBdLBrcLocIdSet、funcLocId.locationId相互配合使得funcLocId.locationId作为funcLocId.srcFileId局部下的自增数
+      this->do_modify_me(//其中的insertAfter_X__funcEnter内Vst.fnBdLBrcLocIdSet、funcLocId.locationId相互配合使得funcLocId.locationId作为funcLocId.srcFileId局部下的自增数
         funcReturnType,
         false,
         endStmtOfFuncBody,
@@ -230,7 +230,7 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
 
   std::string whoReturn=fmt::format("{}:cpp函数尾非return", who);
   if(modify_me){
-    this->do_modify(
+    this->do_modify_me(
       funcReturnType,
       false,
       endStmtOfFuncBody,
@@ -321,7 +321,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   //lambda一定有body
 
   if(modify_me){
-    this->do_modify(
+    this->do_modify_me(
       funcReturnType,
       false,
       endStmtOfFuncBody,
@@ -336,7 +336,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   return true;//上层遍历循环保持继续以免跳过后续源码文本
 
 }
-bool FnVst::do_modify(
+void FnVst::do_modify_me(
 //        bool funcIsStatic,
 //        bool funcIsInline,
         QualType funcReturnType,
@@ -378,8 +378,7 @@ bool FnVst::do_modify(
     TraverseStmt(compoundStmt);
   }
 
-// _Traverse_Func返回true表示继续遍历函数声明
-    return true;
+    return;
 
 }
 
