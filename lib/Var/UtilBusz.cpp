@@ -9,7 +9,7 @@
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
 using namespace clang;
-bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
+bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
   bool isModifiableFuncDecl= false;
   clang::DynTypedNode returnNode=clang::DynTypedNode::create(*stmt);
   clang::DynTypedNode funcNode;
@@ -17,7 +17,7 @@ bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompilerInstance& CI,
   if(found_funcNode){
     const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
     assert(funcDecl!= nullptr);
-    isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,SM);
+    isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,compoundStmt_/*出量*/,funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/,  SM);
   }
   return isModifiableFuncDecl;
 }
@@ -29,7 +29,7 @@ bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompilerInstance& CI,
  * @param SM
  * @return
  */
-bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, SourceManager& SM ){
+bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/, SourceManager& SM ){
 
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
@@ -53,18 +53,18 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Source
 
   //获得 函数体、左右花括号
   Stmt* body = cxxMethDecl->getBody();
-  CompoundStmt* compoundStmt;
-  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt, funcBodyLBraceLoc,funcBodyRBraceLoc);
+//  CompoundStmt* compoundStmt;
+//  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
+  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/);
 
   //跳过 函数体内无语句
-  int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
+  int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt_);
   if(stmtCntInFuncBody<=0){
     RetFalse_For_NotModifiableFunctionDecl;
   }
 
   //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
-  bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
+  bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM, funcBodyLBraceLoc_/*入量*/, funcBodyRBraceLoc_/*入量*/);
   if(funcBodyLRBraceInSameLine){
     RetFalse_For_NotModifiableFunctionDecl;
   }

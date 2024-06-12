@@ -9,6 +9,7 @@
 #include "Var/RangeHasMacroAstVst.h"
 #include "Var/CollectIncMacro_PPCb.h"
 #include "Var/Common.h"
+#include "Var/UtilBusz.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -65,42 +66,13 @@ bool FnVst::insert_init__After_FnBdLBrc( bool useCXX,LocId fnBdLBrcLocId,std::st
 }
 
 bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
-    //跳过非MainFile
-    bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM, funcDecl->getLocation());
-    if(!_LocFileIDEqMainFileID){
-        RetTrue_to_KeepOuterLoop;
-    }
-    //跳过 default
-//    if(Util::funcIsDefault(funcDecl)){
-//        RetTrue_to_KeepOuterLoop;
-//    }
-    //跳过 无函数体
-    bool hasBody=funcDecl->hasBody();
-    if(!hasBody){
-        RetTrue_to_KeepOuterLoop;
-    }
-    //跳过 constexpr
-    bool _isConstexpr = funcDecl->isConstexpr();
-    if(_isConstexpr){
-        RetTrue_to_KeepOuterLoop;
-    }
-
-    //获得 函数体、左右花括号
-    Stmt* body  = funcDecl->getBody();
     CompoundStmt* compoundStmt;
     SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt, funcBodyLBraceLoc,funcBodyRBraceLoc);
 
-    //跳过 函数体内无语句
-    int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
-    if(stmtCntInFuncBody<=0){
-        RetTrue_to_KeepOuterLoop;
-    }
-
-    //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
-    bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
-    if(funcBodyLRBraceInSameLine){
-        RetTrue_to_KeepOuterLoop;
+    bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,  SM);
+    // 若 此函数  为 不应修改的函数 , 则直接退出
+    if(!isModifiableFuncDecl){
+      RetTrue_to_KeepOuterLoop;
     }
 
     //获取最后一条语句
@@ -167,44 +139,12 @@ bool FnVst::TraverseCXXDestructorDecl(CXXDestructorDecl * cxxDestructorDecl){
 
 bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who){
 
-//  UtilDebugDecl::debugFuncDeclByGlobalCounter(cxxMethDecl ,*Ctx,CI);
-  //调试说明在该函数内
-
-  //跳过非MainFile
-  bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,cxxMethDecl->getLocation());
-  if(!_LocFileIDEqMainFileID){
-    RetTrue_to_KeepOuterLoop;
-  }
-  //跳过 default
-//  if(Util::funcIsDefault(cxxMethDecl)){
-//    RetTrue_to_KeepOuterLoop;
-//  }
-  //跳过 无函数体
-  bool hasBody=cxxMethDecl->hasBody();
-  if(!hasBody){
-    RetTrue_to_KeepOuterLoop;
-  }
-  //跳过 constexpr
-  bool _isConstexpr = cxxMethDecl->isConstexpr();
-  if(_isConstexpr){
-    RetTrue_to_KeepOuterLoop;
-  }
-
-  //获得 函数体、左右花括号
-  Stmt* body = cxxMethDecl->getBody();
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt, funcBodyLBraceLoc,funcBodyRBraceLoc);
 
-  //跳过 函数体内无语句
-  int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt);
-  if(stmtCntInFuncBody<=0){
-    RetTrue_to_KeepOuterLoop;
-  }
-
-  //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
-  bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
-  if(funcBodyLRBraceInSameLine){
+  bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(cxxMethDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,  SM);
+  // 若 此函数  为 不应修改的函数 , 则直接退出
+  if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;
   }
 
@@ -241,7 +181,7 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
 }
 bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
 
-  if(sizeof(lambdaExpr)<0){//以这样一句话暂时跳过lambda
+  if(sizeof(lambdaExpr)<0){//开发用, 这行的小于号改为大于号 可以暂时跳过lambda
     RetTrue_to_KeepOuterLoop;
   }
 

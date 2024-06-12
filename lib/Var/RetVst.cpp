@@ -63,7 +63,10 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   std::string filePath;
   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
 
-  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,CI,SM,Ctx);
+  CompoundStmt* compoundStmt;
+  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
+
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, CI,SM,Ctx);
   // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
   if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;

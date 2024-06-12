@@ -18,7 +18,7 @@ public:
  * @param SM
  * @return
  */
-  static bool isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl,   SourceManager& SM );
+  static bool isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/,   SourceManager& SM );
 
 /** 给定语句所在函数声明 是否 为 能够被修改的函数
  *
@@ -28,7 +28,7 @@ public:
  * @param Ctx
  * @return
  */
-static bool func_of_stmt_isModifiable(const Stmt* stmt, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx );
+static bool func_of_stmt_isModifiable(const Stmt* stmt,CompoundStmt* compoundStmt_/*出参*/, SourceLocation funcBodyLBraceLoc_/*出参*/, SourceLocation funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx );
 };
 
 
