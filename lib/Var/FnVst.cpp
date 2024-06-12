@@ -167,7 +167,7 @@ bool FnVst::TraverseCXXDestructorDecl(CXXDestructorDecl * cxxDestructorDecl){
 
 bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who){
 
-  UtilDebugDecl::debugFuncDeclByGlobalCounter(cxxMethDecl ,*Ctx,CI);
+//  UtilDebugDecl::debugFuncDeclByGlobalCounter(cxxMethDecl ,*Ctx,CI);
   //调试说明在该函数内
 
   //跳过非MainFile
