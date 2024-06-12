@@ -58,23 +58,15 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
     RetTrue_to_KeepOuterLoop;
   }
 
-
   //获取主文件ID,文件路径
   FileID mainFileId;
   std::string filePath;
   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
 
-  clang::DynTypedNode returnNode=clang::DynTypedNode::create(*returnStmt);
-  clang::DynTypedNode funcNode;
-  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
-  if(found_funcNode){
-    const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
-    assert(funcDecl!= nullptr);
-    bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,SM);
-    // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
-    if(!isModifiableFuncDecl){
-      RetTrue_to_KeepOuterLoop;
-    }
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,CI,SM,Ctx);
+  // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
+  if(!isModifiableFuncDecl){
+    RetTrue_to_KeepOuterLoop;
   }
 
 /////////////////////////对当前节点returnStmt做 自定义处理

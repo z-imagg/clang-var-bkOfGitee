@@ -3,10 +3,24 @@
 #include "base/UtilMainFile.h"
 #include "base/UtilCompoundStmt.h"
 #include "base/UtilLineNum.h"
+#include "base/UtilTraverseSingleParent.h"
 #include "Var/Common.h"
+#include "Var/ClConst.h"
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
 using namespace clang;
+bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
+  bool isModifiableFuncDecl= false;
+  clang::DynTypedNode returnNode=clang::DynTypedNode::create(*stmt);
+  clang::DynTypedNode funcNode;
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
+  if(found_funcNode){
+    const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
+    assert(funcDecl!= nullptr);
+    isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,SM);
+  }
+  return isModifiableFuncDecl;
+}
 /** 给定函数声明 是否 为 能够被修改的函数
  Modifiable == 能够被修改的函数 == 具有被修改资格的函数
  Modifiable 且 该函数还没被修改 == 应该修改该函数
