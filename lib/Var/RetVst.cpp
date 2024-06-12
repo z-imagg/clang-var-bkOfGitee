@@ -10,6 +10,7 @@
 #include "Var/CollectIncMacro_PPCb.h"
 #include "Var/Common.h"
 #include "Var/ClConst.h"
+#include "Var/UtilBusz.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -68,6 +69,8 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
   if(found_funcNode){
     const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
+    assert(funcDecl!= nullptr);
+    UtilBusz::isModifiable_FunctionDecl()
   }
 
 /////////////////////////对当前节点returnStmt做 自定义处理
