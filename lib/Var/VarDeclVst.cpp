@@ -8,6 +8,7 @@
 #include "Var/RangeHasMacroAstVst.h"
 #include "Var/CollectIncMacro_PPCb.h"
 #include "Var/Common.h"
+#include "Var/UtilBusz.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -100,7 +101,15 @@ static  void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& decl
 
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
-    //获取主文件ID,文件路径
+    // 若 该声明语句所在函数  为 不应修改的函数 , 则直接退出
+    CompoundStmt* compoundStmt;
+    SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
+    bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(declStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, CI,SM,Ctx);
+    if(!isModifiableFuncDecl){
+      RetTrue_to_KeepOuterLoop;
+    }
+
+  //获取主文件ID,文件路径
     FileID mainFileId;
     std::string filePath;
   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
