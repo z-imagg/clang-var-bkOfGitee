@@ -7,6 +7,7 @@
 #include "base/StrUtil.h"
 #include "Var/RangeHasMacroAstVst.h"
 #include "Var/CollectIncMacro_PPCb.h"
+#include "Var/Common.h"
 #include <vector>
 
 #include <fmt/core.h>
@@ -95,7 +96,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
     bool parentNKIsForEachStmt = ASTNodeKind::getFromNodeKind<CXXForRangeStmt>().isSame(parentNK);
     if(parentNKIsForStmt || parentNKIsForEachStmt){
-        return false;
+        RetTrue_to_KeepOuterLoop;
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
@@ -110,7 +111,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     singleDecl = declStmt->getSingleDecl();
     //跳过函数声明  (在函数f1体内,声明另一个函数f2签名的语句. 跳过这样的函数签名语句)
     if(singleDecl && llvm::isa<FunctionDecl>(*singleDecl)){
-      return true;
+      RetTrue_to_KeepOuterLoop;
     }
     declVec.push_back(singleDecl);
   }else{
@@ -152,7 +153,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
        //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
     }
 
-    return true;
+    RetTrue_to_KeepOuterLoop;
 }
 
 // 递归遍历typedef链条
