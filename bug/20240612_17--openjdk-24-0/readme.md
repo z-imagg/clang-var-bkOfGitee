@@ -31,3 +31,10 @@ make jdk  JOBS=1
 ```htop``` 并重新执行该命令 , 发现其单cpu核心100%占用,  全部8G内存被吃尽, 因为 怀疑clang-var插件在不合理的地方插入了runtime_c*调用 ,导致死循环或死递归
 
 因此 问题 可以归类为 '不提前退出上层循环后引发的副作用'
+
+
+
+### 人肉观察gdb打印确认哪个函数导致的
+```shell
+gdb -q --command=/fridaAnlzAp/clang-var/bug/20240612_17--openjdk-24-0/human_watch_runtimeFnCall.gdb_script.sh  --args /d2/jdk-jdk-24-0/build_home/hotspot/variant-server/tools/adlc/adlc -q -T -DLINUX=1 -D_GNU_SOURCE=1 -g -DAMD64=1 -D_LP64=1 -DNDEBUG -DPRODUCT /d2/jdk-jdk-24-0/build_home/hotspot/variant-server/support/adlc/all-ad-src.ad -c/d2/jdk-jdk-24-0/build_home/hotspot/variant-server/support/adlc/ad_x86.cpp -h/d2/jdk-jdk-24-0/build_home/hotspot/variant-server/support/adlc/ad_x86.hpp -a/d2/jdk-jdk-24-0/build_home/hotspot/variant-server/support/adlc/dfa_x86.cpp -v/d2/jdk-jdk-24-0/build_home/hotspot/variant-server/support/adlc/adGlobals_x86.hpp
+```
