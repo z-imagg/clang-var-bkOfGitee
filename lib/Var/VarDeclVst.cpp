@@ -98,7 +98,6 @@ static  void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& decl
   }
 }
 
-
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
     //获取主文件ID,文件路径
@@ -119,7 +118,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
     bool parentNKIsForEachStmt = ASTNodeKind::getFromNodeKind<CXXForRangeStmt>().isSame(parentNK);
     if(parentNKIsForStmt || parentNKIsForEachStmt){
-        RetTrue_to_KeepOuterLoop;
+      RetTrue_to_KeepOuterLoop;
     }
     //TODO ForEach 要像 ForStmt 一样 处理么?
 
@@ -154,6 +153,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     }
 
   }
+
   //对 关注的声明们 执行修改
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
     bool useCxx=ASTContextUtil::useCxx(Ctx);
