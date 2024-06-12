@@ -3,6 +3,8 @@
 
 
 #操作步骤
+#0. 新开终端Z执行htop 观看cpu 和 内存占用
+
 #1. 新开终端A执行以下命令
 #   一开始会因为无进程adlc而报错 可以忽略
 # 间隔20毫秒发送一个信号SIGUSR1给进程adlc
@@ -14,6 +16,12 @@
 #3. 终端B被gdb占有,  输入 run , 步骤1 将实际开始间隔20毫秒发送 信号SIGUSR1给gdb此脚本
 #   从而 间接地 使得 此脚本 间隔20毫秒执行一次 断点处理过程
 
+#执行一次以上步骤 , 获知 当counter==350的时候 , 内存吃了大约4GB, 此时开始打印调用栈
+#   看调用栈并没有死循环, 因此 排除死循环
+#     剩下另一个排查方案:
+#       将 局限范围在adlc依赖的源码文件们中 , 比较 上一次正常的clang-var修改代码 和 此次clang-var修改代码(崩溃)   人工观看二者差异,
+#       调整差异量  从新编译 adlc 观看是否崩溃 ,
+#       在去掉某个函数的修改后 adlc 恰好不崩溃, 则 就是该函数的修改有问题
 set print pretty on
 set pagination off
 set breakpoint pending on
@@ -29,7 +37,9 @@ commands 1
  silent
  set $counter=$counter+1
  printf "counter= %d \n", $counter
+ if $counter >= 350
  backtrace
+ end
  continue
 end
 
