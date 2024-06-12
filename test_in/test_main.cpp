@@ -1,27 +1,23 @@
-// c++ 闭包
-// 模拟  jdk-jdk-24-0/src/hotspot/share/gc/g1/g1HeapVerifier.cpp
-class G1HeapVerifier{
-public:
-  void verify_bitmap_clear(bool from_tams) ;
-};
+#include "MyClz.h"
+#include <algorithm>
+#include <list>
 
-void G1HeapVerifier::verify_bitmap_clear(bool from_tams) {
-  if (true) {
-    return;
+int main(int argc, char** argv){
+  my_nsp::MyClass varMyClass;
+  static Point pnt1;
+  struct Point pnt2;
+  {
+    struct Point * ptr1=&pnt1;
+    struct Point * ptr2=&pnt2;
+    struct Point pnt3;
   }
 
-  class G1VerifyBitmapClear   {
 
-  public:
-    G1VerifyBitmapClear( int xxx)  { }
+  std::list<my_nsp::MyClass*> ls;
 
-    virtual bool targetClosureFunction_do_heap_region(int* r) {
-      //这里插入了destroy, 但是却没有插入init. 说明 FnVisit没认识闭包
-      return false;
-    }
-  } cl(from_tams);
+  std::for_each(ls.begin(), ls.end(), [](my_nsp::MyClass* k){ my_nsp::MyClass* idx=k; return k; });
 
-  double ddyy;
+  return 0;
 }
 
 
