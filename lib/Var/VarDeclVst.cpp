@@ -77,7 +77,7 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
     return insertResult;
 }
 
-static  void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& declVec_/*出量*/, bool & isFunctionDecl_/*出量*/){
+void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& declVec_/*出量*/, bool & isFunctionDecl_/*出量*/){
   Decl *singleDecl;
 
 //  std::vector<const Decl*> declVec;
@@ -97,6 +97,7 @@ static  void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& decl
     std::copy(dg.begin(), dg.end(), std::back_inserter(declVec_));
 
   }
+  return;
 }
 
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
@@ -134,7 +135,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
   //声明语句 转为 声明们
   std::vector<const Decl*> declVec;//声明们
-  bool isFunctionDecl;
+  bool isFunctionDecl=false;
   declStmt2DeclVec(declStmt, declVec/*出量*/, isFunctionDecl/*出量*/);
   //跳过函数声明  (在函数f1体内,声明另一个函数f2签名的语句. 跳过这样的函数签名语句)
   if(isFunctionDecl){
