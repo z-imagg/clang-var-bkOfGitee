@@ -97,7 +97,8 @@ void declStmt2DeclVec(DeclStmt* declStmt, std::vector<const Decl*>& declVec_/*�
     std::copy(dg.begin(), dg.end(), std::back_inserter(declVec_));
 
   }
-  return;
+
+  return; //Release版 函数末尾始终要有return语句
 }
 
 bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
@@ -233,7 +234,7 @@ void VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeD
 //        std::cout<<fmt::format("[返回]likeStruct=={}\n", focus_);
     }
 
-    return;
+    return; //Release版 函数末尾始终要有return语句
 }
 
 /**  clang::Type::Auto == typeClass , 但是typeName不同 , typeName为 'class (lambda at ...)' 或 typeName='class ...'

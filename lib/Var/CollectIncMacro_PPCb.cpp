@@ -37,6 +37,8 @@ using namespace clang;
       InclusionDirectiveLocSet.insert(LocId::buildFor(filePath, HashLoc,SM));
 //      std::cout << "Include指令:" << FileName.str() << std::endl;//开发打印日志
       //endregion
+
+      return; //Release版 函数末尾始终要有return语句
     }
 
     //预处理回调收集#define 以判断case起止范围内 有无#d
@@ -64,6 +66,8 @@ using namespace clang;
       MacroDefinedLocSet.insert(LocId::buildFor(filePath, macroNameTkLoc,SM));
 //      std::cout << "宏定义:" << MacroNameTok.getIdentifierInfo()->getName().str() << std::endl;//开发打印日志
       //endregion
+
+      return; //Release版 函数末尾始终要有return语句
     }
 
     //判断给定起止范围内 有无#include
@@ -128,6 +132,8 @@ std::unordered_set<LocId,LocId> CollectIncMacro_PPCb::MacroDefinedLocSet;
         std::cout << fmt::format("namespaceSR:{} , msgSR:{}, msgKind:{}, msgFull:{}\n", namespaceSR.str(), msgSR.str() , (int)msgKind, msgFull) ;
 
         //endregion
+
+        return; //Release版 函数末尾始终要有return语句
     }
 
 
