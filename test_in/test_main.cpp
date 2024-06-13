@@ -13,7 +13,7 @@ void C_User::func02() {
 }
 int C_User::func01(Score x) {
   if(true){
-    Score zz;
+    Score zz,yy;
   }
   T_Animal animal;
   return 0.;
