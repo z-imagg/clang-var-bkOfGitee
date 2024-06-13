@@ -63,17 +63,23 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 //关注 auto 似结构体类型
 //关注 似结构体类型
   //////////
+
+  return; //Release版 函数末尾始终要有return语句
 }
 
 void VarTypeDesc::fillVarName_devOnly(clang::IdentifierInfo * _varName){
   this->varName=  _varName->getName();
 
   this->msg=fmt::format("[VarDecl描述] varName={}, {} \n", this->varName,this->msg);
+
+  return; //Release版 函数末尾始终要有return语句
 }
 
 
 void VarTypeDesc::printMsg_devOnly(){
 std::cout<<this->msg;
+
+return; //Release版 函数末尾始终要有return语句
 }
 
 

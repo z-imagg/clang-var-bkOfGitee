@@ -99,7 +99,7 @@ void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
     }
   }
 
-  return;
+  return; //Release版 函数末尾始终要有return语句
 }
 
 
