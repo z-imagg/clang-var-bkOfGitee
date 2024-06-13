@@ -53,8 +53,9 @@ bool RetVst::insert_destroy__Before_fnRet(bool useCXX ,LocId retBgnLocId, Source
 }
 
 bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
-  UtilDebugStmt::debugStmtByGlobalCounter(returnStmt ,*Ctx,CI);
+//  UtilDebugStmt::debugStmtByGlobalCounter(returnStmt ,*Ctx,CI);
   //调试说明在该函数内
+  
   //跳过非MainFile
   bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,returnStmt->getBeginLoc());
   if(!_LocFileIDEqMainFileID){
@@ -98,7 +99,7 @@ void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
     }
   }
 
-  return;
+  return; //Release版 函数末尾始终要有return语句
 }
 
 

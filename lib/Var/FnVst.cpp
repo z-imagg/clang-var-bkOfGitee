@@ -312,8 +312,7 @@ void FnVst::do__modify_me__traverseCompoundStmt(
     TraverseStmt(compoundStmt);
   }
 
-    return;
-
+    return; //Release版 函数末尾始终要有return语句
 }
 
 

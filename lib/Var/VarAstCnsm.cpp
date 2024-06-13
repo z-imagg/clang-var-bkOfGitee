@@ -168,5 +168,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
     //可以发现, 本方法 两次被调用 ， 对象地址this 即对象CTkAstCnsm的地址，两次是不同的。 原因在Act中 是 每次都是 新创建 CTkAstCnsm。
     mainFileProcessed=true;
    //endregion
+
+   return; //Release版 函数末尾始终要有return语句
  }
 
