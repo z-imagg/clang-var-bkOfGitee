@@ -174,14 +174,21 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
-        //只有似结构体变量才会产生通知
-       insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
-       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
+      bool insertResult =false;
+      //只有似结构体变量才会产生通知
+      insertResult = insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
+      if(insertResult){
+//        const FunctionDecl* funcDecl;
+//        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);
+        LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
+        this->createVar__fnBdLBrcLocIdSet.insert(funcBodyLBraceLocId);
+      }
+
     }
     // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec
     //////}
 
-
+  //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
     RetTrue_to_KeepOuterLoop;
 }
 

@@ -9,6 +9,8 @@
 #include "base/UtilFile.h"
 #include "base/UtilEnvVar.h"
 #include "base/UtilDiagnostics.h"
+#include "base/UtilCompoundStmt.h"
+#include "base/UtilLocId.h"
 #include <llvm/Support/Casting.h>
 
 
@@ -108,12 +110,21 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
 //         cxxRecordDecl->methods();
          CXXDestructorDecl *deconstor = cxxRecordDecl->getDestructor();
          std::vector<CXXMethodDecl*> cxxMethodDeclVec(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end());
-         std::for_each(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end(), [this](  CXXMethodDecl* cxxMethodDecl){
+         std::for_each(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end(), [filePath,this](  CXXMethodDecl* cxxMethodDecl){
            // cxx方法k
+           //获得 函数体、左右花括号
+           Stmt* body = cxxMethodDecl->getBody();
+          CompoundStmt* compoundStmt;
+          SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
+           UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/);
+           LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+           
            // A1、B1、C1需要保持顺序一致么？
-           this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
+           this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
+           if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {//若有
+             this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
              this->retVst.TraverseCXXMethodDecl(cxxMethodDecl);//B1
-             this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
+           }
          });
 
        }
@@ -124,9 +135,9 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
        if(clang::FunctionDecl *funDecl = dyn_cast<clang::FunctionDecl>(D)){
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
+         this->varDeclVst.TraverseDecl(funDecl);//C1
          this->fnVst.TraverseDecl(funDecl);//A1
            this->retVst.TraverseDecl(funDecl);//B1
-           this->varDeclVst.TraverseDecl(funDecl);//C1
        }
      }else{
 //       const std::string &msg = fmt::format("跳过不关心的Decl，declKind={},declKindName={}\n\n", int(declKind), declKindName);
