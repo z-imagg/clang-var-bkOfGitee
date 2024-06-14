@@ -112,10 +112,11 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
            // cxx方法k
            // A1、B1、C1需要保持顺序一致么？
            bool focusFunc=this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
-           if(focusFunc){
+           //由于 FnVst::Traverse*Decl 总是以 RetTrue_to_KeepOuterLoop 结束 即 始终返回true， 因此以下focusFunc判断不需要了
+//           if(focusFunc){
              this->retVst.TraverseCXXMethodDecl(cxxMethodDecl);//B1
              this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
-           }
+//           }
          });
 
        }
@@ -127,10 +128,11 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
          bool focusFunc=this->fnVst.TraverseDecl(funDecl);//A1
-         if(focusFunc){
+         //由于 FnVst::Traverse*Decl 总是以 RetTrue_to_KeepOuterLoop 结束 即 始终返回true， 因此以下focusFunc判断不需要了
+//         if(focusFunc){
            this->retVst.TraverseDecl(funDecl);//B1
            this->varDeclVst.TraverseDecl(funDecl);//C1
-         }
+//         }
        }
      }else{
 //       const std::string &msg = fmt::format("跳过不关心的Decl，declKind={},declKindName={}\n\n", int(declKind), declKindName);
