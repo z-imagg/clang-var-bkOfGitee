@@ -87,15 +87,21 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
 //  Expr *xxx = returnStmt->getRetValue();
 }
 
-void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
+void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath,SourceLocation funcBodyLBraceLoc){
   bool useCxx=ASTContextUtil::useCxx(Ctx);
 
   const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
   LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, SM);
 
+  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, SM);
+
   if(bool parentIsCompound=UtilParentKind::parentIsCompound(Ctx,returnStmt)){
-    if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {//防重复
-      insert_destroy__Before_fnRet(useCxx, retBgnLocId, retBgnLoc);
+    if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {
+      //防重复, 若 本函数还 没有 插入 destroyVarLs_ 语句，才插入。
+      if(UtilLocId::LocIdSetContains(this->createVar__fnBdLBrcLocIdSet, funcBodyLBraceLocId)) {
+        //若 本函数 有 关注的变量声明(即已插入createVar__语句),  才插入
+        insert_destroy__Before_fnRet(useCxx, retBgnLocId, retBgnLoc);
+      }
     }
   }
 

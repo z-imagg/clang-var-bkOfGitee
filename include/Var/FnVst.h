@@ -25,9 +25,10 @@ class FnVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit FnVst(CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit FnVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
-    : mRewriter_ptr(rewriter_ptr),
+    : createVar__fnBdLBrcLocIdSet(createVar__fnBdLBrcLocIdSet),
+    mRewriter_ptr(rewriter_ptr),
     Ctx(Ctx),
     CI(CI),
     SM(SM)
@@ -79,6 +80,11 @@ public:
     // 一个函数定义的体花括号紧后插入_init_varLs语句后,则将该位置塞入此集合,
     //   以保证对该位置只插入一次.
     std::unordered_set<LocId,LocId> fnBdLBrcLocIdSet;
+
+  //已有 createVar__语句 的 函数体
+  //    变量声明紧后插入的createVar__语句
+  //    引用的VarDeclVst中的同名字段
+  std::unordered_set<LocId,LocId>& createVar__fnBdLBrcLocIdSet;
 };
 
 
