@@ -67,8 +67,12 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
   std::copy(code_ls.begin(), code_ls.end(), std::ostream_iterator<std::string>(oss, "  "));
   std::string code_ls_txt = oss.str();
 
-    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
-
+    bool insertResult=false;
+    insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
+    if(!insertResult){
+      std::string errMsg=fmt::format("[未意料的可能错误] InsertTextAfterToken返回false\n");
+      std::cout<<errMsg;
+    }
 
     //记录已插入语句的节点ID们以防重： 即使重复遍历了 但不会重复插入
   //用funcEnterLocIdSet的尺寸作为LocationId的计数器
