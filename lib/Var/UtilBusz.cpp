@@ -6,8 +6,11 @@
 #include "base/UtilTraverseSingleParent.h"
 #include "Var/Common.h"
 #include "Var/ClConst.h"
+#include "base/UtilPrintAstNode.h"
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
+#include <iostream>
+
 using namespace clang;
 bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* & compoundStmt_/*出参*/, SourceLocation &  funcBodyLBraceLoc_/*出参*/, SourceLocation & funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
   bool isModifiableFuncDecl= false;
@@ -55,8 +58,14 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
   Stmt* body = cxxMethDecl->getBody();
 //  CompoundStmt* compoundStmt;
 //  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/,
-                                                             funcBodyRBraceLoc_/*出量*/);
+
+  if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/)){
+    std::string errMsg=fmt::format("[未意料的可能错误] funcBody is not a CompoundStmt. \n" );
+    std::cout<<errMsg;
+//    UtilPrintAstNode::printStmt(Ctx, CI, "未意料的可能错误", errMsg, body, true);
+    RetFalse_For_OtherErr;//跳过for_each的此次循环体 进入下次循环体
+  }
+
 
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt_);
