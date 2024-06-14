@@ -131,10 +131,10 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
            // A1、B1、C1需要保持顺序一致么？
            this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
            if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
-             //若varDecl在此函数中插入了create语句, 才在此函数中插入init语句和destroy语句
+             //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
              this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
              this->retVst.TraverseCXXMethodDecl(cxxMethodDecl);//B1
-           }//否则(即varDecl在此函数中没有插入create语句, 则才在此函数中也不必插入init语句和destroy语句
+           }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
          });
 
        }
@@ -160,10 +160,10 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          // A1、B1、C1需要保持顺序一致么？
          this->varDeclVst.TraverseDecl(funDecl);//C1
          if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
-           //若varDecl在此函数中插入了create语句, 才在此函数中插入init语句和destroy语句
+           //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
            this->fnVst.TraverseDecl(funDecl);//A1
            this->retVst.TraverseDecl(funDecl);//B1
-         }//否则(即varDecl在此函数中没有插入create语句, 则才在此函数中也不必插入init语句和destroy语句
+         }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
        }
      }else{
 //       const std::string &msg = fmt::format("跳过不关心的Decl，declKind={},declKindName={}\n\n", int(declKind), declKindName);
