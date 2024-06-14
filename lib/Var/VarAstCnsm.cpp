@@ -121,6 +121,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
        }
      }else
      //访问实现文件中某方法体
+     // FunctionDecl的子类们:  CXXMethodDecl 、 CXXConstructorDecl 、 CXXDestructorDecl 、 CXXDeductionGuideDecl 、 CXXConversionDecl
      if (D && llvm::isa<clang::FunctionDecl>(*D)) {
        if(clang::FunctionDecl *funDecl = dyn_cast<clang::FunctionDecl>(D)){
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
