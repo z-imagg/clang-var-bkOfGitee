@@ -1,4 +1,5 @@
 
+#define  XXX
 class User{};
 class Main{
 public:
