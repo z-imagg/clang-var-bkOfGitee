@@ -113,10 +113,14 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          std::for_each(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end(), [filePath,this](  CXXMethodDecl* cxxMethodDecl){
            // cxx方法k
            //获得 函数体、左右花括号
-           Stmt* body = cxxMethodDecl->getBody();
+           Stmt* funcBody = cxxMethodDecl->getBody();
+           //跳过函数体为空的函数
+           if(funcBody== nullptr){
+             return;
+           }
           CompoundStmt* compoundStmt;
           SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
-           UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/);
+           UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/);
            LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
            
            // A1、B1、C1需要保持顺序一致么？
