@@ -16,6 +16,10 @@ double Main::func01(){
   User & u = user;
 #endif
     func02([](char ch,int int_){
+#ifdef  UUU
+      User myuser;
+  User & up = myuser;
+#endif
       User self;
     });
   return 0.0;
