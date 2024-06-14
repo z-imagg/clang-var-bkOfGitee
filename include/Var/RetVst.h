@@ -27,7 +27,7 @@ class RetVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit RetVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit RetVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, ClGO _clGO)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
     : createVar__fnBdLBrcLocIdSet(createVar__fnBdLBrcLocIdSet),
       clGO(_clGO)
