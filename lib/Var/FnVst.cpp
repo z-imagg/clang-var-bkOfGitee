@@ -27,6 +27,7 @@
 #include "base/UtilEnvVar.h"
 #include "base/UtilPrintAstNode.h"
 #include "base/UtilDebugDecl.h"
+#include "base/UtilDebugStmt.h"
 
 using namespace llvm;
 using namespace clang;
@@ -296,7 +297,10 @@ void FnVst::do__modify_me__traverseCompoundStmt(
     //region 插入 函数进入语句
     if(UtilLocId::LocIdSetNotContains(fnBdLBrcLocIdSet, funcBodyLBraceLocId)){
       //防重复, 若 本函数还 没有 插入 _init_varLs_ 语句，才插入。
-      //        Util::printStmt(*Ctx, CI, fmt::format("排查问题:{:x},",reinterpret_cast<uintptr_t> (&fnBdLBrcLocIdSet)), funcBodyLBraceLocId.to_csv_line(), compoundStmt, true);
+
+      UtilDebugStmt::debugStmtByGlobalCounter(compoundStmt ,clGO.astCtx,clGO.CI);
+      //调试说明在该函数内
+
       if(UtilLocId::LocIdSetContains(this->createVar__fnBdLBrcLocIdSet, funcBodyLBraceLocId)) {
       //若 本函数 有 关注的变量声明(即已插入createVar__语句),  才插入
         insert_init__After_FnBdLBrc(useCxx,funcBodyLBraceLocId,funcName, funcBodyLBraceLoc, funcBodyRBraceLoc);
