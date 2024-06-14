@@ -25,6 +25,7 @@
 #include "base/UtilLocId.h"
 #include "base/UtilEnvVar.h"
 #include "base/UtilTraverseSingleParent.h"
+#include "base/UtilCompoundStmt.h"
 
 using namespace llvm;
 using namespace clang;
@@ -87,13 +88,20 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
 //  Expr *xxx = returnStmt->getRetValue();
 }
 
-void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath,SourceLocation funcBodyLBraceLoc){
+void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
+
+  //获得return语句所在函数体
+  const FunctionDecl* funcDecl;
+  CompoundStmt* compoundStmt;
+  SourceLocation funcBodyLBraceLoc, funcBodyRBraceLoc;
+  UtilBusz::get_func_of_stmt(returnStmt, funcDecl/*出量*/,compoundStmt/*出参*/,funcBodyLBraceLoc/*出参*/,funcBodyRBraceLoc/*出参*/,CI, Ctx);
+  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, SM);
+
   bool useCxx=ASTContextUtil::useCxx(Ctx);
 
+  //返回语句位置
   const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
   LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, SM);
-
-  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, SM);
 
   if(bool parentIsCompound=UtilParentKind::parentIsCompound(Ctx,returnStmt)){
     if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {

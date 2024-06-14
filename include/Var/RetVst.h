@@ -41,7 +41,7 @@ public:
 
     bool TraverseReturnStmt(ReturnStmt *returnStmt);
 
-    void do__modify_me(ReturnStmt *returnStmt,std::string filePath,SourceLocation funcBodyLBraceLoc);
+    void do__modify_me(ReturnStmt *returnStmt,std::string filePath);
 
 public:
     const std::shared_ptr<Rewriter> mRewriter_ptr;

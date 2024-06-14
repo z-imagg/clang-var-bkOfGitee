@@ -86,15 +86,30 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
 
 /** 获得给定语句所在的函数 (暂时没用到函数get_func_of_stmt)
  */
-bool UtilBusz::get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompilerInstance& CI,  ASTContext *Ctx){
-  bool isModifiableFuncDecl= false;
+bool UtilBusz::get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompoundStmt*& compoundStmt_/*出参*/,SourceLocation& funcBodyLBraceLoc_/*出参*/,SourceLocation& funcBodyRBraceLoc_/*出参*/,  CompilerInstance& CI,  ASTContext *Ctx){
+  //向上查找函数体定义
   clang::DynTypedNode stmtNode=clang::DynTypedNode::create(*stmt);
   clang::DynTypedNode funcNode;
   bool found_funcNode=UtilTraverseSingleParent::do_traverse(stmtNode, ClConstAstNodeKind::functionDecl , funcNode/*出量*/, CI, Ctx);
+  //若找到函数体定义
   if(found_funcNode){
     if(const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>()){
-      funcDecl=funcDecl_;
+      //若的确是函数体声明
+
+      //回传函数体声明
+      funcDecl_=funcDecl;
+
+      //获取函数体左花括号位置
+      Stmt* funcBody = funcDecl_->getBody();
+      if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/)){
+        std::string errMsg=fmt::format("[未意料的可能错误__get_func_of_stmt] funcBody is not a CompoundStmt. \n" );
+        std::cout<<errMsg;
+        //若无函数体 返回false
+        RetFalse_For_OtherErr;
+      }
+      return true;
     }
   }
-  return found_funcNode;
+  //若未找到函数体定义 返回false
+  return false;
 }
