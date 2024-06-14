@@ -81,7 +81,7 @@ bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
     //获取主文件ID,文件路径
     FileID mainFileId;
     std::string filePath;
-  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(clGO.SM,mainFileId,filePath);
 
     //获取函数名称
     const std::string &funcQualifiedName = funcDecl->getQualifiedNameAsString();
@@ -89,8 +89,8 @@ bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
 //  funcDecl->getName();
 
     //按照左右花括号，构建位置id，防止重复插入
-    LocId funcBodyLBraceLocId=LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
-    LocId funcBodyRBraceLocId=LocId::buildFor(filePath, funcBodyRBraceLoc, SM);
+    LocId funcBodyLBraceLocId=LocId::buildFor(filePath, funcBodyLBraceLoc, clGO.SM);
+    LocId funcBodyRBraceLocId=LocId::buildFor(filePath, funcBodyRBraceLoc, clGO.SM);
 
     //获取返回类型
     const QualType funcReturnType = funcDecl->getReturnType();
@@ -154,14 +154,14 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
   //获取主文件ID,文件路径
   FileID mainFileId;
   std::string filePath;
-  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(clGO.SM,mainFileId,filePath);
 
   //获取函数名称
   const std::string &funcQualifiedName = cxxMethDecl->getQualifiedNameAsString();
 
   //按照左右花括号，构建位置id，防止重复插入
-  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,funcBodyLBraceLoc, SM);
-  LocId funcBodyRBraceLocId=LocId::buildFor(filePath,funcBodyRBraceLoc, SM);
+  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,funcBodyLBraceLoc, clGO.SM);
+  LocId funcBodyRBraceLocId=LocId::buildFor(filePath,funcBodyRBraceLoc, clGO.SM);
 
   //获取返回类型
   const QualType funcReturnType = cxxMethDecl->getReturnType();
@@ -186,7 +186,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   }
 
   //跳过非MainFile
-  bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,lambdaExpr->getBeginLoc());
+  bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(clGO.SM,lambdaExpr->getBeginLoc());
   if(!_LocFileIDEqMainFileID){
     RetTrue_to_KeepOuterLoop;
   }
@@ -220,7 +220,7 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
 
   //跳过 函数左花括号、右花括号在同一行 且 (todo)函数体内只有一条语句的(难,一个大块复合语句也是一条语句)
   //  lambda表达式写在一行是很常见的, 因此要求该lambda表达式体内无语句时才跳过
-  bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
+  bool funcBodyLRBraceInSameLine=UtilLineNum::isEqSrcLocLineNum(clGO.SM,funcBodyLBraceLoc,funcBodyRBraceLoc);
   if(funcBodyLRBraceInSameLine && stmtCntInFuncBody == 0){
     RetTrue_to_KeepOuterLoop;
   }
@@ -231,14 +231,14 @@ bool FnVst::TraverseLambdaExpr(LambdaExpr *lambdaExpr) {
   //获取主文件ID,文件路径
   FileID mainFileId;
   std::string filePath;
-  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(clGO.SM,mainFileId,filePath);
 
   //lambda无函数名称
   const char * funName="";
 
   //按照左右花括号，构建位置id，防止重复插入
-  LocId funcBodyLBraceLocId=LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
-  LocId funcBodyRBraceLocId=LocId::buildFor(filePath, funcBodyRBraceLoc, SM);
+  LocId funcBodyLBraceLocId=LocId::buildFor(filePath, funcBodyLBraceLoc, clGO.SM);
+  LocId funcBodyRBraceLocId=LocId::buildFor(filePath, funcBodyRBraceLoc, clGO.SM);
 
   //获取返回类型
   CXXRecordDecl *cxxRecordDecl = lambdaExpr->getLambdaClass();
@@ -291,7 +291,7 @@ void FnVst::do__modify_me__traverseCompoundStmt(
 //    Util::printStmt(*Ctx,CI,"_Traverse_Func","查看语句compoundStmt源码",compoundStmt,true);
 
 /////////////////////////对当前节点cxxMethodDecl|functionDecl做 自定义处理
-  bool useCxx = ASTContextUtil::useCxx(Ctx);
+  bool useCxx = ASTContextUtil::useCxx(& clGO.astCtx);
 
     //region 插入 函数进入语句
     if(UtilLocId::LocIdSetNotContains(fnBdLBrcLocIdSet, funcBodyLBraceLocId)){
