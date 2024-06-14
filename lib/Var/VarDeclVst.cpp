@@ -183,7 +183,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
       insertResult = insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
 //      if(insertResult){
 //        const FunctionDecl* funcDecl;
-//        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);
+//        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);//暂时用不上get_func_of_stmt, 因为上面的func_of_stmt_isModifiable 已经拿到了目标量
         LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
         this->createVar__fnBdLBrcLocIdSet.insert(funcBodyLBraceLocId);
 //      }

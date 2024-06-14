@@ -84,7 +84,7 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
   RetTrue_For_ModifiableFunctionDecl;
 }
 
-/** 获得给定语句所在的函数
+/** 获得给定语句所在的函数 (暂时没用到函数get_func_of_stmt)
  */
 bool UtilBusz::get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompilerInstance& CI,  ASTContext *Ctx){
   bool isModifiableFuncDecl= false;

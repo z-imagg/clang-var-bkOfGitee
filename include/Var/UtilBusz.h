@@ -30,7 +30,7 @@ public:
  */
   static bool isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, CompoundStmt* & compoundStmt_/*出参*/, SourceLocation & funcBodyLBraceLoc_/*出参*/, SourceLocation & funcBodyRBraceLoc_/*出参*/,   SourceManager& SM );
 
-  /** 获得给定语句所在的函数
+  /** 获得给定语句所在的函数  (暂时没用到函数get_func_of_stmt)
    */
   static bool get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompilerInstance& CI,  ASTContext *Ctx);
 };
