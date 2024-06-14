@@ -54,8 +54,8 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 // !vTF.isBuiltinType
 // !vTF.isPointerType
 // 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
-// 关注        (非内置类型               且    非指针类型             且   非lambda类型)         或    记录类型           或      elaborated类型              或   数组类型         或  类类型          或    结构体or类类型              或   联合类型
-  self.focus= ((!qT->isBuiltinType()) && (!qT->isPointerType()) && (!vTF.isLambdaType)  ) || (qT->isRecordType() || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
+// 关注        (非内置类型               且    非指针类型          且          非引用类型         且   非lambda类型)         或    记录类型           或      elaborated类型              或   数组类型         或  类类型          或    结构体or类类型              或   联合类型
+  self.focus= ((!qT->isBuiltinType()) && (!qT->isPointerType()) && (!qT->isReferenceType()) && (!vTF.isLambdaType)  ) || (qT->isRecordType() || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
 
 //不关注 auto lambda
 //不关注 基本类型
