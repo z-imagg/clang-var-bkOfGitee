@@ -68,7 +68,7 @@ public:
 
 
 public:
-
+    const std::shared_ptr<Rewriter> mRewriter_ptr;
     ClGO clGO;
 
     //函数体左花括号紧后

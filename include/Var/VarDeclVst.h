@@ -44,6 +44,7 @@ public:
 
 
 public:
+    const std::shared_ptr<Rewriter> mRewriter_ptr;
     ClGO clGO;
 
     //变量声明紧后,
