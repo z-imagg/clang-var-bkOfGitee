@@ -8,7 +8,6 @@ public:
 
 class NameList{};
 void C_User::func02() {
-  NameList pipeline_reads;
   return;
 }
 int C_User::func01(Score x) {
