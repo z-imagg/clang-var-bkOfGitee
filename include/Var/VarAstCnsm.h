@@ -39,9 +39,9 @@ public:
             Ctx(*_astContext),
             SM(_SM),
             varOk(false),
-            fnVst(_CI, _rewriter_ptr, _astContext, _SM, _langOptions),
-            retVst(_CI, _rewriter_ptr, _astContext, _SM, _langOptions),
-            varDeclVst(_CI,_rewriter_ptr,_astContext,_SM,_langOptions)
+            varDeclVst(_CI,_rewriter_ptr,_astContext,_SM,_langOptions),
+            fnVst(varDeclVst.createVar__fnBdLBrcLocIdSet, _CI, _rewriter_ptr, _astContext, _SM, _langOptions),
+            retVst(varDeclVst.createVar__fnBdLBrcLocIdSet, _CI, _rewriter_ptr, _astContext, _SM, _langOptions)
             {
       //构造函数
 //      _rewriter_ptr->overwriteChangedFiles();//C'正常.

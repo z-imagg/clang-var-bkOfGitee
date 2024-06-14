@@ -26,9 +26,10 @@ class RetVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit RetVst(CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit RetVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
-    : mRewriter_ptr(rewriter_ptr),
+    : createVar__fnBdLBrcLocIdSet(createVar__fnBdLBrcLocIdSet),
+    mRewriter_ptr(rewriter_ptr),
     Ctx(Ctx),CtxRef(*Ctx),
     CI(CI),
     SM(SM)
@@ -53,6 +54,11 @@ public:
 
     //return紧前
     std::unordered_set<LocId,LocId> retBgnLocIdSet;
+
+  //已有 createVar__语句 的 函数体
+  //    变量声明紧后插入的createVar__语句
+  //    引用的VarDeclVst中的同名字段
+  std::unordered_set<LocId,LocId>& createVar__fnBdLBrcLocIdSet;
 };
 
 
