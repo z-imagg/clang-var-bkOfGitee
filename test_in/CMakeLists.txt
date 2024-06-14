@@ -26,6 +26,6 @@ target_include_directories( TestIn
 )
 
 target_link_libraries(  TestIn
-#    "${runtime_c__TmPnt_ThreadLocal__staticLib}"
-#    "${runtime_cpp__vars_fn__staticLib}"
+    "${runtime_c__TmPnt_ThreadLocal__staticLib}"
+    "${runtime_cpp__vars_fn__staticLib}"
 )
