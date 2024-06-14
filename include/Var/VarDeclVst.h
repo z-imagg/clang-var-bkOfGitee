@@ -26,10 +26,11 @@ class VarDeclVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit VarDeclVst(ClGO _clGO)
+    explicit VarDeclVst(ClGO _clGO,const std::shared_ptr<Rewriter> _mRewriter_ptr)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
     :
-    clGO(_clGO)
+    clGO(_clGO),
+    mRewriter_ptr(_mRewriter_ptr)
     {
 
     }

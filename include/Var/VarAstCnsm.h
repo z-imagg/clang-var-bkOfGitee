@@ -36,11 +36,11 @@ public:
                         LangOptions &_langOptions,Preprocessor &_PP, const std::shared_ptr<Rewriter> _mRewriter_ptr)
             //Rewriter:4:  Consumer将Rewriter传递给Visitor
             :
-            clGO(_CI,_SM, _astContext, _langOptions,_PP,  _mRewriter_ptr),
+            clGO(_CI,_SM, _astContext, _langOptions,_PP),
             varOk(false),
-            varDeclVst(clGO),
-            fnVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO),
-            retVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO)
+            varDeclVst(clGO,_mRewriter_ptr),
+            fnVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO,_mRewriter_ptr),
+            retVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO,_mRewriter_ptr)
             {
       //构造函数
 //      _rewriter_ptr->overwriteChangedFiles();//C'正常.
