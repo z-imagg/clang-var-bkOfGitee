@@ -71,7 +71,7 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,clGO.Ctx);
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&clGO.astCtx);
   if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;
   }

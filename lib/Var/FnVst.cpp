@@ -69,7 +69,7 @@ bool FnVst::TraverseFunctionDecl(FunctionDecl *funcDecl) {
     CompoundStmt* compoundStmt;
     SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
 
-    bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,  SM);
+    bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(funcDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,   clGO.SM);
     // 若 此函数  为 不应修改的函数 , 则直接退出
     if(!isModifiableFuncDecl){
       RetTrue_to_KeepOuterLoop;
@@ -142,7 +142,7 @@ bool FnVst::I__TraverseCXXMethodDecl(CXXMethodDecl* cxxMethDecl,const char* who)
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
 
-  bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(cxxMethDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,  SM);
+  bool isModifiableFuncDecl=UtilBusz::isModifiable_FunctionDecl(cxxMethDecl,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/,   clGO.SM);
   // 若 此函数  为 不应修改的函数 , 则直接退出
   if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;
