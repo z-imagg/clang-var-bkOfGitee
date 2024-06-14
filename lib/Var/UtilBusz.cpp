@@ -55,7 +55,8 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
   Stmt* body = cxxMethDecl->getBody();
 //  CompoundStmt* compoundStmt;
 //  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/);
+  UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/,
+                                                             funcBodyRBraceLoc_/*出量*/);
 
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt_);
