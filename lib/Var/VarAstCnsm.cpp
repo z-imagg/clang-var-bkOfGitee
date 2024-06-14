@@ -29,7 +29,7 @@ bool VarAstCnsm::mainFileProcessed=false;
      ///region 打印各重要对象地址
    std::cout << fmt::format("HandleTranslationUnit打印各重要对象地址: CI:{:x},this->Ctx:{:x},Ctx:{:x},SM:{:x},mRewriter_ptr:{:x}",
 reinterpret_cast<uintptr_t> (& clGO.CI ),
-reinterpret_cast<uintptr_t> (&(this-> clGO.astCtx) ),
+reinterpret_cast<uintptr_t> (&(clGO.astCtx) ),
 reinterpret_cast<uintptr_t> (&Ctx ),
 reinterpret_cast<uintptr_t> (& clGO.SM ),
 reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
@@ -123,7 +123,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
           SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
           if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/)){
             std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
-            UtilPrintAstNode::printStmt(this-> clGO.astCtx, this-> clGO.CI, "[头文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+            UtilPrintAstNode::printStmt(clGO.astCtx, this-> clGO.CI, "[头文件中函数] 未意料的可能错误", errMsg, funcBody, true);
             return;//跳过内层for_each的此次循环体 进入下次循环体
           }
           LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc,  clGO.SM);
@@ -151,7 +151,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
          if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/) ){
            std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
-           UtilPrintAstNode::printStmt(this-> clGO.astCtx, this-> clGO.CI, "[实现文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+           UtilPrintAstNode::printStmt(clGO.astCtx, this-> clGO.CI, "[实现文件中函数] 未意料的可能错误", errMsg, funcBody, true);
            continue;//跳过外层for的此次循环体 进入下次循环体
 
          }

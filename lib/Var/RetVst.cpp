@@ -71,7 +71,7 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&clGO.astCtx);
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&(clGO.astCtx));
   if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;
   }
@@ -94,7 +94,7 @@ void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
   const FunctionDecl* funcDecl;
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc, funcBodyRBraceLoc;
-  UtilBusz::get_func_of_stmt(returnStmt, funcDecl/*出量*/,compoundStmt/*出参*/,funcBodyLBraceLoc/*出参*/,funcBodyRBraceLoc/*出参*/,clGO.CI, &clGO.astCtx);
+  UtilBusz::get_func_of_stmt(returnStmt, funcDecl/*出量*/,compoundStmt/*出参*/,funcBodyLBraceLoc/*出参*/,funcBodyRBraceLoc/*出参*/,clGO.CI, &(clGO.astCtx));
   LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, clGO.SM);
 
   bool useCxx=ASTContextUtil::useCxx(& clGO.astCtx);
@@ -103,7 +103,7 @@ void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
   const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
   LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, clGO.SM);
 
-  if(bool parentIsCompound=UtilParentKind::parentIsCompound(&clGO.astCtx,returnStmt)){
+  if(bool parentIsCompound=UtilParentKind::parentIsCompound(&(clGO.astCtx),returnStmt)){
     if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {
       //防重复, 若 本函数还 没有 插入 destroyVarLs_ 语句，才插入。
       if(UtilLocId::LocIdSetContains(this->createVar__fnBdLBrcLocIdSet, funcBodyLBraceLocId)) {

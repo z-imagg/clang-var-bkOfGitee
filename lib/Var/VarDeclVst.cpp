@@ -34,7 +34,7 @@ static std::string __bool2txt(bool isArr, bool useCxx){
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
 bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
-  bool useCxx = ASTContextUtil::useCxx(&clGO.astCtx);
+  bool useCxx = ASTContextUtil::useCxx(&(clGO.astCtx));
   std::string varDeclLocIdStr=varDeclLocId.to_string();
   //const std::string typeName,int varCnt
   std::string funcName=Constant::fnNameS__createVar[useCXX];
@@ -110,7 +110,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     // 若 该声明语句所在函数  为 不应修改的函数 , 则直接退出
     CompoundStmt* compoundStmt;
     SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-    bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(declStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&clGO.astCtx);
+    bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(declStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&(clGO.astCtx));
     if(!isModifiableFuncDecl){
       RetTrue_to_KeepOuterLoop;
     }
@@ -171,7 +171,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
   //对 关注的声明们 执行修改
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
-    bool useCxx=ASTContextUtil::useCxx(&clGO.astCtx);
+    bool useCxx=ASTContextUtil::useCxx(&(clGO.astCtx));
     //是结构体
     if(!vTDVec_ptr_focus.empty()){
         //按照左右花括号，构建位置id，防止重复插入
