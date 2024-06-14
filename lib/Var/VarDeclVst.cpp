@@ -177,12 +177,12 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
       bool insertResult =false;
       //只有似结构体变量才会产生通知
       insertResult = insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
-      if(insertResult){
+//      if(insertResult){
 //        const FunctionDecl* funcDecl;
 //        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);
         LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
         this->createVar__fnBdLBrcLocIdSet.insert(funcBodyLBraceLocId);
-      }
+//      }
 
     }
     // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec

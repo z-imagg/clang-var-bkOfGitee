@@ -133,11 +133,21 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
      // FunctionDecl的子类们:  CXXMethodDecl 、 CXXConstructorDecl 、 CXXDestructorDecl 、 CXXDeductionGuideDecl 、 CXXConversionDecl
      if (D && llvm::isa<clang::FunctionDecl>(*D)) {
        if(clang::FunctionDecl *funDecl = dyn_cast<clang::FunctionDecl>(D)){
+
+         //获得 函数体、左右花括号
+         Stmt* body = funDecl->getBody();
+         CompoundStmt* compoundStmt;
+         SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
+         UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/);
+         LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
          this->varDeclVst.TraverseDecl(funDecl);//C1
-         this->fnVst.TraverseDecl(funDecl);//A1
+         if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {//若有
+           this->fnVst.TraverseDecl(funDecl);//A1
            this->retVst.TraverseDecl(funDecl);//B1
+         }
        }
      }else{
 //       const std::string &msg = fmt::format("跳过不关心的Decl，declKind={},declKindName={}\n\n", int(declKind), declKindName);
