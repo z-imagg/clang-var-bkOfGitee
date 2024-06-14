@@ -1,3 +1,4 @@
+
 class User{};
 class Main{
 public:
@@ -10,10 +11,11 @@ int func02(double (*func_ptr) (char,int )){
 }
 double Main::func01(){
 
-  assert(true, "must");
+#ifdef  XXX
   User user;
   User & u = user;
-  if(&u!= nullptr){
+#endif
+  if(nullptr== nullptr){
     func02([](char ch,int int_){
       User self;
       return 1.0;
