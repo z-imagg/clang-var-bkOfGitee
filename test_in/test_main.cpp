@@ -1,19 +1,18 @@
-class Score {};
-class T_Animal{};
-class C_User{
-public:
-  int func01(Score x);
-  void func02();
-};
+class User{};
 
-class NameList{};
-void C_User::func02() {
-  return;
+int func02(double (*func_ptr) (char,int )){
+  char sex;
+  int age;
+  func_ptr(sex, age);
 }
-int C_User::func01(Score x) {
-  if(true){
-    Score zz,yy;
+double func01(){
+  User user;
+  User & u = user;
+  if(&u!= nullptr){
+    func02([](char ch,int int_){
+      User self;
+      return 1.0;
+    });
   }
-  T_Animal animal;
-  return 0.;
+  return 0.0;
 }
