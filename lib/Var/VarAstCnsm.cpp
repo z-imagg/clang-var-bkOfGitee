@@ -130,11 +130,12 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
            
            // A1、B1、C1需要保持顺序一致么？
            this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
-           if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
+           //判断不能写在这里的原因是: 如果函数cxxMethodDecl 中有个lambda函数， varDeclVst实际上遍历了 该函数cxxMethodDecl 、 lambda函数， 而下面的判断只用了该函数cxxMethodDecl ， 显然遗漏了lambda函数
+//           if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
              //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
              this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
              this->retVst.TraverseCXXMethodDecl(cxxMethodDecl);//B1
-           }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
+//           }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
          });
 
        }
@@ -159,6 +160,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
          this->varDeclVst.TraverseDecl(funDecl);//C1
+         //判断不能写在这里的原因是: 如果函数funDecl 中有个lambda函数， varDeclVst实际上遍历了 该函数funDecl 、 lambda函数， 而下面的判断只用了该函数funDecl ，显然遗漏了lambda函数
 //         if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
            //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
            this->fnVst.TraverseDecl(funDecl);//A1
