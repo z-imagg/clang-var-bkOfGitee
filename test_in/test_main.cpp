@@ -9,6 +9,8 @@ int func02(double (*func_ptr) (char,int )){
   func_ptr(sex, age);
 }
 double Main::func01(){
+
+  assert(true, "must");
   User user;
   User & u = user;
   if(&u!= nullptr){
