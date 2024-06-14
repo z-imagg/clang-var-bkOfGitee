@@ -12,6 +12,7 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/SourceManager.h"
 #include "base/LocId.h"
+#include "base/ClGO.h"
 
 using namespace llvm;
 using namespace clang;
@@ -25,13 +26,10 @@ class FnVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit FnVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit FnVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, ClGO _clGO)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
     : createVar__fnBdLBrcLocIdSet(createVar__fnBdLBrcLocIdSet),
-    mRewriter_ptr(rewriter_ptr),
-    Ctx(Ctx),
-    CI(CI),
-    SM(SM)
+      clGO(_clGO)
     {
 
     }
@@ -68,13 +66,10 @@ public:
 
 
 
-public:
-    const std::shared_ptr<Rewriter> mRewriter_ptr;
 
 public:
-    ASTContext *Ctx;
-    CompilerInstance& CI;
-    SourceManager& SM;
+
+    ClGO clGO;
 
     //函数体左花括号紧后
     // 一个函数定义的体花括号紧后插入_init_varLs语句后,则将该位置塞入此集合,

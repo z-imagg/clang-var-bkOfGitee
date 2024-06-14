@@ -17,8 +17,9 @@
 
 #include "Var/FnVst.h"
 #include "base/Util.h"
-#include "VarDeclVst.h"
-#include "RetVst.h"
+#include "base/ClGO.h"
+#include "Var/VarDeclVst.h"
+#include "Var/RetVst.h"
 
 using namespace llvm;
 using namespace clang;
@@ -31,17 +32,15 @@ using namespace clang;
 class VarAstCnsm : public ASTConsumer {
 public:
     //Rewriter:3:  Action将Rewriter传递给Consumer
-    explicit VarAstCnsm(CompilerInstance &_CI, const std::shared_ptr<Rewriter> _rewriter_ptr, ASTContext *_astContext,
-                        SourceManager &_SM, LangOptions &_langOptions)
+    explicit VarAstCnsm(CompilerInstance &_CI, SourceManager &_SM, ASTContext& _astContext,
+                        LangOptions &_langOptions,Preprocessor &_PP, const std::shared_ptr<Rewriter> _mRewriter_ptr)
             //Rewriter:4:  Consumer将Rewriter传递给Visitor
             :
-            CI(_CI),
-            Ctx(*_astContext),
-            SM(_SM),
+            clGO(_CI,_SM, _astContext, _langOptions,_PP,  _mRewriter_ptr),
             varOk(false),
-            varDeclVst(_CI,_rewriter_ptr,_astContext,_SM,_langOptions),
-            fnVst(varDeclVst.createVar__fnBdLBrcLocIdSet, _CI, _rewriter_ptr, _astContext, _SM, _langOptions),
-            retVst(varDeclVst.createVar__fnBdLBrcLocIdSet, _CI, _rewriter_ptr, _astContext, _SM, _langOptions)
+            varDeclVst(clGO),
+            fnVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO),
+            retVst(varDeclVst.createVar__fnBdLBrcLocIdSet, clGO)
             {
       //构造函数
 //      _rewriter_ptr->overwriteChangedFiles();//C'正常.
@@ -53,11 +52,7 @@ public:
 
 
 public:
-    CompilerInstance &CI;
-    ASTContext & Ctx;
-//    FnVst insertVst;
-//    FndVarFlagCmtHdl findTCCallROVisitor;
-    SourceManager &SM;
+    ClGO clGO;
     //两次HandleTranslationUnit的ASTConsumer只能每次新建，又期望第二次不要发生，只能让标志字段mainFileProcessed写成static
     static bool mainFileProcessed;
 
