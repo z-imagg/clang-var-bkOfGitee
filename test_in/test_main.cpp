@@ -15,9 +15,6 @@ double Main::func01(){
   User user;
   User & u = user;
 #endif
-    func02([](char ch,int int_){
       User self;
-      return 1.0;
-    });
   return 0.0;
 }
