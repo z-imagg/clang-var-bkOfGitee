@@ -181,7 +181,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
       bool insertResult =false;
       //只有似结构体变量才会产生通知
       insertResult = insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
-//      if(insertResult){
+//      if(insertResult){//貌似记得有时候 Rewriter.InsertTextAfterToken返回了false但其实代码文本被正常插入了, 所以这里暂时不做判断
 //        const FunctionDecl* funcDecl;
 //        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);//暂时用不上get_func_of_stmt, 因为上面的func_of_stmt_isModifiable 已经拿到了目标量
         LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
