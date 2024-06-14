@@ -11,6 +11,7 @@ int func02(double (*func_ptr) (char,int )){
 }
 double Main::func01(){
 
+  User tom;
 #ifdef  XXX
   User user;
   User & u = user;
