@@ -1,3 +1,4 @@
+#pragma message("VarBE_inserted")
 
 class User{};
 class Main{
@@ -16,7 +17,7 @@ double Main::func01(){
   User & u = user;
 #endif
     func02([](char ch,int int_){
-      User self;
+      User self;createVar__RtCxx(_vdLs/*_VarDeclLs*/,  "class User"/*varTypeName*/, sizeof(self)/*varSize*/ , false/*varIsArr*/ , -1/*arrEleSize*/ )  /* 创建变量通知,  /fridaAnlzAp/clang-var/test_in/test_main.cpp:19,16 */ ;  
       return 1.0;
     });
   return 0.0;
