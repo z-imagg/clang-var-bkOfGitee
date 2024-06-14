@@ -34,7 +34,7 @@ static std::string __bool2txt(bool isArr, bool useCxx){
 
 //结构体变量声明末尾 插入 'createVar__RtCxx(_varLs_ptr,"变量类型名",变量个数);'
 bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*>& varTypeDescVec,LocId varDeclLocId, SourceLocation varDeclEndLoc ){
-  bool useCxx = ASTContextUtil::useCxx(Ctx);
+  bool useCxx = ASTContextUtil::useCxx(&(clGO.astCtx));
   std::string varDeclLocIdStr=varDeclLocId.to_string();
   //const std::string typeName,int varCnt
   std::string funcName=Constant::fnNameS__createVar[useCXX];
@@ -110,7 +110,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     // 若 该声明语句所在函数  为 不应修改的函数 , 则直接退出
     CompoundStmt* compoundStmt;
     SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-    bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(declStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, CI,SM,Ctx);
+    bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(declStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&(clGO.astCtx));
     if(!isModifiableFuncDecl){
       RetTrue_to_KeepOuterLoop;
     }
@@ -118,7 +118,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
   //获取主文件ID,文件路径
     FileID mainFileId;
     std::string filePath;
-  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(clGO.SM,mainFileId,filePath);
 
     const SourceLocation declStmtBgnLoc = declStmt->getEndLoc();
 
@@ -127,7 +127,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     //   请注意 'T var2;' 的父亲是CompoundStmt
     DynTypedNode parent;
     ASTNodeKind parentNK;
-    bool only1P = UtilParentKind::only1ParentNodeKind(CI, *Ctx, declStmt, parent, parentNK);
+    bool only1P = UtilParentKind::only1ParentNodeKind(clGO.CI, clGO.astCtx, declStmt, parent, parentNK);
     assert(only1P);
     //跳过for 、foreach 中的循环变量
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
@@ -171,12 +171,12 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 
   //对 关注的声明们 执行修改
   //  Ctx.langOpts.CPlusPlus 估计只能表示当前是用clang++编译的、还是clang编译的, [TODO] 但不能涵盖 'extern c'、'extern c++'造成的语言变化
-    bool useCxx=ASTContextUtil::useCxx(Ctx);
+    bool useCxx=ASTContextUtil::useCxx(&(clGO.astCtx));
     //是结构体
     if(!vTDVec_ptr_focus.empty()){
         //按照左右花括号，构建位置id，防止重复插入
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
-        LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
+        LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, clGO.SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
       bool insertResult =false;
       //只有似结构体变量才会产生通知
@@ -184,7 +184,7 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
 //      if(insertResult){//貌似记得有时候 Rewriter.InsertTextAfterToken返回了false但其实代码文本被正常插入了, 所以这里暂时不做判断
 //        const FunctionDecl* funcDecl;
 //        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);//暂时用不上get_func_of_stmt, 因为上面的func_of_stmt_isModifiable 已经拿到了目标量
-        LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
+        LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, clGO.SM);
         this->createVar__fnBdLBrcLocIdSet.insert(funcBodyLBraceLocId);
 //      }
 

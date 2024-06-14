@@ -28,10 +28,10 @@ bool VarAstCnsm::mainFileProcessed=false;
 
      ///region 打印各重要对象地址
    std::cout << fmt::format("HandleTranslationUnit打印各重要对象地址: CI:{:x},this->Ctx:{:x},Ctx:{:x},SM:{:x},mRewriter_ptr:{:x}",
-reinterpret_cast<uintptr_t> (&CI ),
-reinterpret_cast<uintptr_t> (&(this->Ctx) ),
+reinterpret_cast<uintptr_t> (& clGO.CI ),
+reinterpret_cast<uintptr_t> (&(clGO.astCtx) ),
 reinterpret_cast<uintptr_t> (&Ctx ),
-reinterpret_cast<uintptr_t> (&SM ),
+reinterpret_cast<uintptr_t> (& clGO.SM ),
 reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
 //  ASTConsumer::HandleTranslationUnit(Ctx);
     //endregion
@@ -55,7 +55,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
    ///region 获取主文件ID，文件路径
    FileID mainFileId;
    std::string filePath;
-   UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+   UtilMainFile::getMainFileIDMainFilePath( clGO.SM,mainFileId,filePath);
    //endregion
 
    ///region 若是系统文件 或 tick文件则跳过
@@ -65,7 +65,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
    //endregion
 
    ///region 打印文件路径 开发用
-   FrontendOptions &frontendOptions = CI.getFrontendOpts();
+   FrontendOptions &frontendOptions =  clGO.CI.getFrontendOpts();
    std::cout << "查看，文件路径:" << filePath << ",mainFileId:" << mainFileId.getHashValue() << ",frontendOptions.ProgramAction:" << frontendOptions.ProgramAction << "，Ctx.TUKind:" << Ctx.TUKind <<  std::endl;
    //endregion
    
@@ -95,7 +95,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
    for(int i=0; i<declCnt; i++) {
      Decl *D = declVec[i];
      //跳过非MainFile中的声明
-     if(!UtilMainFile::isDeclInMainFile(SM,D)){
+     if(!UtilMainFile::isDeclInMainFile( clGO.SM,D)){
        continue;
      }
 
@@ -123,10 +123,10 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
           SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
           if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/)){
             std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
-            UtilPrintAstNode::printStmt(this->Ctx, this->CI, "[头文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+            UtilPrintAstNode::printStmt(clGO.astCtx, this-> clGO.CI, "[头文件中函数] 未意料的可能错误", errMsg, funcBody, true);
             return;//跳过内层for_each的此次循环体 进入下次循环体
           }
-          LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+          LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc,  clGO.SM);
            
            // A1、B1、C1需要保持顺序一致么？
            this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
@@ -151,11 +151,11 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
          SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
          if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/) ){
            std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
-           UtilPrintAstNode::printStmt(this->Ctx, this->CI, "[实现文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+           UtilPrintAstNode::printStmt(clGO.astCtx, this-> clGO.CI, "[实现文件中函数] 未意料的可能错误", errMsg, funcBody, true);
            continue;//跳过外层for的此次循环体 进入下次循环体
 
          }
-         LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+         LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc,  clGO.SM);
 
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
@@ -179,7 +179,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
 
    ///region 3. 插入 已处理 注释标记 到主文件第一个声明前
      bool insertResult;
-     UtilInsertInclude::insertIncludeToFileStart(c.PrgMsgStmt_funcIdAsmIns, mainFileId, SM, fnVst.mRewriter_ptr, insertResult);//此时  insertVst.mRewriter.getRewriteBufferFor(mainFileId)  != NULL， 可以做插入
+     UtilInsertInclude::insertIncludeToFileStart(c.PrgMsgStmt_funcIdAsmIns, mainFileId,  clGO.SM, fnVst.mRewriter_ptr, insertResult);//此时  insertVst.mRewriter.getRewriteBufferFor(mainFileId)  != NULL， 可以做插入
      std::string msg=fmt::format("插入'#pragma 消息'到文件{},对mainFileId:{},结果:{}\n",filePath,mainFileId.getHashValue(),insertResult);
      std::cout<< msg ;
 
@@ -196,7 +196,7 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
      if( (!(fnVst.fnBdLBrcLocIdSet.empty())) || (!(retVst.retBgnLocIdSet.empty())) || (!(varDeclVst.VarDeclLocIdSet.empty()))  ){
          fnVst.mRewriter_ptr->overwriteChangedFiles();//A1写
      }
-     DiagnosticsEngine &Diags = CI.getDiagnostics();
+     DiagnosticsEngine &Diags =  clGO.CI.getDiagnostics();
      std::cout <<  UtilDiagnostics::strDiagnosticsEngineHasErr(Diags) << std::endl;
    //endregion
 

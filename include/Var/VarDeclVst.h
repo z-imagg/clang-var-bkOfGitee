@@ -12,6 +12,7 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/SourceManager.h"
 #include "base/LocId.h"
+#include "base/ClGO.h"
 #include "Var/VarTypeDesc.h"
 
 using namespace llvm;
@@ -25,12 +26,11 @@ class VarDeclVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit VarDeclVst(CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit VarDeclVst(ClGO _clGO,const std::shared_ptr<Rewriter> _mRewriter_ptr)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
-    : mRewriter_ptr(rewriter_ptr),
-    Ctx(Ctx),
-    CI(CI),
-    SM(SM)
+    :
+    clGO(_clGO),
+    mRewriter_ptr(_mRewriter_ptr)
     {
 
     }
@@ -44,14 +44,9 @@ public:
 
 
 
-
 public:
     const std::shared_ptr<Rewriter> mRewriter_ptr;
-
-public:
-    ASTContext *Ctx;
-    CompilerInstance& CI;
-    SourceManager& SM;
+    ClGO clGO;
 
     //变量声明紧后,
     // 一个变量声明紧后插入createVar__语句后,则将该位置塞入此集合,

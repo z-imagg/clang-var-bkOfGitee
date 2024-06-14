@@ -12,6 +12,7 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/SourceManager.h"
 #include "base/LocId.h"
+#include "base/ClGO.h"
 #include "Constant.h"
 
 using namespace llvm;
@@ -26,13 +27,11 @@ class RetVst
 public:
 public:
     //Rewriter:4:  Consumer将Rewriter传递给Visitor
-    explicit RetVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, CompilerInstance &CI, const std::shared_ptr<Rewriter> rewriter_ptr, ASTContext *Ctx, SourceManager& SM, LangOptions &_langOptions)
+    explicit RetVst(std::unordered_set<LocId,LocId> & createVar__fnBdLBrcLocIdSet, ClGO _clGO, const std::shared_ptr<Rewriter> _mRewriter_ptr)
     //Rewriter:5:  Consumer将Rewriter传递给Visitor, 并由Visitor.mRewriter接收
     : createVar__fnBdLBrcLocIdSet(createVar__fnBdLBrcLocIdSet),
-    mRewriter_ptr(rewriter_ptr),
-    Ctx(Ctx),CtxRef(*Ctx),
-    CI(CI),
-    SM(SM)
+      clGO(_clGO),
+      mRewriter_ptr(_mRewriter_ptr)
     {
 
     }
@@ -43,14 +42,10 @@ public:
 
     void do__modify_me(ReturnStmt *returnStmt,std::string filePath);
 
-public:
-    const std::shared_ptr<Rewriter> mRewriter_ptr;
 
 public:
-    ASTContext *Ctx;
-    ASTContext &CtxRef;
-    CompilerInstance& CI;
-    SourceManager& SM;
+    const std::shared_ptr<Rewriter> mRewriter_ptr;
+    ClGO clGO;
 
     //return紧前
     std::unordered_set<LocId,LocId> retBgnLocIdSet;

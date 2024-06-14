@@ -58,7 +58,7 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   //调试说明在该函数内
   
   //跳过非MainFile
-  bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(SM,returnStmt->getBeginLoc());
+  bool _LocFileIDEqMainFileID=UtilMainFile::LocFileIDEqMainFileID(clGO.SM,returnStmt->getBeginLoc());
   if(!_LocFileIDEqMainFileID){
     RetTrue_to_KeepOuterLoop;
   }
@@ -66,12 +66,12 @@ bool RetVst::TraverseReturnStmt(ReturnStmt *returnStmt){
   //获取主文件ID,文件路径
   FileID mainFileId;
   std::string filePath;
-  UtilMainFile::getMainFileIDMainFilePath(SM,mainFileId,filePath);
+  UtilMainFile::getMainFileIDMainFilePath(clGO.SM,mainFileId,filePath);
 
   // 若 该return语句所在函数  为 不应修改的函数 , 则直接退出
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, CI,SM,Ctx);
+  bool isModifiableFuncDecl=UtilBusz::func_of_stmt_isModifiable(returnStmt,compoundStmt/*出量*/,funcBodyLBraceLoc/*出量*/, funcBodyRBraceLoc/*出量*/, clGO.CI,clGO.SM,&(clGO.astCtx));
   if(!isModifiableFuncDecl){
     RetTrue_to_KeepOuterLoop;
   }
@@ -94,16 +94,16 @@ void RetVst::do__modify_me(ReturnStmt *returnStmt,std::string filePath){
   const FunctionDecl* funcDecl;
   CompoundStmt* compoundStmt;
   SourceLocation funcBodyLBraceLoc, funcBodyRBraceLoc;
-  UtilBusz::get_func_of_stmt(returnStmt, funcDecl/*出量*/,compoundStmt/*出参*/,funcBodyLBraceLoc/*出参*/,funcBodyRBraceLoc/*出参*/,CI, Ctx);
-  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, SM);
+  UtilBusz::get_func_of_stmt(returnStmt, funcDecl/*出量*/,compoundStmt/*出参*/,funcBodyLBraceLoc/*出参*/,funcBodyRBraceLoc/*出参*/,clGO.CI, &(clGO.astCtx));
+  LocId funcBodyLBraceLocId=LocId::buildFor(filePath,   funcBodyLBraceLoc, clGO.SM);
 
-  bool useCxx=ASTContextUtil::useCxx(Ctx);
+  bool useCxx=ASTContextUtil::useCxx(& clGO.astCtx);
 
   //返回语句位置
   const SourceLocation &retBgnLoc = returnStmt->getBeginLoc();
-  LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, SM);
+  LocId retBgnLocId=LocId::buildFor(filePath,   retBgnLoc, clGO.SM);
 
-  if(bool parentIsCompound=UtilParentKind::parentIsCompound(Ctx,returnStmt)){
+  if(bool parentIsCompound=UtilParentKind::parentIsCompound(&(clGO.astCtx),returnStmt)){
     if(UtilLocId::LocIdSetNotContains(retBgnLocIdSet, retBgnLocId)) {
       //防重复, 若 本函数还 没有 插入 destroyVarLs_ 语句，才插入。
       if(UtilLocId::LocIdSetContains(this->createVar__fnBdLBrcLocIdSet, funcBodyLBraceLocId)) {
