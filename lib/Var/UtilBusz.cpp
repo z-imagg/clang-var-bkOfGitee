@@ -13,7 +13,7 @@ bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* & compo
   bool isModifiableFuncDecl= false;
   clang::DynTypedNode returnNode=clang::DynTypedNode::create(*stmt);
   clang::DynTypedNode funcNode;
-  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode/*出量*/, CI, Ctx);
   if(found_funcNode){
     const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
     assert(funcDecl!= nullptr);
