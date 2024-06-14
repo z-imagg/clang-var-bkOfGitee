@@ -76,6 +76,8 @@ public:
     SourceManager& SM;
 
     //函数体左花括号紧后
+    // 一个函数定义的体花括号紧后插入_init_varLs语句后,则将该位置塞入此集合,
+    //   以保证对该位置只插入一次.
     std::unordered_set<LocId,LocId> fnBdLBrcLocIdSet;
 };
 

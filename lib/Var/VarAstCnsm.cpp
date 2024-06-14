@@ -9,6 +9,9 @@
 #include "base/UtilFile.h"
 #include "base/UtilEnvVar.h"
 #include "base/UtilDiagnostics.h"
+#include "base/UtilCompoundStmt.h"
+#include "base/UtilLocId.h"
+#include "base/UtilPrintAstNode.h"
 #include <llvm/Support/Casting.h>
 
 
@@ -108,12 +111,30 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
 //         cxxRecordDecl->methods();
          CXXDestructorDecl *deconstor = cxxRecordDecl->getDestructor();
          std::vector<CXXMethodDecl*> cxxMethodDeclVec(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end());
-         std::for_each(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end(), [this](  CXXMethodDecl* cxxMethodDecl){
+         std::for_each(cxxRecordDecl->method_begin(), cxxRecordDecl->method_end(), [filePath,this](  CXXMethodDecl* cxxMethodDecl){
            // cxx方法k
+           //获得 函数体、左右花括号
+           Stmt* funcBody = cxxMethodDecl->getBody();
+           //跳过函数体为空的函数
+           if(funcBody== nullptr){
+             return;//跳过for_each的此次循环体 进入下次循环体
+           }
+          CompoundStmt* compoundStmt;
+          SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
+          if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/)){
+            std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
+            UtilPrintAstNode::printStmt(this->Ctx, this->CI, "[头文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+            return;//跳过内层for_each的此次循环体 进入下次循环体
+          }
+          LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+           
            // A1、B1、C1需要保持顺序一致么？
-           this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
+           this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
+           if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
+             //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
+             this->fnVst.TraverseCXXMethodDecl(cxxMethodDecl);//A1
              this->retVst.TraverseCXXMethodDecl(cxxMethodDecl);//B1
-             this->varDeclVst.TraverseCXXMethodDecl(cxxMethodDecl);//C1
+           }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
          });
 
        }
@@ -122,11 +143,27 @@ reinterpret_cast<uintptr_t> ( (fnVst.mRewriter_ptr.get()) ) ) << std::endl;
      // FunctionDecl的子类们:  CXXMethodDecl 、 CXXConstructorDecl 、 CXXDestructorDecl 、 CXXDeductionGuideDecl 、 CXXConversionDecl
      if (D && llvm::isa<clang::FunctionDecl>(*D)) {
        if(clang::FunctionDecl *funDecl = dyn_cast<clang::FunctionDecl>(D)){
+
+         //获得 函数体、左右花括号
+         Stmt* funcBody = funDecl->getBody();
+         CompoundStmt* compoundStmt;
+         SourceLocation fnBdyLBrcLoc,fnBdyRBrcLoc;
+         if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(funcBody, compoundStmt/*出量*/, fnBdyLBrcLoc/*出量*/, fnBdyRBrcLoc/*出量*/) ){
+           std::string errMsg=fmt::format("funcBody is not a CompoundStmt." );
+           UtilPrintAstNode::printStmt(this->Ctx, this->CI, "[实现文件中函数] 未意料的可能错误", errMsg, funcBody, true);
+           continue;//跳过外层for的此次循环体 进入下次循环体
+
+         }
+         LocId fnBdyLBrcLocId = LocId::buildFor(filePath, fnBdyLBrcLoc, SM);
+
          // CUser::cxx方法j(){方法体}  , 普通方法i(){方法体}
          // A1、B1、C1需要保持顺序一致么？
-         this->fnVst.TraverseDecl(funDecl);//A1
+         this->varDeclVst.TraverseDecl(funDecl);//C1
+         if(UtilLocId::LocIdSetContains(this->varDeclVst.createVar__fnBdLBrcLocIdSet, fnBdyLBrcLocId)) {
+           //若varDeclVsVst在此函数中插入了createVar__语句, 才在此函数中插入_init_varLs语句和destroyVarLs语句
+           this->fnVst.TraverseDecl(funDecl);//A1
            this->retVst.TraverseDecl(funDecl);//B1
-           this->varDeclVst.TraverseDecl(funDecl);//C1
+         }//否则(即varDecl在此函数中没有插入createVar__语句, 则才在此函数中也不必插入_init_varLs语句和destroyVarLs语句
        }
      }else{
 //       const std::string &msg = fmt::format("跳过不关心的Decl，declKind={},declKindName={}\n\n", int(declKind), declKindName);

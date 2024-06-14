@@ -67,8 +67,12 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
   std::copy(code_ls.begin(), code_ls.end(), std::ostream_iterator<std::string>(oss, "  "));
   std::string code_ls_txt = oss.str();
 
-    bool insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
-
+    bool insertResult=false;
+    insertResult=mRewriter_ptr->InsertTextAfterToken(varDeclEndLoc , code_ls_txt);
+    if(!insertResult){
+      std::string errMsg=fmt::format("[未意料的可能错误] InsertTextAfterToken返回false\n");
+      std::cout<<errMsg;
+    }
 
     //记录已插入语句的节点ID们以防重： 即使重复遍历了 但不会重复插入
   //用funcEnterLocIdSet的尺寸作为LocationId的计数器
@@ -174,14 +178,21 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
         //  在变量声明语句这，不知道如何获得当前所在函数名 因此暂时函数名传递空字符串
         LocId declStmtBgnLocId=LocId::buildFor(filePath,declStmtBgnLoc, SM);
         //【执行业务内容】 向threadLocal记录发生一次 :  栈区变量声明 其类型为typeClassName
-        //只有似结构体变量才会产生通知
-       insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
-       //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
+      bool insertResult =false;
+      //只有似结构体变量才会产生通知
+      insertResult = insertAfter_VarDecl(useCxx, vTDVec_ptr_focus, declStmtBgnLocId, declStmtBgnLoc);
+//      if(insertResult){//貌似记得有时候 Rewriter.InsertTextAfterToken返回了false但其实代码文本被正常插入了, 所以这里暂时不做判断
+//        const FunctionDecl* funcDecl;
+//        UtilBusz::get_func_of_stmt(declStmt,funcDecl/*出参*/,CI,Ctx);//暂时用不上get_func_of_stmt, 因为上面的func_of_stmt_isModifiable 已经拿到了目标量
+        LocId funcBodyLBraceLocId = LocId::buildFor(filePath, funcBodyLBraceLoc, SM);
+        this->createVar__fnBdLBrcLocIdSet.insert(funcBodyLBraceLocId);
+//      }
+
     }
     // 到此时 不再需要 vTDVec_ptr_focus  , 进而 不再需要 vTDVec
     //////}
 
-
+  //不要返回false, 否则导致clang外层遍历器不再遍历后边的变量声明们
     RetTrue_to_KeepOuterLoop;
 }
 

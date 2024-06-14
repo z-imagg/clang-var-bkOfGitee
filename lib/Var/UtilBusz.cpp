@@ -6,14 +6,17 @@
 #include "base/UtilTraverseSingleParent.h"
 #include "Var/Common.h"
 #include "Var/ClConst.h"
+#include "base/UtilPrintAstNode.h"
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
+#include <iostream>
+
 using namespace clang;
 bool UtilBusz::func_of_stmt_isModifiable(const Stmt* stmt, CompoundStmt* & compoundStmt_/*出参*/, SourceLocation &  funcBodyLBraceLoc_/*出参*/, SourceLocation & funcBodyRBraceLoc_/*出参*/, CompilerInstance& CI, SourceManager& SM , ASTContext *Ctx){
   bool isModifiableFuncDecl= false;
   clang::DynTypedNode returnNode=clang::DynTypedNode::create(*stmt);
   clang::DynTypedNode funcNode;
-  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode, CI, Ctx);
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(returnNode, ClConstAstNodeKind::functionDecl , funcNode/*出量*/, CI, Ctx);
   if(found_funcNode){
     const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>();
     assert(funcDecl!= nullptr);
@@ -55,7 +58,14 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
   Stmt* body = cxxMethDecl->getBody();
 //  CompoundStmt* compoundStmt;
 //  SourceLocation funcBodyLBraceLoc,funcBodyRBraceLoc;
-  UtilCompoundStmt::funcBodyIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/);
+
+  if(!UtilCompoundStmt::funcBodyAssertIsCompoundThenGetLRBracLoc(body, compoundStmt_/*出量*/, funcBodyLBraceLoc_/*出量*/, funcBodyRBraceLoc_/*出量*/)){
+    std::string errMsg=fmt::format("[未意料的可能错误] funcBody is not a CompoundStmt. \n" );
+    std::cout<<errMsg;
+//    UtilPrintAstNode::printStmt(Ctx, CI, "未意料的可能错误", errMsg, body, true);
+    RetFalse_For_OtherErr;//跳过for_each的此次循环体 进入下次循环体
+  }
+
 
   //跳过 函数体内无语句
   int stmtCntInFuncBody= UtilCompoundStmt::childrenCntOfCompoundStmt(compoundStmt_);
@@ -72,4 +82,19 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
 
 //Modifiable == 能够被修改的函数 == 具有被修改资格的函数
   RetTrue_For_ModifiableFunctionDecl;
+}
+
+/** 获得给定语句所在的函数 (暂时没用到函数get_func_of_stmt)
+ */
+bool UtilBusz::get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompilerInstance& CI,  ASTContext *Ctx){
+  bool isModifiableFuncDecl= false;
+  clang::DynTypedNode stmtNode=clang::DynTypedNode::create(*stmt);
+  clang::DynTypedNode funcNode;
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(stmtNode, ClConstAstNodeKind::functionDecl , funcNode/*出量*/, CI, Ctx);
+  if(found_funcNode){
+    if(const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>()){
+      funcDecl=funcDecl_;
+    }
+  }
+  return found_funcNode;
 }

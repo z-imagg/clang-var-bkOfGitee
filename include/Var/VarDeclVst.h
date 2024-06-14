@@ -53,8 +53,15 @@ public:
     CompilerInstance& CI;
     SourceManager& SM;
 
-    //一个位置若是插入了花括号，则表明此位置不需要再次插入花括号了。
+    //变量声明紧后,
+    // 一个变量声明紧后插入createVar__语句后,则将该位置塞入此集合,
+    //   以保证对该位置只插入一次.
     std::unordered_set<LocId,LocId> VarDeclLocIdSet;
+
+  //函数体左花括号紧后
+  // 一个变量声明紧后插入createVar__语句后,则将该变量声明所在函数定义体的左花括号位置塞入此集合,
+  //   以标记该函数体内已经被插入createVar__语句, 从而使得 FnVst、RetVst做相应插入.
+  std::unordered_set<LocId,LocId> createVar__fnBdLBrcLocIdSet;
 };
 
 
