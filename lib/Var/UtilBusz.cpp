@@ -73,3 +73,18 @@ bool UtilBusz::isModifiable_FunctionDecl(const FunctionDecl* cxxMethDecl, Compou
 //Modifiable == 能够被修改的函数 == 具有被修改资格的函数
   RetTrue_For_ModifiableFunctionDecl;
 }
+
+/** 获得给定语句所在的函数
+ */
+bool UtilBusz::get_func_of_stmt(const Stmt* stmt, const FunctionDecl* & funcDecl_/*出参*/, CompilerInstance& CI,  ASTContext *Ctx){
+  bool isModifiableFuncDecl= false;
+  clang::DynTypedNode stmtNode=clang::DynTypedNode::create(*stmt);
+  clang::DynTypedNode funcNode;
+  bool found_funcNode=UtilTraverseSingleParent::do_traverse(stmtNode, ClConstAstNodeKind::functionDecl , funcNode/*出量*/, CI, Ctx);
+  if(found_funcNode){
+    if(const FunctionDecl* funcDecl=funcNode.get<FunctionDecl>()){
+      funcDecl=funcDecl_;
+    }
+  }
+  return found_funcNode;
+}
