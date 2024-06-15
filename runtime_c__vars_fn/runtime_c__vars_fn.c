@@ -49,6 +49,9 @@ void createVar__RtC00(_VarDeclLs *_vdLs, sds varTypeName, int varSize,short varI
     list_rpush(_vdLs->_vdVec, node); // vdLs->_vdVec->push_back(vd);
 }
 
+#define _sds_jsonItem(jsnTxt, fieldName, fieldVal)      sdscat(jsnTxt, "\"");; sdscat(jsnTxt, fieldName);; sdscat(jsnTxt, "\":");; sdscat(jsnTxt, fieldVal);
+#define sds_jsonItemEnd(jsnTxt, fieldName, fieldVal)       _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\"");;
+#define sds_jsonItem(jsnTxt, fieldName, fieldVal)          _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\",");;
 
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
 void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs){
@@ -56,20 +59,26 @@ void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs){
 
   long varDeclCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
 
+//变量jsonTxt 、变量jsonTxt_vdItem 用于 组装_vdLs为json并输出到控制台
 if(varDeclCnt>0){
+  sds jsonTxt = sdsempty();
+  jsonTxt=sdscat(jsonTxt,"{\"vdLs\":[");
+
   int varSizeSum=0;
   list_node_t *nodeK;
   list_iterator_t *it = list_iterator_new(_vdVec, LIST_HEAD);
   while ((nodeK = list_iterator_next(it))) {
     _VarDecl* vdK=(_VarDecl*)(nodeK->val); //这不是c++，这是c，无类型信息，只能做危险的强制类型转换
-    printf("vd:{varTypeName=%s,varSize=%d,varIsArr=%d,arrEleSize=%d}\n",vdK->varTypeName,vdK->varSize,vdK->varIsArr,vdK->arrEleSize);
+    sds jsonTxt_vdItem   =sdscatprintf(sdsempty(), "{\"varTypeName\":\"%s\", \"varSize\":%d, \"varIsArr\":%d, \"arrEleSize\":%d}", vdK->varTypeName, vdK->varSize, vdK->varIsArr, vdK->arrEleSize);
+    jsonTxt=sdscatprintf(jsonTxt,"%S, %s", jsonTxt, jsonTxt_vdItem);
     varSizeSum += vdK->varSize;
     _DEL_(vdK);//释放 对象1 : _DEL_1
   }
   //释放迭代器(不释放链表自身)
   list_iterator_destroy(it);
 
-  printf("%s:%d:%d,varDeclCnt=%d,varSizeSum=%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclCnt, varSizeSum ) ;
+  jsonTxt=sdscatprintf(jsonTxt,"\"srcFilePath\":\"%s\", \"funcLBrc_line:\":%d, \"funcLBrc_column\":%d, \"varDeclCnt\":%d, \"varSizeSum\":%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclCnt, varSizeSum ) ;
+  printf("%s",jsonTxt);
 
 }
 
