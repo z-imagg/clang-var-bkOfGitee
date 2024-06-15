@@ -1,8 +1,20 @@
--Xclang   -load -Xclang /fridaAnlzAp/clang-voidFnEndInsertRet/build/lib/libVFIRPlugin.so  -Xclang   -add-plugin -Xclang  VFIRPlugin
+```-Xclang   -load -Xclang /fridaAnlzAp/clang-voidFnEndInsertRet/build/lib/libVFIRPlugin.so  -Xclang   -add-plugin -Xclang  VFIRPlugin```
 
+#### xx
+```shell
+cat /etc/issue
+#Ubuntu 22.04.3 LTS \n \l
 
+uname -a
+#Linux xx 6.5.0-35-generic #35~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May  7 09:00:52 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+```
 
+```shell
+sudo apt install  libgcc-11-dev gcc-11 g++-11
 
+#卸载libgcc-12-dev, 从而统一使用gcc-11, 否则报错 找不到 cstddef 
+sudo apt remove  libgcc-12-dev
+```
 
 #### 术语
 - VFIR == Void Function Insert Return == 'void函数末尾无return时候，补充return语句'
