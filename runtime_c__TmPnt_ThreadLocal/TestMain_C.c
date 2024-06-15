@@ -37,14 +37,15 @@ extern __thread  int TL_TmPnt;
 void* thread_function(void* _tmPnt_init_ptr) {
   int* tmPnt_init_ptr = (int*) _tmPnt_init_ptr;
   int tmPnt_init = *tmPnt_init_ptr;
+  int _Tl_curThreadId=-1;
 
   int tmPnt_ThreadLocal_A=TL_TmPnt__get();
-  TL_TmPnt__update(tmPnt_init);
+  TL_TmPnt__update(_Tl_curThreadId, tmPnt_init);
 
   int tmPnt_ThreadLocal_B=TL_TmPnt__get();
 
   sleep(1);
-  TL_TmPnt__update(tmPnt_init*2);
+  TL_TmPnt__update(_Tl_curThreadId, tmPnt_init*2);
   int tmPnt_ThreadLocal_C=TL_TmPnt__get();
   int tmPnt_ThreadLocal_D=TL_TmPnt;
 
