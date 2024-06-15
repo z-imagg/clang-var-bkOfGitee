@@ -12,6 +12,7 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <sstream>
 
 //函数左花括号后 插入 'void* _varLs_ptr=_init_varLs_inFn__RtCxx();'
 _VarDeclLs *  _init_varLs_inFn__RtCxx(std::string srcFilePath, std::string funcName, int funcLBrc_line, int funcLBrc_column){
@@ -46,6 +47,14 @@ void createVar__RtCxx(_VarDeclLs *_vdLs, std::string varTypeName,  int varSize,b
 }
 
 
+#define _jsonItem( fieldName, fieldVal)      << "\"" << fieldName << "\":\"" << fieldVal
+#define jsonItemEnd( fieldName, fieldVal)                 _jsonItem( fieldName, fieldVal) << "\""
+#define jsonItem( fieldName, fieldVal)                    _jsonItem( fieldName, fieldVal)  << "\","
+
+//日志开头标记
+//  以换行开头的理由是，避开应用程序日志中不换行的日志 造成的干扰。
+const static std::string _LogLinePrefix="\n__@__@";
+
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtCxx(_varLs_ptr);'
 void destroyVarLs_inFn__RtCxx(_VarDeclLs *_vdLs){
     std::vector<_VarDecl> *_vdVec = _vdLs->_vdVec;
@@ -68,11 +77,30 @@ if(varDeclCnt > 0){
 
     int varSizeSum=sum_vd.varSize;
 
-    std::cout << _vdLs->srcFilePath << ":" << _vdLs->funcLBrc_line << ":" << _vdLs->funcLBrc_column << ",varDeclCnt=" << varDeclCnt << ",varSizeSum=" << varSizeSum << std::endl;
-
-    std::for_each(_vdVec->begin(), _vdVec->end(), [](const _VarDecl vd){
-      std::cout<<"vd@runtimeCxx:{varTypeName="<<vd.varTypeName<<",varSize="<<vd.varSize<<",varIsArr="<<vd.varIsArr<<",arrEleSize="<<vd.arrEleSize<<"}"<<std::endl;
+    //组装_vdLs为json并输出到控制台
+    std::stringstream ss;
+    ss << _LogLinePrefix
+        jsonItem("srcFilePath",_vdLs->srcFilePath)
+        jsonItem("funcLBrc_line",_vdLs->funcLBrc_line)
+        jsonItem("funcLBrc_column",_vdLs->funcLBrc_column)
+        jsonItem("varDeclCnt",varDeclCnt)
+        jsonItem("varSizeSum",varSizeSum)
+    ;
+    ss << "[";
+    std::for_each(_vdVec->begin(), _vdVec->end(), [&ss](const _VarDecl vd){
+      ss
+          jsonItem("kind","runtimeCxx")
+          jsonItem("varTypeName",vd.varTypeName)
+          jsonItem("varSize",vd.varSize)
+          jsonItem("varIsArr",vd.varIsArr)
+          jsonItemEnd("arrEleSize",vd.arrEleSize)
+      ;
     });
+    ss << "]\n";
+    std::string jsonLineTxt=ss.str();
+    std::cout << jsonLineTxt;
+    //}
+
   }
 
     //delete:HeapObj_vdVec
