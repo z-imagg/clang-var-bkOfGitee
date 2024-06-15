@@ -7,12 +7,15 @@ extern "C" {
 #endif
 
 
-// __thread是gcc扩展 ,  
+// __thread是gcc扩展 ,
 //    __thread == ThreadLocal
 //  术语  TL_ == ThreadLocal_
+// frida会通过函数TL_TmPnt__update 修改 以下两个threadLocal变量
+__thread int TL_curThreadId = -1;
 __thread int TL_TmPnt = -1;
 
-void TL_TmPnt__update(int _TmPnt_new) {
+void TL_TmPnt__update(int _Tl_curThreadId, int _TmPnt_new) {
+    TL_curThreadId = _Tl_curThreadId;
     TL_TmPnt = _TmPnt_new;
 }
 

@@ -7,7 +7,8 @@
 extern "C" {
 #endif
 
-void TL_TmPnt__update(int _TmPnt_new);
+// frida会通过函数TL_TmPnt__update 修改 两个threadLocal变量
+void TL_TmPnt__update(int _Tl_curThreadId, int _TmPnt_new);
 
 int TL_TmPnt__get() ;
 
