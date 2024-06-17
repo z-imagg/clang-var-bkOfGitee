@@ -11,8 +11,28 @@
 // 计算 是否关注 该函数
 static bool _calc_focus(VarTypeFlag vT_Leaf , clang::QualType qT_Leaf){
 // 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
-// 关注        (非内置类型               且    非指针类型             且   非lambda类型)         或    记录类型           或      elaborated类型              或   数组类型         或  类类型          或    结构体or类类型              或   联合类型
-  bool focus= ((!qT_Leaf->isBuiltinType()) && (!qT_Leaf->isPointerType()) && (!vT_Leaf.isLambdaType)  ) || (qT_Leaf->isRecordType() || qT_Leaf->isElaboratedTypeSpecifier() || qT_Leaf->isArrayType() || qT_Leaf->isClassType() || qT_Leaf->isStructureOrClassType() || qT_Leaf->isUnionType() );
+  bool focus=
+(
+// 非内置类型
+  (!qT_Leaf->isBuiltinType()) &&
+// 非指针类型
+  (!qT_Leaf->isPointerType()) &&
+// 非lambda类型
+  (!vT_Leaf.isLambdaType)
+) || (
+// 记录类型
+  qT_Leaf->isRecordType() ||
+// elaborated类型
+  qT_Leaf->isElaboratedTypeSpecifier() ||
+// 数组类型
+  qT_Leaf->isArrayType() ||
+// 类类型
+  qT_Leaf->isClassType() ||
+// 结构体or类类型
+  qT_Leaf->isStructureOrClassType() ||
+// 联合类型
+  qT_Leaf->isUnionType()
+);
 
   return focus;
 }
