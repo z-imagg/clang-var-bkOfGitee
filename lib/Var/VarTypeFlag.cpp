@@ -6,7 +6,7 @@
 #include "Var/VarTypeFlag.h"
 #include "base/UtilTraverseTypeDefChain.h"
 
-VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_){
+VarTypeFlag::VarTypeFlag(clang::QualType qualType,std::string & msg_/*出量*/){
 
 {//不关注 auto lambda
   /* 本代码块判断 变量是否 被赋值为 lambda表达式

@@ -228,7 +228,7 @@ const clang::Type* traverseTypedefChain(clang::QualType qualType) {
 }
 
 
-void VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_){
+void VarDeclVst::process_singleDecl(const Decl *singleDecl,VarTypeDesc& varTypeDesc_/*出量*/){
   //  QualType &qualType_, bool& focus_, std::string &typeName_, std::string &varName_
     if (const ValueDecl *valueDecl = dyn_cast_or_null<ValueDecl>(singleDecl)) {
       QualType qualType = valueDecl->getType();

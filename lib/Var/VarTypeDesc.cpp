@@ -9,7 +9,7 @@
 #include "base/UtilTraverseTypeDefChain.h"
 
 
-void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
+void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self/*出量*/){
 
 //}
 //VarTypeDesc::VarTypeDesc(clang::QualType _qualType)
@@ -18,7 +18,7 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self){
 
   //原类型==typedef第一层别名
   self.qualType=_qualType;
-  self.varTypeFlag=VarTypeFlag(_qualType, msg_origin);
+  self.varTypeFlag=VarTypeFlag(_qualType, msg_origin/*出量*/);
 
   const clang::Type* typePtr = _qualType.getTypePtr();
 

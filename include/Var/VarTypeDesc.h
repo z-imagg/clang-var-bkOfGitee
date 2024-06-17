@@ -35,7 +35,7 @@ public:
 public:
   VarTypeDesc()=default;
 //  VarTypeDesc(clang::QualType _qualType);
-  static void build(clang::QualType _qualType, VarTypeDesc& thiz_);
+  static void build(clang::QualType _qualType, VarTypeDesc& thiz_/*出量*/);
 //  void focus(bool& focus_);
   void fillVarName_devOnly(clang::IdentifierInfo * _varName);
   void printMsg_devOnly();
