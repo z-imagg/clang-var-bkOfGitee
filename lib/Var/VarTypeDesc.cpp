@@ -15,11 +15,15 @@ static bool _calc_focus(VarTypeFlag vT_Leaf , clang::QualType qT_Leaf){
 (
 // 非内置类型
   (!qT_Leaf->isBuiltinType()) &&
-// 非指针类型
-  (!qT_Leaf->isPointerType()) &&
+// 非枚举类型
+  (!qT_Leaf->isEnumeralType()) &&
 // 非lambda类型
   (!vT_Leaf.isLambdaType)
 ) || (
+// 指针类型
+  qT_Leaf->isPointerType() ||
+// 指针类型
+  qT_Leaf->isReferenceType() ||
 // 记录类型
   qT_Leaf->isRecordType() ||
 // elaborated类型
