@@ -41,7 +41,7 @@ bool RetVst::insert_destroy__Before_fnRet(bool useCXX ,LocId retBgnLocId, Source
 //【销毁变量通知】  函数在return紧前 插入 销毁语句'destroyVarLs_inFn__RtCxx(_vdLs);'
     //region 构造插入语句
     std::string cStr_destroy=fmt::format(
-            "{}(_vdLs); /* 销毁函数变量列表: {}*/",  // destroyVarLs_inFn__RtCxx 或 destroyVarLs_inFn__RtC00
+            "{}(_vdLs); /* 销毁函数变量列表: {}*/ \n",  // destroyVarLs_inFn__RtCxx 或 destroyVarLs_inFn__RtC00
             fnName, verbose
     );
     llvm::StringRef strRef_destroy(cStr_destroy);
