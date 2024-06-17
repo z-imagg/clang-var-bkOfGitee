@@ -8,6 +8,34 @@
 #include "Var/VarTypeDesc.h"
 #include "base/UtilTraverseTypeDefChain.h"
 
+// 计算 是否关注 该函数
+static bool _calc_focus(VarTypeFlag vT_Leaf , clang::QualType qT_Leaf){
+// 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
+  bool focus=
+(
+// 非内置类型
+  (!qT_Leaf->isBuiltinType()) &&
+// 非指针类型
+  (!qT_Leaf->isPointerType()) &&
+// 非lambda类型
+  (!vT_Leaf.isLambdaType)
+) || (
+// 记录类型
+  qT_Leaf->isRecordType() ||
+// elaborated类型
+  qT_Leaf->isElaboratedTypeSpecifier() ||
+// 数组类型
+  qT_Leaf->isArrayType() ||
+// 类类型
+  qT_Leaf->isClassType() ||
+// 结构体or类类型
+  qT_Leaf->isStructureOrClassType() ||
+// 联合类型
+  qT_Leaf->isUnionType()
+);
+
+  return focus;
+}
 
 void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self/*出量*/){
 
@@ -44,18 +72,14 @@ void VarTypeDesc::build(clang::QualType _qualType, VarTypeDesc& self/*出量*/){
 
 
   //////////计算focus
-  VarTypeFlag vTF = self.getVarTypeFlag_Leaf();
-  clang::QualType qT = self.getQualType_Leaf();
-  assert(vTF._inited);
-  self.typeName = qT.getAsString();
+  VarTypeFlag vT_Leaf = self.getVarTypeFlag_Leaf();
+  clang::QualType qT_Leaf = self.getQualType_Leaf();
+  assert(vT_Leaf._inited);
+  self.typeName = qT_Leaf.getAsString();
   self.msg=fmt::format("typeName={}  {}", self.typeName, self.msg );
-//  clang::Type::TypeClass typeClass = qT->getTypeClass();
-//  clang::Type::Record == typeClass;
-// !vTF.isBuiltinType
-// !vTF.isPointerType
 // 其实只有 isLambdaType 是需要VarTypeFlag去特定计算的,其余的不需要
-// 关注        (非内置类型               且    非指针类型             且   非lambda类型)         或    记录类型           或      elaborated类型              或   数组类型         或  类类型          或    结构体or类类型              或   联合类型
-  self.focus= ((!qT->isBuiltinType()) && (!qT->isPointerType()) && (!vTF.isLambdaType)  ) || (qT->isRecordType() || qT->isElaboratedTypeSpecifier() || qT->isArrayType() || qT->isClassType() || qT->isStructureOrClassType() || qT->isUnionType() );
+// 计算 是否关注 该函数
+  self.focus=_calc_focus(vT_Leaf, qT_Leaf );
 
 //不关注 auto lambda
 //不关注 基本类型
