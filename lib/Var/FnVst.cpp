@@ -46,7 +46,7 @@ bool FnVst::insert_init__After_FnBdLBrc( bool useCXX,LocId fnBdLBrcLocId,std::st
 
     //region 构造插入语句
     std::string cStr_init=fmt::format(
-            "\n _VarDeclLs * _vdLs={}(\"{}\", \"{}\", {}, {}); /* 初始化函数变量列表, {}*/", // _init_varLs_inFn__RtCxx 或 _init_varLs_inFn__RtC00
+            "_VarDeclLs * _vdLs={}(\"{}\", \"{}\", {}, {}); /* 初始化函数变量列表, {}*/", // _init_varLs_inFn__RtCxx 或 _init_varLs_inFn__RtC00
             fnName,
             fnBdLBrcLocId.filePath,
             funcName,

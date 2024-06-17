@@ -53,7 +53,7 @@ bool VarDeclVst::insertAfter_VarDecl( bool useCXX,std::vector<const VarTypeDesc*
        std::string eleSizeOf=isArr?fmt::format("sizeof({}[0])",varTypeDescK->varName):"-1";
 
        std::string code_inserted=fmt::format(
-        "\n {}(_vdLs/*_VarDeclLs*/,  \"{}\"/*varTypeName*/, sizeof({})/*varSize*/ , {}/*varIsArr*/ , {}/*arrEleSize*/ )  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
+        "{}(_vdLs/*_VarDeclLs*/,  \"{}\"/*varTypeName*/, sizeof({})/*varSize*/ , {}/*varIsArr*/ , {}/*arrEleSize*/ )  /* 创建变量通知,  {} */ ;", // createVar__RtCxx 或 createVar__RtC00
         funcName,
         varTypeDescK->typeName, varTypeDescK->varName, isArrTxt,eleSizeOf,
         varDeclLocIdStr
