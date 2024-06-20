@@ -70,7 +70,8 @@ if(varDeclCnt>0){
   while ((nodeK = list_iterator_next(it))) {
     _VarDecl* vdK=(_VarDecl*)(nodeK->val); //这不是c++，这是c，无类型信息，只能做危险的强制类型转换
     sds jsonTxt_vdItem   =sdscatprintf(sdsempty(), "{\"varTypeName\":\"%s\", \"varSize\":%d, \"varIsArr\":%d, \"arrEleSize\":%d}", vdK->varTypeName, vdK->varSize, vdK->varIsArr, vdK->arrEleSize);
-    jsonTxt=sdscatprintf(jsonTxt,"%s, %s", jsonTxt, jsonTxt_vdItem);//sdscatprintf的 目标参数和来源参数都为jsonTxt 导致了 指数爆炸增长 最终肯定会出问题（缓冲区溢出）
+    jsonTxt=sdscatprintf(jsonTxt,"%s", jsonTxt_vdItem);//现在这是sdscatprintf的 正确语义；原本将 目标参数和来源参数都为jsonTxt 是错误语义（导致指数爆炸增长，最终肯定会缓冲区溢出）
+    //若sds类型的格式化串用%S ，则这里sdscatprintf返回NULL， 改为%s则结果正常
     varSizeSum += vdK->varSize;
     _DEL_(vdK);//释放 对象1 : _DEL_1
   }
