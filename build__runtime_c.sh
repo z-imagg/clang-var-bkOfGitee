@@ -34,7 +34,7 @@ LIB_Var_CXX_FLAGS=" -fno-omit-frame-pointer -Wall   -O0    -g1"
 # LIB_Var_CXX_FLAGS=" -fno-omit-frame-pointer -Wall   -O0    -g2"
 # -rwxrwxr-x 1 zz zz 27M  7月 24 15:03 /bal/clang-add-funcIdAsm/build/lib/libVar.so
 
-cmake -S $PrjHm -B $BUILD_HOME  -DCMAKE_BUILD_TYPE=Release   -DCMAKE_CXX_FLAGS="$LIB_Var_CXX_FLAGS"   -DCMAKE_C_FLAGS="$LIB_Var_CXX_FLAGS"    && \
+cmake -S $PrjHm -B $BUILD_HOME  -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="$LIB_Var_CXX_FLAGS"   -DCMAKE_C_FLAGS="$LIB_Var_CXX_FLAGS"    && \
 #-DCMAKE_VERBOSE_MAKEFILE=True
 ( cd $BUILD_HOME && make -j2 ;) && \
 true ;}
