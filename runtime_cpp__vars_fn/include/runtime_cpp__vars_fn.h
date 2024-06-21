@@ -51,6 +51,9 @@ void createVar__RtCxx(_VarDeclLs * _vdLs, std::string varTypeName, int varSize,b
 //【销毁变量通知】  函数右花括号前 插入 'destroyVarLs_inFn__RtCxx(_varLs_ptr);'
 void destroyVarLs_inFn__RtCxx(_VarDeclLs * _vdLs, std::string * jsonTxtOut_);
 
+//无输出缓冲区的destroy调用宏
+#define macroNoOutBuf__destroyVarLs_inFn__RtCxx(_vdLs)  destroyVarLs_inFn__RtCxx(_vdLs, NULL)
+
 #endif  //__cplusplus判断结束
 
 #endif //runtime_cpp__vars_fn_H
