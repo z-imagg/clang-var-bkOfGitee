@@ -20,7 +20,7 @@ public:
   //                                                           C语言(下标0==(int)false), C++(下标1==(int)true)
   constexpr static   const char* fnNameS__init_varLs[]={"_init_varLs_inFn__RtC00", "_init_varLs_inFn__RtCxx"};
   constexpr static   const char* fnNameS__createVar[]={"createVar__RtC00", "createVar__RtCxx"};
-  constexpr static   const char* fnNameS__destroyVar[]={"destroyVarLs_inFn__RtC00", "destroyVarLs_inFn__RtCxx"};
+  constexpr static   const char* fnNameS__destroyVar[]={"macroNoOutBuf__destroyVarLs_inFn__RtC00", "macroNoOutBuf__destroyVarLs_inFn__RtCxx"};
 
 };
 #endif //Var_CONSTANT_H

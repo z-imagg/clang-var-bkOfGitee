@@ -60,6 +60,8 @@ void createVar__RtC00(_VarDeclLs * _vdLs, char* _varTypeName, int varSize, short
  */
 void destroyVarLs_inFn__RtC00(_VarDeclLs * _vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_);
 
+//无输出缓冲区的destroy调用宏
+#define macroNoOutBuf__destroyVarLs_inFn__RtC00(_vdLs)  destroyVarLs_inFn__RtC00(_vdLs, 0, NULL, NULL)
 #endif  //__cplusplus判断结束
 
 #endif //runtime_c__vars_fn_H
