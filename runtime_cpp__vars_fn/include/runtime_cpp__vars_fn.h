@@ -49,7 +49,7 @@ void createVar__RtCxx(_VarDeclLs * _vdLs, std::string varTypeName, int varSize,b
 
 
 //【销毁变量通知】  函数右花括号前 插入 'destroyVarLs_inFn__RtCxx(_varLs_ptr);'
-void destroyVarLs_inFn__RtCxx(_VarDeclLs * _vdLs);
+void destroyVarLs_inFn__RtCxx(_VarDeclLs * _vdLs, std::string * jsonTxtOut_);
 
 #endif  //__cplusplus判断结束
 
