@@ -2,6 +2,7 @@
 #include "runtime_c__vars_fn.h"
 #include "rntm_c__TmPnt_ThrLcl.h"
 #include <malloc.h>
+#include <string.h>
 
 // 本模块 runtime_c__vars_fn 只允许被C使用，而不允许被C++使用
 #ifdef __cplusplus
@@ -16,6 +17,13 @@
 
 #include "sds.h"
 #include "list.h"
+
+//向外报出错误，方便gdb以此加断点，从而直接到达错误现场
+int __debugVar__ErrCode__runtime_c__vars_fn=0;
+#define Err01_Beyond_JsonTxtOutLimit 11
+
+//危险隔离带长度
+#define __Gap_Danger_Char_Cnt 9
 
 //函数左花括号后 插入 'void* _varLs_ptr=_init_varLs_inFn__RtC00();'
 _VarDeclLs *  _init_varLs_inFn__RtC00(sds srcFilePath, sds funcName, int funcLBrc_line, int funcLBrc_column){
@@ -54,7 +62,7 @@ void createVar__RtC00(_VarDeclLs *_vdLs, sds varTypeName, int varSize,short varI
 #define sds_jsonItem(jsnTxt, fieldName, fieldVal)          _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\",");;
 
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
-void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs){
+void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_){
     list_t* _vdVec = _vdLs->_vdVec; // std::vector<_VarDecl>
 
   long varDeclCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
@@ -79,7 +87,25 @@ if(varDeclCnt>0){
   list_iterator_destroy(it);
 
   jsonTxt=sdscatprintf(jsonTxt,"\"srcFilePath\":\"%s\", \"funcLBrc_line:\":%d, \"funcLBrc_column\":%d, \"varDeclCnt\":%d, \"varSizeSum\":%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclCnt, varSizeSum ) ;
-  printf("%s",jsonTxt);
+  int jsonTxtLen=(int)sdslen(jsonTxt);
+
+  // 将json串返回给调用者
+  //如果给出的json文本长度超出 frida提供的缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接退出当前进程
+  //   解决办法是frida使用更大的缓冲区jsonTxtOut_
+  if(jsonTxtLen > jsonTxtOutLimit - __Gap_Danger_Char_Cnt){
+    //写调试变量, gdb可以以此加条件断点'break runtime_c__vars_fn.c:96 if __debugVar__ErrCode__runtime_c__vars_fn=11(Err01_Beyond_JsonTxtOutLimit)'
+    __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
+    printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jsonTxtOutLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_",jsonTxtLen, jsonTxtOutLimit,__Gap_Danger_Char_Cnt,__debugVar__ErrCode__runtime_c__vars_fn);
+    exit(Err01_Beyond_JsonTxtOutLimit);
+  }else{
+    if(jsonTxtOut_!=NULL && jsonTxtOutLen_!=NULL){
+      //复制jsonTxt到jsonTxtOut_
+      memcpy(jsonTxtOut_, jsonTxt, jsonTxtLen);
+      jsonTxtOut_[jsonTxtLen-1]='\0';
+      (*jsonTxtOutLen_)=jsonTxtLen;
+    }
+  }
+//  printf("%s",jsonTxt); //不再输出结果到控制台
 
 }
 
