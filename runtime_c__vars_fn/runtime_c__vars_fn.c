@@ -2,6 +2,7 @@
 #include "runtime_c__vars_fn.h"
 #include "rntm_c__TmPnt_ThrLcl.h"
 #include <malloc.h>
+#include <string.h>
 
 // 本模块 runtime_c__vars_fn 只允许被C使用，而不允许被C++使用
 #ifdef __cplusplus
@@ -16,6 +17,14 @@
 
 #include "sds.h"
 #include "list.h"
+
+//向外报出错误，方便gdb以此加断点，从而直接到达错误现场
+int __debugVar__ErrCode__runtime_c__vars_fn=0;
+#define Err01_Beyond_JsonTxtOutLimit 11
+
+//危险隔离带长度
+#define __Gap_Danger_Char_Cnt 9
+
 
 /**
  * 关于指针参数, 正常的约定是：
@@ -62,7 +71,7 @@ void createVar__RtC00(_VarDeclLs *_vdLs, char* _varTypeName, int varSize, short 
 #define sds_jsonItem(jsnTxt, fieldName, fieldVal)          _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\",");;
 
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
-void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs){
+void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_){
     list_t* _vdVec = _vdLs->_vdVec; // std::vector<_VarDecl>
 
   long varDeclCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
@@ -91,7 +100,37 @@ if(varDeclCnt>0){
   list_iterator_destroy(it);
 
   jsonTxt=sdscatprintf(jsonTxt,"\"srcFilePath\":\"%s\", \"funcLBrc_line:\":%d, \"funcLBrc_column\":%d, \"varDeclCnt\":%d, \"varSizeSum\":%d\n", _vdLs->srcFilePath , _vdLs->funcLBrc_line , _vdLs->funcLBrc_column , varDeclCnt, varSizeSum ) ;
-  printf("%s",jsonTxt);
+
+
+  int jsonTxtLen=(int)sdslen(jsonTxt);
+  // 如果调用者不接收json串，则打印到控制台
+  if(jsonTxtOutLimit==0 && jsonTxtOut_==NULL && jsonTxtOutLen_==NULL){
+    printf("%s",jsonTxt); //不再输出结果到控制台
+  }
+  // 否则, 如果 看起来具备接收条件 则将json串返回给调用者
+  else if(jsonTxtOutLimit>0 && jsonTxtOut_!=NULL && jsonTxtOutLen_!=NULL){
+    //如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接以报错退出当前进程。   解决办法是frida使用更大的缓冲区jsonTxtOut_
+    if(jsonTxtLen > jsonTxtOutLimit - __Gap_Danger_Char_Cnt){
+      //写调试变量.   gdb可以以此加条件断点'break runtime_c__vars_fn.c:96 if __debugVar__ErrCode__runtime_c__vars_fn=11(Err01_Beyond_JsonTxtOutLimit)'
+      __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
+      //打印错误消息
+      printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jsonTxtOutLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_\n",jsonTxtLen, jsonTxtOutLimit,__Gap_Danger_Char_Cnt,__debugVar__ErrCode__runtime_c__vars_fn);
+      //直接退出当前进程
+      exit(Err01_Beyond_JsonTxtOutLimit);
+    }
+    //否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
+    else{
+      //复制jsonTxt到jsonTxtOut_
+      //   sds基本路数 是 char们(0结尾) 后跟 描述量 ? 所以可以直接用memcpy?    从sds.c中函数sdscpylen看到的 ， https://github.com/antirez/sds/blob/a9a03bb3304030bb8a93823a9aeb03c157831ba9/sds.c#L427
+      //   复制 sds样式量jsonTxt的 char们 到 返回缓冲区jsonTxtOut_
+      memcpy(jsonTxtOut_, jsonTxt, jsonTxtLen);
+      //   返回缓冲区末尾 加字符串结束标识0
+      jsonTxtOut_[jsonTxtLen-1]='\0';
+      //   填写 缓冲区中字符串实际长度
+      (*jsonTxtOutLen_)=jsonTxtLen;
+    }
+  }
+
 
   //释放 此if内的对象
   sdsfree(jsonTxt);
