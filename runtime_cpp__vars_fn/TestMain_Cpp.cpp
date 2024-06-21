@@ -27,7 +27,7 @@ void func1(){_VarDeclLs * _vdLs=_init_varLs_inFn__RtCxx("runtime_cpp__vars_fn/te
         }
     }
 
-destroyVarLs_inFn__RtCxx(_vdLs);}
+macroNoOutBuf__destroyVarLs_inFn__RtCxx(_vdLs);}
 
 
 int main(int argc, char** argv){
