@@ -56,7 +56,7 @@ void createVar__RtCxx(_VarDeclLs *_vdLs, std::string varTypeName,  int varSize,b
 const static std::string _LogLinePrefix="\n__@__@";
 
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtCxx(_varLs_ptr);'
-void destroyVarLs_inFn__RtCxx(_VarDeclLs *_vdLs){
+void destroyVarLs_inFn__RtCxx(_VarDeclLs *_vdLs, std::string * jsonTxtOut_){
     std::vector<_VarDecl> *_vdVec = _vdLs->_vdVec;
 
   long varDeclCnt = std::distance(_vdVec->begin(), _vdVec->end());
@@ -64,6 +64,7 @@ void destroyVarLs_inFn__RtCxx(_VarDeclLs *_vdLs){
 if(varDeclCnt > 0){
     _VarDecl zero; zero.varSize=0;
 
+    //循环累加获得变量个数
     const _VarDecl &sum_vd = std::accumulate(
     _vdVec->begin(),
     _vdVec->end(),
@@ -87,6 +88,7 @@ if(varDeclCnt > 0){
         jsonItem("varSizeSum",varSizeSum)
     ;
     ss << "[";
+    //循环 变量们 ， 将 单变量 转换 json文本
     std::for_each(_vdVec->begin(), _vdVec->end(), [&ss](const _VarDecl vd){
       ss
           jsonItem("kind","runtimeCxx")
@@ -98,7 +100,17 @@ if(varDeclCnt > 0){
     });
     ss << "]\n";
     std::string jsonLineTxt=ss.str();
-    std::cout << jsonLineTxt;
+
+    // 如果调用者不接收json串，则打印到控制台
+    if(jsonTxtOut_== nullptr){
+      std::cout << jsonLineTxt;
+    }
+    //否则[如果jsonTxtOut_非空] ，则正常返回json文本
+    else{
+      //复制jsonLineTxt到jsonTxtOut_
+      jsonTxtOut_->assign(jsonLineTxt );
+    }
+    
     //}
 
   }
