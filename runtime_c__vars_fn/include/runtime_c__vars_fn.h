@@ -51,7 +51,14 @@ void createVar__RtC00(_VarDeclLs * _vdLs, char* _varTypeName, int varSize, short
 
 
 //【销毁变量通知】    函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
-void destroyVarLs_inFn__RtC00(_VarDeclLs * _vdLs);
+/**
+ *
+ * @param _vdLs 变量们
+ * @param jsonTxtOutLimit 返回json串 最大长度
+ * @param jsonTxtOut_ 接受json串的缓冲区
+ * @param jsonTxtOutLen_ 实际接受到的json串长度
+ */
+void destroyVarLs_inFn__RtC00(_VarDeclLs * _vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_);
 
 #endif  //__cplusplus判断结束
 
