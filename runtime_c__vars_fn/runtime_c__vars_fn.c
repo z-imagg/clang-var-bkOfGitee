@@ -71,7 +71,8 @@ void createVar__RtC00(_VarDeclLs *_vdLs, char* _varTypeName, int varSize, short 
 #define sds_jsonItem(jsnTxt, fieldName, fieldVal)          _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\",");;
 
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
-void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_){
+// 术语 jTxtOL 、 XOut_ 见 本函数声明
+void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs, int jTxtOLimit, char* jsonTxtOut_, int* jTxtOLenOut_){
     list_t* _vdVec = _vdLs->_vdVec; // std::vector<_VarDecl>
 
   long varDeclCnt = _vdVec->len; //std::distance(_vdVec->begin(), _vdVec->end());
@@ -104,17 +105,17 @@ if(varDeclCnt>0){
 
   int jsonTxtLen=(int)sdslen(jsonTxt);
   // 如果调用者不接收json串，则打印到控制台
-  if(jsonTxtOutLimit==0 && jsonTxtOut_==NULL && jsonTxtOutLen_==NULL){
+  if(jTxtOLimit == 0 && jsonTxtOut_ == NULL && jTxtOLenOut_ == NULL){
     printf("%s",jsonTxt); //不再输出结果到控制台
   }
   // 否则, 如果 看起来具备接收条件 则将json串返回给调用者
-  else if(jsonTxtOutLimit>0 && jsonTxtOut_!=NULL && jsonTxtOutLen_!=NULL){
+  else if(jTxtOLimit > 0 && jsonTxtOut_ != NULL && jTxtOLenOut_ != NULL){
     //如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接以报错退出当前进程。   解决办法是frida使用更大的缓冲区jsonTxtOut_
-    if(jsonTxtLen > jsonTxtOutLimit - __Gap_Danger_Char_Cnt){
+    if(jsonTxtLen > jTxtOLimit - __Gap_Danger_Char_Cnt){
       //写调试变量.   gdb可以以此加条件断点'break runtime_c__vars_fn.c:96 if __debugVar__ErrCode__runtime_c__vars_fn=11(Err01_Beyond_JsonTxtOutLimit)'
       __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
       //打印错误消息
-      printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jsonTxtOutLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_\n",jsonTxtLen, jsonTxtOutLimit,__Gap_Danger_Char_Cnt,__debugVar__ErrCode__runtime_c__vars_fn);
+      printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jTxtOLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_\n", jsonTxtLen, jTxtOLimit, __Gap_Danger_Char_Cnt, __debugVar__ErrCode__runtime_c__vars_fn);
       //直接退出当前进程
       exit(Err01_Beyond_JsonTxtOutLimit);
     }
@@ -127,7 +128,7 @@ if(varDeclCnt>0){
       //   返回缓冲区末尾 加字符串结束标识0
       jsonTxtOut_[jsonTxtLen-1]='\0';
       //   填写 缓冲区中字符串实际长度
-      (*jsonTxtOutLen_)=jsonTxtLen;
+      (*jTxtOLenOut_)=jsonTxtLen;
     }
   }
 

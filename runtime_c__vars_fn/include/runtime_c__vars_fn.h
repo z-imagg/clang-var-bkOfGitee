@@ -53,12 +53,15 @@ void createVar__RtC00(_VarDeclLs * _vdLs, char* _varTypeName, int varSize, short
 //【销毁变量通知】    函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
 /**
  *
+  术语 jTxtOL==JsonTxtOut
+  术语 XOut_ == 'X作为入参,但实际上X是返回变量' == 被调函数通过变量X给调用者返回某量
+ *
  * @param _vdLs 变量们
- * @param jsonTxtOutLimit 返回json串 最大长度
+ * @param jTxtOLimit 返回json串 最大长度
  * @param jsonTxtOut_ 接受json串的缓冲区
- * @param jsonTxtOutLen_ 实际接受到的json串长度
+ * @param jTxtOLenOut_ 实际接受到的json串长度
  */
-void destroyVarLs_inFn__RtC00(_VarDeclLs * _vdLs, int jsonTxtOutLimit, char* jsonTxtOut_, int* jsonTxtOutLen_);
+void destroyVarLs_inFn__RtC00(_VarDeclLs * _vdLs, int jTxtOLimit, char* jsonTxtOut_, int* jTxtOLenOut_);
 
 //无输出缓冲区的destroy调用宏
 #define macroNoOutBuf__destroyVarLs_inFn__RtC00(_vdLs)  destroyVarLs_inFn__RtC00(_vdLs, 0, NULL, NULL)
