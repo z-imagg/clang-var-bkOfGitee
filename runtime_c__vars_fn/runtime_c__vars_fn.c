@@ -110,7 +110,7 @@ if(varDeclCnt>0){
   }
   // 否则, 如果 看起来具备接收条件 则将json串返回给调用者
   else if(jTxtOLimit > 0 && jsonTxtOut_ != NULL && jTxtOLenOut_ != NULL){
-    //如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接以报错退出当前进程。   解决办法是frida使用更大的缓冲区jsonTxtOut_
+    //[出错,缓冲区尺寸不够] 如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接以报错退出当前进程。   解决办法是frida使用更大的缓冲区jsonTxtOut_
     if(jsonTxtLen > jTxtOLimit - __Gap_Danger_Char_Cnt){
       //写调试变量.   gdb可以以此加条件断点'break runtime_c__vars_fn.c:96 if __debugVar__ErrCode__runtime_c__vars_fn=11(Err01_Beyond_JsonTxtOutLimit)'
       __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
@@ -119,7 +119,7 @@ if(varDeclCnt>0){
       //直接退出当前进程
       exit(Err01_Beyond_JsonTxtOutLimit);
     }
-    //否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
+    //[正常,缓冲区尺寸足够] 否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
     else{
       //复制jsonTxt到jsonTxtOut_
       //   sds基本路数 是 char们(0结尾) 后跟 描述量 ? 所以可以直接用memcpy?    从sds.c中函数sdscpylen看到的 ， https://github.com/antirez/sds/blob/a9a03bb3304030bb8a93823a9aeb03c157831ba9/sds.c#L427
