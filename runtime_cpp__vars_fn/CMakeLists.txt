@@ -4,8 +4,13 @@ MESSAGE("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 
 MESSAGE("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(runtime_cpp__SOURCES
+
+set(runtime_cpp_core__SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/runtime_cpp__vars_fn.cpp"
+)
+
+set(runtime_cpp__SOURCES
+${runtime_cpp_core__SOURCES}
 "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/TestMain_Cpp.cpp"
 )
 
@@ -34,19 +39,19 @@ runtime_cpp__test_main
 
 #静态库 开始
 # 添加静态库目标
-add_library(clangPlgVar_runtime_cxx STATIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/runtime_cpp__vars_fn.cpp"
+add_library(runtime_cxx__staticLib STATIC
+${runtime_cpp_core__SOURCES}
 )
 
 # 设置静态库目标的包含目录
-target_include_directories(clangPlgVar_runtime_cxx PUBLIC
+target_include_directories(runtime_cxx__staticLib PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/include"
 #本c++运行时 依赖模块 runtime_c__TmPnt_ThreadLocal， 所以依赖 本c++运行时 的应用 一定要添加依赖 runtime_c__TmPnt_ThreadLocal
     "${runtime_c__TmPnt_ThreadLocal__include}"
 )
 
 # 设置静态库编译选项
-target_compile_options(clangPlgVar_runtime_cxx PRIVATE
+target_compile_options(runtime_cxx__staticLib PRIVATE
 -fPIC
 )
 #静态库 结束
