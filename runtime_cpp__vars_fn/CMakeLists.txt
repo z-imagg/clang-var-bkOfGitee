@@ -7,6 +7,7 @@ MESSAGE("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(runtime_cpp_core__SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/runtime_cpp__vars_fn.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/../runtime_cpp__vars_fn/fridaHelper.cpp"
 )
 
 set(runtime_cpp__SOURCES
