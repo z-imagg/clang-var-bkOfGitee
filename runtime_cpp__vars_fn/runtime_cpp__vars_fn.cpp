@@ -104,7 +104,7 @@ if(varDeclCnt > 0){
 
     // 如果调用者不接收json串，则打印到控制台
     if(jsonTxtOut_== nullptr){
-      std::cout << jsonLineTxt;
+      std::cout << jsonLineTxt; //运行 /app2/jdk-jdk-24-0/build_home/jdk/bin/javac 漰溃, 详细见 https://prgrmz07.coding.net/p/app/d/jdk/git/tree/054566a94078594ac3e345afe5427446fcb49d13/README.md
     }
     //否则[如果jsonTxtOut_非空] ，则正常返回json文本
     else{
