@@ -131,13 +131,12 @@ bool VarDeclVst::TraverseDeclStmt(DeclStmt* declStmt){
     assert(only1P);
     //跳过for 、foreach、while 中的循环变量
     bool parentNKIsForStmt = ASTNodeKind::getFromNodeKind<ForStmt>().isSame(parentNK);
+    //   CXXForRangeStmt 就是 ForEach吧？
     bool parentNKIsForEachStmt = ASTNodeKind::getFromNodeKind<CXXForRangeStmt>().isSame(parentNK);
     bool parentNKIsWhileStmt = ASTNodeKind::getFromNodeKind<WhileStmt>().isSame(parentNK);
     if(parentNKIsForStmt || parentNKIsForEachStmt || parentNKIsWhileStmt){
       RetTrue_to_KeepOuterLoop;
     }
-    //TODO ForEach 要像 ForStmt 一样 处理么? 
-
 
   //声明语句 转为 声明们
   std::vector<const Decl*> declVec;//声明们
