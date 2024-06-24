@@ -116,6 +116,9 @@ if(varDeclCnt>0){
       __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
       //打印错误消息
       printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jTxtOLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_\n", jsonTxtLen, jTxtOLimit, __Gap_Danger_Char_Cnt, __debugVar__ErrCode__runtime_c__vars_fn);
+      //退出进程前, flush控制台输出
+      fflush(stdout);
+      fflush(stderr);
       //直接退出当前进程
       exit(Err01_Beyond_JsonTxtOutLimit);
     }
