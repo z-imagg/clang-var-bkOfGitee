@@ -19,7 +19,6 @@
 #include "list.h"
 
 //向外报出错误，方便gdb以此加断点，从而直接到达错误现场
-int __debugVar__ErrCode__runtime_c__vars_fn=0;
 #define Err01_Beyond_JsonTxtOutLimit 11
 
 //危险隔离带长度
@@ -70,6 +69,7 @@ void createVar__RtC00(_VarDeclLs *_vdLs, char* _varTypeName, int varSize, short 
 #define sds_jsonItemEnd(jsnTxt, fieldName, fieldVal)       _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\"");;
 #define sds_jsonItem(jsnTxt, fieldName, fieldVal)          _sds_jsonItem(jsnTxt, fieldName, fieldVal);  sdscat(jsnTxt, "\",");;
 
+#define _Err01MsgToFrida "Err01_Beyond_JsonTxtOutLimit"
 //【销毁变量通知】 函数右花括号前 插入 'destroyVarLs_inFn__RtC00(_varLs_ptr);'
 // 术语 jTxtOL 、 XOut_ 见 本函数声明
 void destroyVarLs_inFn__RtC00(_VarDeclLs *_vdLs, int jTxtOLimit, char* jsonTxtOut_, int* jTxtOLenOut_){
@@ -112,15 +112,11 @@ if(varDeclCnt>0){
   else if(jTxtOLimit > 0 && jsonTxtOut_ != NULL && jTxtOLenOut_ != NULL){
     //[出错,缓冲区尺寸不够] 如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接以报错退出当前进程。   解决办法是frida使用更大的缓冲区jsonTxtOut_
     if(jsonTxtLen > jTxtOLimit - __Gap_Danger_Char_Cnt){
-      //写调试变量.   gdb可以以此加条件断点'break runtime_c__vars_fn.c:96 if __debugVar__ErrCode__runtime_c__vars_fn=11(Err01_Beyond_JsonTxtOutLimit)'
-      __debugVar__ErrCode__runtime_c__vars_fn=Err01_Beyond_JsonTxtOutLimit;
-      //打印错误消息
-      printf("[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jTxtOLimit=[%d],__Gap_Danger_Char_Cnt=[%d],exitCode=[%s]; fixWay: use bigger jsonTxtOut_\n", jsonTxtLen, jTxtOLimit, __Gap_Danger_Char_Cnt, __debugVar__ErrCode__runtime_c__vars_fn);
-      //退出进程前, flush控制台输出
-      fflush(stdout);
-      fflush(stderr);
-      //直接退出当前进程
-      exit(Err01_Beyond_JsonTxtOutLimit);
+      //填写错误消息文本给frida，以告知发生了错误
+      sprintf(jsonTxtOut_, "[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jTxtOLimit=[%d],__Gap_Danger_Char_Cnt=[%d]; fixWay: use bigger jsonTxtOut_\n", jsonTxtLen, jTxtOLimit, __Gap_Danger_Char_Cnt);
+      //   填写 缓冲区中字符串实际长度
+      (*jTxtOLenOut_)=strlen(jsonTxtOut_);
+      goto _fnEnd;
     }
     //[正常,缓冲区尺寸足够] 否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
     else{
@@ -135,7 +131,7 @@ if(varDeclCnt>0){
     }
   }
 
-
+  _fnEnd:
   //释放 此if内的对象
   sdsfree(jsonTxt);
 }
