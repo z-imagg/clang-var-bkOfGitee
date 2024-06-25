@@ -10,7 +10,7 @@
 // 本模块必须被C++使用
 
 ////runtime_cpp 正文开始
-#include <iostream>
+//#include <iostream>
 #include <algorithm>
 #include <numeric>
 #include <sstream>
