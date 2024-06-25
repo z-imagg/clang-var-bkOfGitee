@@ -1,3 +1,6 @@
+[被 cmd-wrap+clang-var 正常编译、运行 的作品们](http://giteaz:3000/cl_plg/clang-var/src/tag/tag__release/work_list.md)
+
+
 ```-Xclang   -load -Xclang /fridaAnlzAp/clang-voidFnEndInsertRet/build/lib/libVFIRPlugin.so  -Xclang   -add-plugin -Xclang  VFIRPlugin```
 
 #### xx
