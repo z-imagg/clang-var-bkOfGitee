@@ -105,7 +105,7 @@ if(varDeclCnt>0){
   int jsonTxtLen=(int)sdslen(jsonTxt);
   // 如果调用者不接收json串，则打印到控制台
   if(jTxtOLimit == 0 && jsonTxtOut_ == NULL && jTxtOLenOut_ == NULL){
-    printf("%s",jsonTxt); //不再输出结果到控制台
+    printf("%s",jsonTxt); //若出参为空，则输出结果到控制台
   }
   // 否则, 如果 看起来具备接收条件 则将json串返回给调用者
   else if(jTxtOLimit > 0 && jsonTxtOut_ != NULL && jTxtOLenOut_ != NULL){
