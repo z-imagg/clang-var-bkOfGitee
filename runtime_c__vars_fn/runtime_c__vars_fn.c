@@ -103,13 +103,13 @@ if(varDeclCnt>0){
 
 
   int jsonTxtLen=(int)sdslen(jsonTxt);
-  // 如果调用者不接收json串，则打印到控制台
+  // 情况1. 如果调用者不接收json串，则打印到控制台
   if(jTxtOLimit == 0 && jsonTxtOut_ == NULL && jTxtOLenOut_ == NULL){
 //    printf("%s",jsonTxt); //若出参为空，则输出结果到控制台
   }
   // 否则, 如果 看起来具备接收条件 则将json串返回给调用者
   else if(jTxtOLimit > 0 && jsonTxtOut_ != NULL && jTxtOLenOut_ != NULL){
-    //[出错,缓冲区尺寸不够] 如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接将错误消息塞入出参。   解决办法是frida使用更大的缓冲区jsonTxtOut_
+    //情况2. [出错,缓冲区尺寸不够] 如果json文本长度 超出 返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit ，则直接将错误消息塞入出参。   解决办法是frida使用更大的缓冲区jsonTxtOut_
     if(jsonTxtLen > jTxtOLimit - __Gap_Danger_Char_Cnt){
       //填写错误消息文本给frida，以告知发生了错误
       sprintf(jsonTxtOut_, "[Err01_Beyond_JsonTxtOutLimit] ,jsonTxtLen=[%d],jTxtOLimit=[%d],__Gap_Danger_Char_Cnt=[%d]; fixWay: use bigger jsonTxtOut_\n", jsonTxtLen, jTxtOLimit, __Gap_Danger_Char_Cnt);
@@ -118,7 +118,7 @@ if(varDeclCnt>0){
       //回到函数结尾 ，用以尽快return.   不能直接退出.因为还有要释放的量
       goto _fnEnd;
     }
-    //[正常,缓冲区尺寸足够] 否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
+    //情况3. [正常,缓冲区尺寸足够] 否则[如果json文本长度 小于  返回缓冲区jsonTxtOut_的尺寸jsonTxtOutLimit] ，则正常返回json文本
     else{
       //复制jsonTxt到jsonTxtOut_
       //   sds基本路数 是 char们(0结尾) 后跟 描述量 ? 所以可以直接用memcpy?    从sds.c中函数sdscpylen看到的 ， https://github.com/antirez/sds/blob/a9a03bb3304030bb8a93823a9aeb03c157831ba9/sds.c#L427
